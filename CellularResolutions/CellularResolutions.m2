@@ -34,7 +34,7 @@ attach(CellComplex,List,RingElement) := (baseComplex,c) -> (
         )
     )
 attach(CellComplex,List) := (baseComplex,cells) -> (
-    
+    --TODO    
     )
 attach(CellComplex,List,Number) := (baseComplex,cells) -> (
     )
