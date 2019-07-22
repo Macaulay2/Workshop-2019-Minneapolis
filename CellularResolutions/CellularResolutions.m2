@@ -11,8 +11,6 @@ newPackage(
 	AuxiliaryFiles => false -- set to true if package comes with auxiliary files
     	)
 
--- hehehe mahrud wrote this
-
 export {"CellComplex"}
 
 CellComplex = new Type of MutableHashTable
@@ -36,7 +34,6 @@ attach(CellComplex,List,RingElement) := (baseComplex,c) -> (
         )
     )
 attach(CellComplex,List) := (baseComplex,cells) -> (
-    --TODO    
     )
 attach(CellComplex,List,Number) := (baseComplex,cells) -> (
     )
