@@ -1,3 +1,26 @@
+-- Example 33 of Decker-Greuel-Pfister
+-- 1 component of degree 2, 2 of degree 1
+restart
+R=ZZ/32003[a..d]
+I=ideal "b4-a3d,
+    ab3-a3c,
+    bc4-ac3d-bcd3+ad4,
+    c6-bc3d2-c3d3+bd5,
+    ac5-b2c3d-ac2d3+b2d4,
+    a2c4-a3d3+b3d3-a2cd3,
+    b3c3-a3d3,
+    ab2c3-a3cd2+b3cd2-ab2d3,
+    a2bc3-a3c2d+b3c2d-a2bd3,
+    a3c3-a3bd2,
+    a4c2-a3b2d"
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
+
+
 -- Example 34 of Decker-Greuel-Pfister
 -- This is an ideal of points which is reduced
 -- but not geometrically reduced, meaning
