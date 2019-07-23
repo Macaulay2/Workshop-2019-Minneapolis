@@ -28,12 +28,12 @@ I=ideal "su,vx,qu,xz,
     uv3-uvw+ux,
     -pu2v2+pu2w+qtx,
     tx2y-uv2z+uwz"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 25 of Decker-Greuel-Pfister
@@ -47,12 +47,12 @@ I=ideal "59ad+59ah+59dh-705d-1199h,
     -cde-377cdh-ceh-deh,
     -54acf-54adf+a+d,
     adfg+a+d"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 26 of Decker-Greuel-Pfister
@@ -84,12 +84,12 @@ I=ideal "t-b-d,
     x+y+z+t-a-c-d,
     xz+yz+xt+zt-ac-ad-cd,
     xzt-acd"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 28 of Decker-Greuel-Pfister
@@ -100,12 +100,12 @@ I=ideal "a+c+d+e+f+g+h+j-1,
     -c2k-2cdk-d2k-cek-dek-cfk-dfk-cgk-dgk-egk-fgk-chk-dhk-ehk-fhk+c+d,
     -c2l-cdl-cel-cfl-cgl-dgl-egl-fgl+c2+2cd+d2+cg+dg+ch+dh,
     -b+c+e+g+j"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 29 of Decker-Greuel-Pfister
@@ -113,12 +113,12 @@ Lold==Lnew
 restart
 R=ZZ/32003[s,t,u,x,y]
 I=ideal "s15,t15,u15,u5-s3tx+s2t2x+s2t2y-st3y"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 30 of Decker-Greuel-Pfister
@@ -135,12 +135,12 @@ I=ideal "f2h-1,
     2e2f2g2hk+2ef2g2h2k+2e2f2g2kl+4ef2g2hkl+2f2g2h2kl+2ef2g2kl2+2f2g2hkl2+2cek,
     e2f2g2k2+2ef2g2hk2+f2g2h2k2+2ef2g2k2l+2f2g2hk2l+dg2,
     -e2f2g2hk2-ef2g2h2k2-e2f2g2k2l-2ef2g2hk2l-f2g2h2k2l-ef2g2k2l2-f2g2hk2l2+a2"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 31 of Decker-Greuel-Pfister
@@ -150,12 +150,12 @@ R=ZZ/32003[t,x,y,z]
 I=ideal "x2+y2+z2-t2,
     xy+z2-1,
     xyz-x2-y2-z+1"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 32 of Decker-Greuel-Pfister
@@ -166,12 +166,12 @@ I=ideal "w2xy+w2xz+w2z2,
     tx2y+x2yz+x2z2,
     twy2+ty2z+y2z2,
     t2wx+t2wz+t2z2"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 33 of Decker-Greuel-Pfister
@@ -189,12 +189,12 @@ I=ideal "b4-a3d,
     a2bc3-a3c2d+b3c2d-a2bd3,
     a3c3-a3bd2,
     a4c2-a3b2d"
-Lold=elapsedTime decompose I;
-tally(Lold/dim)
-needsPackage "MinimalPrimes"
-installMinprimes()
-Lnew=elapsedTime decompose I;
-Lold==Lnew
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
 
 
 -- Example 34 of Decker-Greuel-Pfister
