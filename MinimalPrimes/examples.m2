@@ -1,4 +1,9 @@
+restart
 R=ZZ/32003[a..g]
+-- this is an ideal of points which is reduced
+-- but not geometrically reduced, meaning
+-- the double points arise from quadratic polynomials
+-- irreducible over the base field
 I=ideal "a2+2de+2cf+2bg+a,
     2ab+e2+2df+2cg+b,
     b2+2ac+2ef+2dg+c,
@@ -8,4 +13,9 @@ I=ideal "a2+2de+2cf+2bg+a,
     d2+2ce+2bf+2ag+g"
 needsPackage "MinimalPrimes"
 installMinprimes()
-elapsedTime decompose I
+L=elapsedTime decompose I;
+dim I
+degree I
+tally(L/degree)
+
+
