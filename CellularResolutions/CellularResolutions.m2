@@ -11,11 +11,12 @@ newPackage(
 	AuxiliaryFiles => false -- set to true if package comes with auxiliary files
     	)
 
-export {"CellComplex","Cell","cellComplex","makeCell","attach"}
+export {"CellComplex","Cell","cellComplex","makeCell","attach","label"}
 protect labelRing
 protect cells 
 protect boundary 
 protect cellDimension 
+protect label
 
 CellComplex = new Type of HashTable
 
@@ -54,9 +55,9 @@ makeCell := (lst, l) -> (
 --Boundary function, which returns a hashtable with the cells in the boundary and their degrees, which is probably \pm 1
 boundary := (cell) -> HashTable tally cell.boundary
 
---Check if something (a list) is a boundary
-isCycle = method()
-isCycle() := (lst) -> 
+--Check if something (a list) is a cycle
+-- isCycle = method()
+-- isCycle() := (lst) -> 
 
 --Attach a cell
 attach = method()
@@ -77,7 +78,7 @@ attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
 attach(CellComplex,List) := (baseComplex,cells) -> attach(baseComplex,cells,1)
 
 --Get list of cells 
-cells := (cellcomplex) -> toList cellcomplex.cells
+cellList := (cellcomplex) -> toList cellcomplex.cells
 
 ----------------------------
 
@@ -89,7 +90,7 @@ cells := (cellcomplex) -> toList cellcomplex.cells
 
 beginDocumentation()
 
-doc ///
+cdoc ///
     Key
         CellularResolutions
     Headline
