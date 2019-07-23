@@ -1,9 +1,13 @@
-restart
-R=ZZ/32003[a..g]
--- this is an ideal of points which is reduced
+-- Example 34 of Decker-Greuel-Pfister
+-- This is an ideal of points which is reduced
 -- but not geometrically reduced, meaning
 -- the double points arise from quadratic polynomials
--- irreducible over the base field
+-- irreducible over the base field.
+-- The ideal is radical so to check we have the right
+-- minimal primes it is enough to check the ideal is equal
+-- to the intersection of the compute minimal primes
+restart
+R=ZZ/32003[a..g]
 I=ideal "a2+2de+2cf+2bg+a,
     2ab+e2+2df+2cg+b,
     b2+2ac+2ef+2dg+c,
@@ -17,5 +21,5 @@ L=elapsedTime decompose I;
 dim I
 degree I
 tally(L/degree)
-
-
+radical I == I
+intersect(L) == I
