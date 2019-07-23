@@ -1,5 +1,54 @@
+-- Example 30 of Decker-Greuel-Pfister
+-- 18 components of dim 3
+restart
+R=ZZ/32003[a..l]
+I=ideal "f2h-1,
+    ek2-1,
+    g2l-1,
+    2ef2g2hk2+f2g2h2k2+2ef2g2k2l+2f2g2hk2l+f2g2k2l2+ck2,
+    2e2fg2hk2+2efg2h2k2+2e2fg2k2l+4efg2hk2l+2fg2h2k2l+2efg2k2l2+2fg2hk2l2+2bfh,
+    2e2f2ghk2+2ef2gh2k2+2e2f2gk2l+4ef2ghk2l+2f2gh2k2l+2ef2gk2l2+2f2ghk2l2+2dgl,
+    e2f2g2k2+2ef2g2hk2+2ef2g2k2l+2f2g2hk2l+f2g2k2l2+bf2,
+    2e2f2g2hk+2ef2g2h2k+2e2f2g2kl+4ef2g2hkl+2f2g2h2kl+2ef2g2kl2+2f2g2hkl2+2cek,
+    e2f2g2k2+2ef2g2hk2+f2g2h2k2+2ef2g2k2l+2f2g2hk2l+dg2,
+    -e2f2g2hk2-ef2g2h2k2-e2f2g2k2l-2ef2g2hk2l-f2g2h2k2l-ef2g2k2l2-f2g2hk2l2+a2"
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
+
+
+-- Example 31 of Decker-Greuel-Pfister
+-- Only 1 component, was it used to test independent sets?
+restart
+R=ZZ/32003[t,x,y,z]
+I=ideal "x2+y2+z2-t2,
+    xy+z2-1,
+    xyz-x2-y2-z+1"
+L=elapsedTime decompose I;
+#L
+
+
+-- Example 32 of Decker-Greuel-Pfister
+-- 6 components of dim 2, 2 of dim 1
+restart
+R=ZZ/32003[t,w,x,y,z]
+I=ideal "w2xy+w2xz+w2z2,
+    tx2y+x2yz+x2z2,
+    twy2+ty2z+y2z2,
+    t2wx+t2wz+t2z2"
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
+
+
 -- Example 33 of Decker-Greuel-Pfister
--- 1 component of degree 2, 2 of degree 1
+-- 1 component of dim 2, 2 of dim 1
 restart
 R=ZZ/32003[a..d]
 I=ideal "b4-a3d,
