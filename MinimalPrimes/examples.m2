@@ -1,3 +1,126 @@
+-- Example 23 of Decker-Greuel-Pfister
+-- 2 components of dim 4, 2 of dim 6, 1 of dim 8
+restart
+R=ZZ/32003[a..d,u..x]
+I=ideal "a+b+c+d,
+    u+v+w+x,
+    3ab+3ac+3bc+3ad+3bd+3cd+2,
+    bu+cu+du+av+cv+dv+aw+bw+dw+ax+bx+cx,
+    bcu+bdu+cdu+acv+adv+cdv+abw+adw+bdw+abx+acx+bcx,
+    abc+abd+acd+bcd,
+    bcdu+acdv+abdw+abcx"
+L1 = elapsedTime decompose I;
+scan(keys I.cache, k -> remove(I.cache,k));
+needsPackage "MinimalPrimes";
+installMinprimes();
+L2 = elapsedTime decompose I;
+all(L1,I->any(L2,J->J==I)) and all(L2,I->any(L1,J->J==I))
+
+
+
+
+-- Example 24 of Decker-Greuel-Pfister
+-- 2 components of dim 4, 2 of dim 6, 1 of dim 8
+restart
+R=ZZ/32003[p,q,s..z]
+I=ideal "su,vx,qu,xz,
+    stx+ux,
+    uv3-uvw+ux,
+    -pu2v2+pu2w+qtx,
+    tx2y-uv2z+uwz"
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
+
+
+-- Example 25 of Decker-Greuel-Pfister
+-- 2 components of dim 1, 1 of dim 3, 1 of dim 5
+restart
+R=ZZ/32003[a..h]
+I=ideal "59ad+59ah+59dh-705d-1199h,
+    330acde+330aceh+330cdeh-407acd-1642ade-1410cde-407ach-407cdh-1642aeh-2398ceh-1642deh,
+    -483acd-483ach-483cdh+821ad+705cd+821ah+1199ch+821dh,
+    13926abcde+13926abceh+13926bcdeh-9404abcd-9239abde-4968acde-13157bcde-9404abch-9404bcdh-9239abeh-4968aceh-13025bceh-9239bdeh-4968cdeh,
+    -cde-377cdh-ceh-deh,
+    -54acf-54adf+a+d,
+    adfg+a+d"
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
+
+
+-- Example 26 of Decker-Greuel-Pfister
+-- 0 dimensional, 16 reduced points, 24 double points
+-- default methods take too long
+-- we check the answer using the radical (see Example 34)
+-- to speed up radical computation we use the Unmixed option
+restart
+R=ZZ/32003[a..f]
+I=ideal "a2+d2+2ce+2bf+a,
+    2ab+2de+2cf+b,
+    b2+2ac+e2+2df+c,
+    2bc+2ad+2ef+d,
+    c2+2bd+2ae+f2+e,
+    2cd+2be+2af+f"
+needsPackage "MinimalPrimes"
+installMinprimes()
+L=elapsedTime decompose I;
+tally(L/degree)
+radical(I,Unmixed=>true) == I
+intersect(L) == I
+
+
+-- Example 27 of Decker-Greuel-Pfister
+-- 3 components of dim 4
+restart
+R=ZZ/32003[a..d,t,x..z]
+I=ideal "t-b-d,
+    x+y+z+t-a-c-d,
+    xz+yz+xt+zt-ac-ad-cd,
+    xzt-acd"
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
+
+
+-- Example 28 of Decker-Greuel-Pfister
+-- 2 components of dim 7
+restart
+R=ZZ/32003[a..h,j..l]
+I=ideal "a+c+d+e+f+g+h+j-1,
+    -c2k-2cdk-d2k-cek-dek-cfk-dfk-cgk-dgk-egk-fgk-chk-dhk-ehk-fhk+c+d,
+    -c2l-cdl-cel-cfl-cgl-dgl-egl-fgl+c2+2cd+d2+cg+dg+ch+dh,
+    -b+c+e+g+j"
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
+
+
+-- Example 29 of Decker-Greuel-Pfister
+-- One component
+restart
+R=ZZ/32003[s,t,u,x,y]
+I=ideal "s15,t15,u15,u5-s3tx+s2t2x+s2t2y-st3y"
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
+
+
 -- Example 30 of Decker-Greuel-Pfister
 -- 18 components of dim 3
 restart
@@ -27,8 +150,12 @@ R=ZZ/32003[t,x,y,z]
 I=ideal "x2+y2+z2-t2,
     xy+z2-1,
     xyz-x2-y2-z+1"
-L=elapsedTime decompose I;
-#L
+Lold=elapsedTime decompose I;
+tally(Lold/dim)
+needsPackage "MinimalPrimes"
+installMinprimes()
+Lnew=elapsedTime decompose I;
+Lold==Lnew
 
 
 -- Example 32 of Decker-Greuel-Pfister
