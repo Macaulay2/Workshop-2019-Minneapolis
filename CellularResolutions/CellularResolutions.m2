@@ -50,7 +50,7 @@ makeCell := (lst) -> (
 
 --Attach a cell
 attach = method()
-attach(CellComplex,List,RingElement) := (baseComplex,boundary,label) -> (
+attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
     c := makeCell boundary;
     n := dim c;
     if baseComplex.cells#?n 
@@ -63,12 +63,11 @@ attach(CellComplex,List,RingElement) := (baseComplex,boundary,label) -> (
 	);
     c
     )
-attach(CellComplex,List) := (baseComplex,cells) -> (
-    )
-attach(CellComplex,List,Number) := (baseComplex,cells,label) -> (
-    )
+
+attach(CellComplex,List) := (baseComplex,cells) -> attach(baseComplex,cells,1)
 
 
+----------------------------
 
 
 beginDocumentation()
