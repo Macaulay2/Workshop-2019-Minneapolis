@@ -71,17 +71,84 @@ attach(CellComplex,List) := (baseComplex,cells) -> attach(baseComplex,cells,1)
 
 
 beginDocumentation()
-document { 
-	Key => CellularResolutions,
-	Headline => "A package for cellular resolutions of monomial ideals",
-	EM "Cellular Resolutions", "TODO"
-	}
-       
+
+doc ///
+    Key
+        CellularResolutions
+    Headline
+        A package for cellular resolutions of monomial ideals
+    Description
+        Text
+            Cellular Resolutions
+///
+
+doc ///
+    Key
+        CellComplex
+    Headline
+        the class of all cell complexes
+    Description
+        Text
+            A cell complex in this context is the combinatorial data of a
+            CW-complex, i.e. a collection of cells in various dimensions along
+            with their boundary expressed as a sequence of cells along with an
+            orientation such that the boundary is a cycle.
+///
+
+doc ///
+    Key
+        cellComplex
+        (cellComplex,Ring)
+    Headline
+        create an empty cell complex
+    Usage
+        cellComplex R
+    Inputs
+        R : Ring
+            that specifies the base ring for the labels
+    Outputs
+        : CellComplex
+            an empty cell complex
+    Description
+        Text
+            This constructs an empty cell complex to which cells can be attached
+        Example
+            C = cellComplex QQ;
+            R = QQ[x,y];
+            C = cellComplex R;
+    SeeAlso
+        (attach,CellComplex,List)
+        (attach,CellComplex,List,Thing)
+///
+
+doc ///
+    Key
+        attach
+        (attach,CellComplex,List,Thing)
+        (attach,CellComplex,List)
+    Headline
+        attach a cell to a cell complex
+    Usage
+        attach(C,boundary,label)
+        attach(C,boundary)
+    Inputs
+        C : CellComplex
+            the complex to attach a cell to
+        boundary : List
+            that gives the boundary of the cell to attach as a list of pairs of cells and attaching degree
+        label : Thing
+            that gives a label to associate to the cell, default of 1
+    Outputs
+        : Cell
+            that was attached
+///
+
 end
 
 restart
+installPackage("CellularResolutions")
 loadPackage("CellularResolutions", Reload => true)
-
+viewHelp CellularResolutions
 
 C = cellComplex()
 a = attach(C,{});
