@@ -32,8 +32,11 @@ cellComplex(Ring) := (R) -> (
 --Define dimension for cell
 dim(Cell) := (cell) -> cell.cellDimension
 
+--Define dimension for cell complex 
+dim(CellComplex) := (cellComplex) -> max keys CellComplex.cells
+
 --Make cell 
-makeCell := (lst) -> (
+makeCell := (lst, l) -> (
     bdim := -1;
     for cell in lst do ( 
 	if bdim < 0 
@@ -41,12 +44,19 @@ makeCell := (lst) -> (
 	else assert(bdim == dim cell#0)
 	);
     n := bdim + 1;
-    h := new HashTable from {
+    new Cell from {
 	symbol cellDimension => n, --FIGURE IT OUT
-	symbol boundary => lst -- could verify that it's a list
-    	};
-    new Cell from h
+	symbol boundary => lst, -- could verify that it's a list
+	symbol label => l
+    	}
     );
+
+--Boundary function, which returns a hashtable with the cells in the boundary and their degrees, which is probably \pm 1
+boundary := (cell) -> HashTable tally cell.boundary
+
+--Check if something (a list) is a boundary
+isCycle = method()
+isCycle() := (lst) -> 
 
 --Attach a cell
 attach = method()
@@ -60,12 +70,19 @@ attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
 	)
     else (
 	baseComplex.cells#n = new MutableList from {c};
-	);
+	);    
     c
     )
 
 attach(CellComplex,List) := (baseComplex,cells) -> attach(baseComplex,cells,1)
 
+--Get list of cells 
+cells := (cellcomplex) -> toList cellcomplex.cells
+
+----------------------------
+
+-- THINGS TO DO:
+-- - verify that boundary is a cycle 
 
 ----------------------------
 
