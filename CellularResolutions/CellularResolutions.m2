@@ -27,8 +27,8 @@ protect cellDimension
 protect label
 
 CellComplex = new Type of HashTable
-
-Cell = new Type of HashTable
+--Note, the mutable hash table means that equality works "Correctly"
+Cell = new Type of MutableHashTable
 
 
 cellComplex = method()
@@ -88,21 +88,19 @@ attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
 	)
     else (
 	baseComplex.cells#n = new MutableList from {c};
-	);    
+	);
     c
     )
 attach(CellComplex,List) := (baseComplex,cells) -> attach(baseComplex,cells,1)
 
 isSimplexBoundary := (lst) -> (
-    if #lst==0
-    then true
-    else (
-        bdim = dim lst#0
-        all(lst,isSimplex @@ first) and
-        all(lst,i -> dim i == bdim) and
-        (#lst == bdim+2) and
-        (length lst == length unique lst) and
-        (isCycle lst)
+    if #lst==0 then return true;
+    bdim := dim first lst#0;
+    all(lst,isSimplex @@ first) and
+    all(lst,i -> dim first i == bdim) and
+    (#lst == bdim+2) and
+    (length lst == length unique (lst/first)) and
+    (isCycle lst)
     )
 
 isSimplex = method();
