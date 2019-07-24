@@ -18,11 +18,12 @@ export {"CellComplex",
         "attach",
         "isCycle",
         "attachSimplex",
-        "isSimplex"
+        "isSimplex",
+	"cells",
+	"boundary",
+	"boundaryMap"
         }
 protect labelRing
-protect cells 
-protect boundary 
 protect cellDimension
 protect label
 
@@ -64,7 +65,8 @@ chainToVirtualTally := (lst) -> (
     sum(lst, (cell,deg) -> new VirtualTally from {cell => deg})
     )
 
-boundary := (cell) -> cell.boundary
+boundary = method()
+boundary(Cell) := (cell) -> cell.boundary
 --Boundary function, returns the boundary as a VirtualTally
 boundaryTally := (cell) -> chainToVirtualTally cell.boundary
 
@@ -157,7 +159,25 @@ attachSimplex(CellComplex,List) := (baseComplex,boundary) -> (
     )
 
 --Get list of cells 
-cells := (cellcomplex) -> toList cellcomplex.cells
+cells = method();
+cells(CellComplex) := (cellComplex) -> cellComplex.cells
+
+--Create chain complex from cell complex 
+boundaryMap = method();
+boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
+    rCells := cellComplex.cells#r;
+    t := r-1;
+    tCells := cellComplex.cells#t;
+    tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
+    L := {};       
+    for F in rCells do (
+        lst := new MutableList from (#tCells:0);
+	scanPairs(boundaryTally F, (cell,deg) -> lst#(tCellsIndexed#cell) = deg);
+	L = append(L, toList lst);
+	);
+    transpose matrix L
+    );
+    
 
 ----------------------------
 
