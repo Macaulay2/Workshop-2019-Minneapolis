@@ -62,17 +62,21 @@ chainToVirtualTally := (lst) -> (
     sum(lst, (cell,deg) -> new VirtualTally from {cell => deg})
     )
 
+boundary := (cell) -> cell.boundary
 --Boundary function, returns the boundary as a VirtualTally
 boundaryTally := (cell) -> chainToVirtualTally cell.boundary
 
 --Check if a chain, represented by a list is a boundary
 isCycle = method()
-isCycle(List) := (lst) -> sum(lst,boundaryTally)==0
+isCycle(List) := (lst) ->
+    sum(lst,(c,deg) -> if deg>0
+                       then sum(deg,i -> boundaryTally c)
+                       else - sum(deg,i -> boundaryTally c))==0
 
 --Attach a cell
 attach = method()
 attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
-    c := makeCell boundary;
+    c := makeCell(boundary,label);
     if not isCycle boundary then error "Expected the boundary to be a cycle";
     n := dim c;
     if baseComplex.cells#?n 
