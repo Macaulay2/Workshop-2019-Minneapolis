@@ -16,7 +16,9 @@ export {"CellComplex",
         "cellComplex",
         "makeCell",
         "attach",
-        "isCycle"
+        "isCycle",
+        "attachSimplex",
+        "isSimplex"
         }
 protect labelRing
 protect cells 
@@ -89,8 +91,24 @@ attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
 	);    
     c
     )
-
 attach(CellComplex,List) := (baseComplex,cells) -> attach(baseComplex,cells,1)
+
+isSimplexBoundary := (lst) -> (
+    all(lst,isSimplex @@ first) and
+    (1>=length unique (lst / (dim @@ first))) and
+    (length lst == length unique lst) and
+    (isCycle lst)
+    )
+
+isSimplex = method();
+isSimplex(Cell) := cell ->
+     isSimplexBoundary boundary cell
+
+attachSimplex = method();
+attachSimplex(CellComplex,List) := (baseComplex,boundary) -> (
+    if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
+    attach(baseComplex,boundary)
+    )
 
 --Get list of cells 
 cells := (cellcomplex) -> toList cellcomplex.cells
@@ -176,11 +194,23 @@ doc ///
             that was attached
 ///
 
+TEST ///
+C = cellComplex(QQ);
+v1 = attachSimplex(C,{});
+v2 = attachSimplex(C,{});
+assert(isSimplex v1);
+assert(isSimplex v2);
+l1 = attachSimplex(C,{(v1,1),(v2,-1)});
+assert(isSimplex l1);
+///
+
+
 end
 
 restart
 installPackage("CellularResolutions")
 loadPackage("CellularResolutions", Reload => true)
+check(CellularResolutions)
 viewHelp CellularResolutions
 
 C = cellComplex()
