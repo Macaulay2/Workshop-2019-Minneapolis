@@ -191,7 +191,10 @@ boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
 	);
     map(codomain,domain,L)
     );
-    
+
+chainComplex(CellComplex) := (cellComplex) -> (
+    chainComplex apply((dim cellComplex) + 1, r -> boundaryMap(r,cellComplex))
+    );
 
 ----------------------------
 
@@ -301,6 +304,7 @@ del100 = boundaryMap(100,C);
 assert(delneg1 == map(QQ^0,QQ^1,0))
 assert(del0 == map(QQ^1,QQ^2, {{1,1}}))
 assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}))
+chainComplex C
 ///
 
 
