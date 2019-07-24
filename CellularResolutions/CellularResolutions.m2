@@ -30,7 +30,7 @@ CellComplex = new Type of HashTable
 --Note, the mutable hash table means that equality works "Correctly"
 Cell = new Type of MutableHashTable
 
-
+--TODO: Add an option to allow/disallow a single -1 cell
 cellComplex = method()
 cellComplex(Ring) := (R) -> (
     new CellComplex from {
@@ -75,9 +75,50 @@ isCycle(List) := (lst) ->
                        then sum(deg,i -> boundaryTally c)
                        else - sum(deg,i -> boundaryTally c))==0
 
+
+--Figure out an orientation automatically
+inferOrientation := (lst) -> (
+    if #lst == 2 then (
+        ret := {(lst#0,-1),(lst#1,-1)};
+        if not isCycle ret then error "The given list of cells do not form a cycle";
+        return ret
+        );
+    boundaryChain := new VirtualTally from {};
+    remainingCells := lst;
+    --the "?" based comparison is a work arround for "==" not working correctly for VirtualTally==ZZ
+    while (boundaryChain ? 0) != symbol == or #remainingCells!=0 list (
+        if (boundaryChain ? 0) == symbol ==
+        then (
+            if remainingCells===lst then error "The orientation on the cycle is non-unique";
+            nextCell := last remainingCells;
+            remainingCells = drop(remainingCells,-1);
+            (nextCell,1)
+            )
+        else (
+            c := (elements boundaryChain)#0;
+            nextElems := select(lst,c2 -> ((boundaryTally c2)#c)!=0);
+            if #nextElems==0 then error "The given list of cells do not form a cycle";
+            newBoundaryComponent := boundaryTally (nextElems#0);
+            remainingCells = delete(nextElems#0,remainingCells);--Inefficient
+            --check sign equality
+            if (boundaryChain#c)*(newBoundaryComponent#c)<0
+            then (
+                boundaryChain = boundaryChain + boundaryTally (nextElems#0);
+                (nextElems#0,1)
+                )
+            else (
+                boundaryChain = boundaryChain - boundaryTally (nextElems#0);
+                (nextElems#0,-1)
+                )
+            )
+        )
+    )
+
 --Attach a cell
 attach = method()
 attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
+    if #boundary!=0 and instance(boundary#0,Cell)
+    then return attach(baseComplex,inferOrientation boundary,label);
     c := makeCell(boundary,label);
     if not isCycle boundary then error "Expected the boundary to be a cycle";
     n := dim c;
@@ -109,6 +150,8 @@ isSimplex(Cell) := cell ->
 
 attachSimplex = method();
 attachSimplex(CellComplex,List) := (baseComplex,boundary) -> (
+    if #boundary!=0 and instance(boundary#0,Cell)
+    then return attachSimplex(baseComplex,inferOrientation boundary);
     if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
     attach(baseComplex,boundary)
     )
@@ -207,9 +250,12 @@ assert(dim C==0);
 assert(dim v1==0);
 assert(dim v2==0);
 l1 = attachSimplex(C,{(v1,1),(v2,-1)});
+l2 = attachSimplex(C,{v1,v2});
 assert(isSimplex l1);
+assert(isSimplex l2);
 assert(dim C==1);
 assert(dim l1==1);
+assert(dim l2==1);
 ///
 
 
