@@ -71,15 +71,15 @@ boundaryTally := (cell) -> chainToVirtualTally cell.boundary
 --Check if a chain, represented by a list is a boundary
 isCycle = method()
 isCycle(List) := (lst) ->
-    sum(lst,(c,deg) -> if deg>0
-                       then sum(deg,i -> boundaryTally c)
-                       else - sum(deg,i -> boundaryTally c))==0
+    (sum(lst,(c,deg) -> if deg>0
+                        then sum(deg,i -> boundaryTally c)
+                        else - sum(deg,i -> boundaryTally c)) ? 0) == symbol ==
 
 
 --Figure out an orientation automatically
 inferOrientation := (lst) -> (
-    if #lst == 2 then (
-        ret := {(lst#0,-1),(lst#1,-1)};
+    if #lst == 2 and (dim first lst) == 0 then (
+        ret := {(lst#0,1),(lst#1,-1)};
         if not isCycle ret then error "The given list of cells do not form a cycle";
         return ret
         );
@@ -89,13 +89,14 @@ inferOrientation := (lst) -> (
     while (boundaryChain ? 0) != symbol == or #remainingCells!=0 list (
         if (boundaryChain ? 0) == symbol ==
         then (
-            if remainingCells===lst then error "The orientation on the cycle is non-unique";
+            if remainingCells =!= lst then error "The orientation on the cycle is non-unique";
             nextCell := last remainingCells;
             remainingCells = drop(remainingCells,-1);
+            boundaryChain = boundaryTally nextCell;
             (nextCell,1)
             )
         else (
-            c := (elements boundaryChain)#0;
+            c := (keys boundaryChain)#0;
             nextElems := select(lst,c2 -> ((boundaryTally c2)#c)!=0);
             if #nextElems==0 then error "The given list of cells do not form a cycle";
             newBoundaryComponent := boundaryTally (nextElems#0);
@@ -256,6 +257,9 @@ assert(isSimplex l2);
 assert(dim C==1);
 assert(dim l1==1);
 assert(dim l2==1);
+f1 = attach(C,{l1,l2});
+assert(dim C==2);
+assert(dim f1==2);
 ///
 
 
