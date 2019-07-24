@@ -42,7 +42,7 @@ cellComplex(Ring) := (R) -> (
 dim(Cell) := (cell) -> cell.cellDimension
 
 --Define dimension for cell complex 
-dim(CellComplex) := (cellComplex) -> max keys CellComplex.cells
+dim(CellComplex) := (cellComplex) -> max keys cellComplex.cells
 
 --Make cell 
 makeCell := (lst, l) -> (
@@ -200,8 +200,13 @@ v1 = attachSimplex(C,{});
 v2 = attachSimplex(C,{});
 assert(isSimplex v1);
 assert(isSimplex v2);
+assert(dim C==0);
+assert(dim v1==0);
+assert(dim v2==0);
 l1 = attachSimplex(C,{(v1,1),(v2,-1)});
 assert(isSimplex l1);
+assert(dim C==1);
+assert(dim l1==1);
 ///
 
 
