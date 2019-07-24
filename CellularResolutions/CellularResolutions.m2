@@ -162,21 +162,34 @@ attachSimplex(CellComplex,List) := (baseComplex,boundary) -> (
 --Get list of cells 
 cells = method();
 cells(CellComplex) := (cellComplex) -> cellComplex.cells
+cells(ZZ,CellComplex) := (r,cellComplex) -> (
+    if cellComplex.cells#?r 
+    then cellComplex.cells#r
+    else {}
+    )
 
 --Create chain complex from cell complex 
 boundaryMap = method();
 boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
-    rCells := cellComplex.cells#r;
+    R := cellComplex.labelRing;
     t := r-1;
-    tCells := cellComplex.cells#t;
-    tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
-    L := {};       
-    for F in rCells do (
-        lst := new MutableList from (#tCells:0);
-	scanPairs(boundaryTally F, (cell,deg) -> lst#(tCellsIndexed#cell) = deg);
-	L = append(L, toList lst);
+    if r == 0 then (
+	return matrix { apply(toList cellComplex.cells#0,i->1_R) };
 	);
-    transpose matrix L
+    if r == -1 then (
+	return map(R^0,R^1,0) );
+    rCells := cells(r,cellComplex);
+    tCells := cells(t,cellComplex);
+    domain := R^(#rCells);
+    codomain := R^(#tCells);
+    tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
+    i := 0;       
+    L := flatten for F in rCells list (
+	l := apply(pairs boundaryTally F, (cell,deg) -> (tCellsIndexed#cell,i) => deg_R);
+	i = i+1;
+	l
+	);
+    map(codomain,domain,L)
     );
     
 
@@ -280,6 +293,14 @@ assert(dim l2==1);
 f1 = attach(C,{l1,l2});
 assert(dim C==2);
 assert(dim f1==2);
+delneg1 = boundaryMap(-1,C);
+del0 = boundaryMap(0,C);
+del1 = boundaryMap(1,C);
+del2 = boundaryMap(2,C);
+del100 = boundaryMap(100,C);
+assert(delneg1 == map(QQ^0,QQ^1,0))
+assert(del0 == map(QQ^1,QQ^2, {{1,1}}))
+assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}))
 ///
 
 
