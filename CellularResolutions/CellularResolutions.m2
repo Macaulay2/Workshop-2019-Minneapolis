@@ -94,10 +94,15 @@ attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
 attach(CellComplex,List) := (baseComplex,cells) -> attach(baseComplex,cells,1)
 
 isSimplexBoundary := (lst) -> (
-    all(lst,isSimplex @@ first) and
-    (1>=length unique (lst / (dim @@ first))) and
-    (length lst == length unique lst) and
-    (isCycle lst)
+    if #lst==0
+    then true
+    else (
+        bdim = dim lst#0
+        all(lst,isSimplex @@ first) and
+        all(lst,i -> dim i == bdim) and
+        (#lst == bdim+2) and
+        (length lst == length unique lst) and
+        (isCycle lst)
     )
 
 isSimplex = method();
