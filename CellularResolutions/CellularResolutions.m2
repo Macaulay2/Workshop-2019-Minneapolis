@@ -1,15 +1,16 @@
 -- -*- coding: utf-8 -*-
 newPackage(
-	"CellularResolutions",
-    	Version => "0.1", 
-    	Date => "July 22, 2019",
-    	Authors => {
-	     {Name => "Jay Yang", Email => "jkyang@umn.edu"},
-             {Name => "Aleksandra Sobieska", Email => "ola@math.tamu.edu"}
-	     },
-    	Headline => "A package for cellular resolutions of monomial ideals",
-	AuxiliaryFiles => false -- set to true if package comes with auxiliary files
-    	)
+    "CellularResolutions",
+    Version => "0.1",
+    Date => "July 22, 2019",
+    Authors => {
+        {Name => "Jay Yang", Email => "jkyang@umn.edu"},
+        {Name => "Aleksandra Sobieska", Email => "ola@math.tamu.edu"}
+        },
+    Headline => "A package for cellular resolutions of monomial ideals",
+    AuxiliaryFiles => false, -- set to true if package comes with auxiliary files
+    PackageExports => {"SimplicialComplexes"}
+    )
 
 export {"CellComplex",
         "Cell",
@@ -19,13 +20,11 @@ export {"CellComplex",
         "isCycle",
         "attachSimplex",
         "isSimplex",
-	"cells",
-	"boundary",
-	"boundaryMap"
+	"cells"
         }
 protect labelRing
 protect cellDimension
-protect label
+-- protect label
 
 CellComplex = new Type of HashTable
 --Note, the mutable hash table means that equality works "Correctly"
@@ -81,7 +80,6 @@ chainToVirtualTally := (lst) -> (
     else sum(lst, (cell,deg) -> new VirtualTally from {cell => deg})
     )
 
-boundary = method()
 boundary(Cell) := (cell) -> cell.boundary
 --Boundary function, returns the boundary as a VirtualTally
 boundaryTally := (cell) -> chainToVirtualTally cell.boundary
@@ -174,6 +172,14 @@ attachSimplex(CellComplex,List) := (baseComplex,boundary) -> (
     if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
     attach(baseComplex,boundary)
     )
+attachSimplex(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
+    if #boundary!=0 and instance(boundary#0,Cell)
+    then return attachSimplex(baseComplex,inferOrientation boundary);
+    if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
+    attach(baseComplex,boundary,label)
+    )
+
+
 
 --Get list of cells 
 cells = method();
@@ -185,8 +191,7 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     )
 
 --Create chain complex from cell complex 
-boundaryMap = method();
-boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
+boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     R := cellComplex.labelRing;
     t := r-1;
     if r == 0 then (
@@ -209,8 +214,8 @@ boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
     );
 
 chainComplex(CellComplex) := (cellComplex) -> (
-    (chainComplex apply((dim cellComplex) + 1, r -> boundaryMap(r,cellComplex)))[1]
-    ); 
+    (chainComplex apply((dim cellComplex) + 1, r -> boundary(r,cellComplex)))[1]
+    );
 
 ----------------------------
 
@@ -239,6 +244,18 @@ doc ///
             CW-complex, i.e. a collection of cells in various dimensions along
             with their boundary expressed as a sequence of cells along with an
             orientation such that the boundary is a cycle.
+///
+
+doc ///
+    Key
+        Cell
+    Headline
+        the class of all cells in cell complexes
+    Description
+        Text
+            This class represents a single cell in a cell complex.
+    SeeAlso
+        CellComplex
 ///
 
 doc ///
@@ -281,13 +298,138 @@ doc ///
         C : CellComplex
             the complex to attach a cell to
         boundary : List
-            that gives the boundary of the cell to attach as a list of pairs of cells and attaching degree
+            that gives the boundary of the cell to attach either as a list of pairs
+            of cells and their orientation, or a list of cells.
         label : Thing
-            that gives a label to associate to the cell, default of 1
+            that gives a label to associate to the cell, otherwise attempt to
+            infer it based on the labels on the boundary
     Outputs
         : Cell
             that was attached
+    Description
+        Text
+            This function adds cells to a cell complex, if given a list of cells
+            without any orientation information, then it attempts to infer the
+            orientation.
+        Text
+            If given an empty list for the boundary, the function adds a 0-cell
+            (a vertex).
+        Text
+            If not given a label, and the labels on the boundary are monomials
+            or monomial ideals, from the same ring, then the label is the lcm
+            of the labels of the boundary
+        Example
+            C = cellComplex(QQ[x,y]);
+            a = attach(C,{},x);
+            b = attach(C,{},y);
+            c1 = attach(C,{(a,1),(a,-1)});
+            c2 = attach(C,{a,a});
+            c3 = attach(C,{a,b});
+    Caveat
+        This function does not check that there is a valid map from the boundary
+        of a n-cell to the given boundary. It only checks that the boundary
+        forms a cycle in homology.
+    SeeAlso
+        cellComplex
+        attachSimplex
 ///
+
+doc ///
+    Key
+        attachSimplex
+        (attachSimplex,CellComplex,List,Thing)
+        (attachSimplex,CellComplex,List)
+    Headline
+        attach a simplex to a cell complex
+    Usage
+        attachSimplex(C,boundary,label)
+        attachSimplex(C,boundary)
+    Inputs
+        C : CellComplex
+            the complex to attach a cell to
+        boundary : List
+            that gives the boundary of the cell to attach either as a list of pairs
+            of cells and their orientation, or a list of cells.
+        label : Thing
+            that gives a label to associate to the cell, otherwise attempt to
+            infer it based on the labels on the boundary
+    Outputs
+        : Cell
+            that was attached
+    Description
+        Text
+            This funciton will only attach simplicies, and it will verify that
+            the attached cell is a simplex, as such does not have the caveat of
+            @TO attach@. Otherwise it has the same behavior. This is
+            particularly useful in constructing \Delta-complexes.
+    SeeAlso
+        cellComplex
+        attach
+///
+
+doc ///
+    Key
+        (dim,CellComplex)
+    Headline
+        compute the dimension of a cell complex
+    Usage
+        dim C
+    Inputs
+        C : CellComplex
+            the complex to compute the dimension of
+    Outputs
+        :ZZ
+            the dimension of the complex
+    SeeAlso
+        (dim,Cell)
+///
+
+doc ///
+    Key
+        (dim,Cell)
+    Headline
+        compute the dimension of a cell
+    Usage
+        dim C
+    Inputs
+        C : Cell
+            the cell to compute the dimension of
+    Outputs
+        :ZZ
+            the dimension of the cell
+    SeeAlso
+        (dim,CellComplex)
+///
+
+doc ///
+    Key
+        (chainComplex,CellComplex)
+    Headline
+        compute the cellular chain complex for a cell complex
+    Usage
+        chainComplex C
+    Inputs
+        C : CellComplex
+            the complex to compute the chain complex
+    Outputs
+        :ChainComplex
+            the dimension of the complex
+    Description
+        Text
+            This constructs the cellular chain complex for a cell complex,
+            taking into account the labels on the cells
+        Example
+            R = QQ[x]
+            C = cellComplex(R);
+            a = attachSimplex(C,{},x);
+            b1 = attach(C,{a,a});
+            b2 = attach(C,{a,a});
+            chainComplex C
+    SeeAlso
+        (boundary,ZZ,CellComplex)
+        (chainComplex,SimplicialComplex)
+///
+
 
 TEST ///
 C = cellComplex(QQ);
@@ -312,11 +454,11 @@ assert(HH_2(CchainComplex)==0);
 f1 = attach(C,{l1,l2});
 assert(dim C==2);
 assert(dim f1==2);
-delneg1 = boundaryMap(-1,C);
-del0 = boundaryMap(0,C);
-del1 = boundaryMap(1,C);
-del2 = boundaryMap(2,C);
-del100 = boundaryMap(100,C);
+delneg1 = boundary(-1,C);
+del0 = boundary(0,C);
+del1 = boundary(1,C);
+del2 = boundary(2,C);
+del100 = boundary(100,C);
 assert(delneg1 == map(QQ^0,QQ^1,0));
 assert(del0 == map(QQ^1,QQ^2, {{1,1}}));
 assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}));
