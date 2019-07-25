@@ -235,6 +235,18 @@ doc ///
 
 doc ///
     Key
+        Cell
+    Headline
+        the class of all cells in cell complexes
+    Description
+        Text
+            This class represents a single cell in a cell complex.
+    SeeAlso
+        CellComplex
+///
+
+doc ///
+    Key
         cellComplex
         (cellComplex,Ring)
     Headline
@@ -273,13 +285,138 @@ doc ///
         C : CellComplex
             the complex to attach a cell to
         boundary : List
-            that gives the boundary of the cell to attach as a list of pairs of cells and attaching degree
+            that gives the boundary of the cell to attach either as a list of pairs
+            of cells and their orientation, or a list of cells.
         label : Thing
-            that gives a label to associate to the cell, default of 1
+            that gives a label to associate to the cell, otherwise attempt to
+            infer it based on the labels on the boundary
     Outputs
         : Cell
             that was attached
+    Description
+        Text
+            This function adds cells to a cell complex, if given a list of cells
+            without any orientation information, then it attempts to infer the
+            orientation.
+        Text
+            If given an empty list for the boundary, the function adds a 0-cell
+            (a vertex).
+        Text
+            If not given a label, and the labels on the boundary are monomials
+            or monomial ideals, from the same ring, then the label is the lcm
+            of the labels of the boundary
+        Example
+            C = cellComplex(QQ[x,y]);
+            a = attach(C,{},x);
+            b = attach(C,{},y);
+            c1 = attach(C,{(a,1),(a,-1)});
+            c2 = attach(C,{a,a});
+            c3 = attach(C,{a,b});
+    Caveat
+        This function does not check that there is a valid map from the boundary
+        of a n-cell to the given boundary. It only checks that the boundary
+        forms a cycle in homology.
+    SeeAlso
+        cellComplex
+        attachSimplex
 ///
+
+doc ///
+    Key
+        attachSimplex
+        (attachSimplex,CellComplex,List,Thing)
+        (attachSimplex,CellComplex,List)
+    Headline
+        attach a simplex to a cell complex
+    Usage
+        attachSimplex(C,boundary,label)
+        attachSimplex(C,boundary)
+    Inputs
+        C : CellComplex
+            the complex to attach a cell to
+        boundary : List
+            that gives the boundary of the cell to attach either as a list of pairs
+            of cells and their orientation, or a list of cells.
+        label : Thing
+            that gives a label to associate to the cell, otherwise attempt to
+            infer it based on the labels on the boundary
+    Outputs
+        : Cell
+            that was attached
+    Description
+        Text
+            This funciton will only attach simplicies, and it will verify that
+            the attached cell is a simplex, as such does not have the caveat of
+            @TO attach@. Otherwise it has the same behavior. This is
+            particularly useful in constructing \Delta-complexes.
+    SeeAlso
+        cellComplex
+        attach
+///
+
+doc ///
+    Key
+        (dim,CellComplex)
+    Headline
+        compute the dimension of a cell complex
+    Usage
+        dim C
+    Inputs
+        C : CellComplex
+            the complex to compute the dimension of
+    Outputs
+        :ZZ
+            the dimension of the complex
+    SeeAlso
+        (dim,Cell)
+///
+
+doc ///
+    Key
+        (dim,Cell)
+    Headline
+        compute the dimension of a cell
+    Usage
+        dim C
+    Inputs
+        C : Cell
+            the cell to compute the dimension of
+    Outputs
+        :ZZ
+            the dimension of the cell
+    SeeAlso
+        (dim,CellComplex)
+///
+
+doc ///
+    Key
+        (chainComplex,CellComplex)
+    Headline
+        compute the cellular chain complex for a cell complex
+    Usage
+        chainComplex C
+    Inputs
+        C : CellComplex
+            the complex to compute the chain complex
+    Outputs
+        :ChainComplex
+            the dimension of the complex
+    Description
+        Text
+            This constructs the cellular chain complex for a cell complex,
+            taking into account the labels on the cells
+        Example
+            R = QQ[x]
+            C = cellComplex(R);
+            a = attachSimplex(C,{},x);
+            b1 = attach(C,{a,a});
+            b2 = attach(C,{a,a});
+            chainComplex C
+    SeeAlso
+        (boundary,ZZ,CellComplex)
+        (chainComplex,SimplicialComplex)
+///
+
 
 TEST ///
 C = cellComplex(QQ);
