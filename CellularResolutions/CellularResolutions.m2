@@ -20,11 +20,11 @@ export {"CellComplex",
         "isCycle",
         "attachSimplex",
         "isSimplex",
-	"cells"
+	"cells",
+        "cellLabel"
         }
 protect labelRing
 protect cellDimension
--- protect label
 
 CellComplex = new Type of HashTable
 --Note, the mutable hash table means that equality works "Correctly"
@@ -56,6 +56,9 @@ dim(CellComplex) := (cellComplex) -> max keys cellComplex.cells
 
 --Define ring for cell complex 
 ring(CellComplex) := (cellComplex) -> cellComplex.labelRing
+
+cellLabel = method()
+cellLabel(Cell) := (cell) -> cell.label
 
 --Make cell 
 makeCell := (lst, l) -> (
@@ -440,6 +443,7 @@ assert(isSimplex v2);
 assert(dim C==0);
 assert(dim v1==0);
 assert(dim v2==0);
+assert(cellLabel v1 == 1)
 l1 = attachSimplex(C,{(v1,1),(v2,-1)});
 l2 = attachSimplex(C,{v1,v2});
 assert(isSimplex l1);
@@ -454,6 +458,7 @@ assert(HH_2(CchainComplex)==0);
 f1 = attach(C,{l1,l2});
 assert(dim C==2);
 assert(dim f1==2);
+assert(cellLabel f1 == 1);
 delneg1 = boundary(-1,C);
 del0 = boundary(0,C);
 del1 = boundary(1,C);
