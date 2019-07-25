@@ -116,7 +116,7 @@ inferOrientation := (lst) -> (
             )
         else (
             c := (keys boundaryChain)#0;
-            nextElems := select(lst,c2 -> ((boundaryTally c2)#c)!=0);
+            nextElems := select(remainingCells,c2 -> (boundaryTally c2)#?c);
             if #nextElems==0 then error "The given list of cells do not form a cycle";
             newBoundaryComponent := boundaryTally (nextElems#0);
             remainingCells = delete(nextElems#0,remainingCells);--Inefficient
