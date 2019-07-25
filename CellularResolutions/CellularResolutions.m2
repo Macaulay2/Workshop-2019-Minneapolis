@@ -196,7 +196,7 @@ boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
     );
 
 chainComplex(CellComplex) := (cellComplex) -> (
-    chainComplex apply((dim cellComplex) + 1, r -> boundaryMap(r,cellComplex))
+    (chainComplex apply((dim cellComplex) + 1, r -> boundaryMap(r,cellComplex)))[1]
     ); -- should this be shifted by a degree? i.e. r -> bM(r-1,cellComplex) ?
 
 ----------------------------
@@ -292,6 +292,10 @@ assert(isSimplex l2);
 assert(dim C==1);
 assert(dim l1==1);
 assert(dim l2==1);
+CchainComplex = chainComplex C;
+assert(HH_0(CchainComplex)==0);
+assert(prune HH_1(CchainComplex)==QQ^1);
+assert(HH_2(CchainComplex)==0);
 f1 = attach(C,{l1,l2});
 assert(dim C==2);
 assert(dim f1==2);
@@ -304,7 +308,10 @@ assert(delneg1 == map(QQ^0,QQ^1,0));
 assert(del0 == map(QQ^1,QQ^2, {{1,1}}));
 assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}));
 assert(del100 == map(QQ^0,QQ^0,{}));
-chainComplex C;
+CchainComplex = chainComplex C;
+assert(HH_0(CchainComplex)==0);
+assert(HH_1(CchainComplex)==0);
+assert(HH_2(CchainComplex)==0);
 ///
 
 TEST /// 
@@ -317,6 +324,10 @@ assert(isSimplex a);
 assert(not isSimplex b1);
 assert(not isSimplex b2);
 DchainComplex = chainComplex D;
+assert(HH_0(DchainComplex)==0);
+R = ring D;
+assert(prune HH_1(DchainComplex)==R^2);
+assert(HH_2(DchainComplex)==0);
 ///
 --assert(prune HH_0 DchainComplex == (QQ[x])^0); --this is triggering an error
 --assert(prune HH_1 DchainComplex == (QQ[x])^2); --this is triggering an error
