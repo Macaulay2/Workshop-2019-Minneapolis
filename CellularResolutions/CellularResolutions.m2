@@ -161,6 +161,14 @@ attachSimplex(CellComplex,List) := (baseComplex,boundary) -> (
     if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
     attach(baseComplex,boundary)
     )
+attachSimplex(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
+    if #boundary!=0 and instance(boundary#0,Cell)
+    then return attachSimplex(baseComplex,inferOrientation boundary);
+    if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
+    attach(baseComplex,boundary,label)
+    )
+
+
 
 --Get list of cells 
 cells = method();
