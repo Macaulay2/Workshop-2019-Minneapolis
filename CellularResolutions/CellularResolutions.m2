@@ -208,12 +208,15 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     t := r-1;
     rCells := cells(r,cellComplex);
     tCells := cells(t,cellComplex);
-    domain := R^(#rCells);
-    codomain := R^(#tCells);
+    domainModules := apply(toList rCells,c -> image matrix {{(cellLabel c)_R}})
+    codomainModules := apply(toList tCells,c -> image matrix {{(cellLabel c)_R}})
+    domain := fold((a,b) -> a ++ b, R^0, domainModules);
+    codomain := fold((a,b) -> a ++ b, R^0, codomainModules);
     tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
     i := 0;
     L := flatten for F in rCells list (
-	l := apply(pairs boundaryTally F, (cell,deg) -> (tCellsIndexed#cell,i) => deg_R*(cellLabel F/cellLabel cell)_R);
+	l := apply(pairs boundaryTally F,
+            (cell,deg) -> (tCellsIndexed#cell,i) => deg_R*(cellLabel F//cellLabel cell));
 	i = i+1;
 	l
 	);
@@ -506,6 +509,7 @@ lxz = attachSimplex(D,{vx,vz});
 fxyz = attachSimplex(D,{lxy,lyz,lxz});
 assert(cellLabel fxyz == x*y*z);
 C = (chainComplex D)[-1];
+assert(HH_0(C)==cokernel matrix {{x,y,z}});
 ///
 
 
