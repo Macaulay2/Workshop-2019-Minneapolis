@@ -45,6 +45,9 @@ dim(Cell) := (cell) -> cell.cellDimension
 --Define dimension for cell complex 
 dim(CellComplex) := (cellComplex) -> max keys cellComplex.cells
 
+--Define ring for cell complex 
+ring(CellComplex) := (cellComplex) -> cellComplex.labelRing
+
 --Make cell 
 makeCell := (lst, l) -> (
     bdim := -1;
@@ -183,7 +186,7 @@ boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
     domain := R^(#rCells);
     codomain := R^(#tCells);
     tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
-    i := 0;       
+    i := 0;
     L := flatten for F in rCells list (
 	l := apply(pairs boundaryTally F, (cell,deg) -> (tCellsIndexed#cell,i) => deg_R);
 	i = i+1;
@@ -194,15 +197,11 @@ boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
 
 chainComplex(CellComplex) := (cellComplex) -> (
     chainComplex apply((dim cellComplex) + 1, r -> boundaryMap(r,cellComplex))
-    );
+    ); -- should this be shifted by a degree? i.e. r -> bM(r-1,cellComplex) ?
 
 ----------------------------
 
--- THINGS TO DO:
--- - verify that boundary is a cycle 
-
 ----------------------------
-
 
 beginDocumentation()
 
@@ -301,11 +300,26 @@ del0 = boundaryMap(0,C);
 del1 = boundaryMap(1,C);
 del2 = boundaryMap(2,C);
 del100 = boundaryMap(100,C);
-assert(delneg1 == map(QQ^0,QQ^1,0))
-assert(del0 == map(QQ^1,QQ^2, {{1,1}}))
-assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}))
-chainComplex C
+assert(delneg1 == map(QQ^0,QQ^1,0));
+assert(del0 == map(QQ^1,QQ^2, {{1,1}}));
+assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}));
+assert(del100 == map(QQ^0,QQ^0,{}));
+chainComplex C;
 ///
+
+TEST /// 
+D = cellComplex(QQ[x]);
+a = attach(D,{});
+b1 = attach(D,{(a,1),(a,-1)});
+b2 = attach(D,{(a,1),(a,-1)});
+assert(dim D == 1);
+assert(isSimplex a);
+assert(not isSimplex b1);
+assert(not isSimplex b2);
+DchainComplex = chainComplex D;
+///
+--assert(prune HH_0 DchainComplex == (QQ[x])^0); --this is triggering an error
+--assert(prune HH_1 DchainComplex == (QQ[x])^2); --this is triggering an error
 
 
 end
