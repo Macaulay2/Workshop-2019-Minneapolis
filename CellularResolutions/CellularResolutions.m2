@@ -1,15 +1,16 @@
 -- -*- coding: utf-8 -*-
 newPackage(
-	"CellularResolutions",
-    	Version => "0.1", 
-    	Date => "July 22, 2019",
-    	Authors => {
-	     {Name => "Jay Yang", Email => "jkyang@umn.edu"},
-             {Name => "Aleksandra Sobieska", Email => "ola@math.tamu.edu"}
-	     },
-    	Headline => "A package for cellular resolutions of monomial ideals",
-	AuxiliaryFiles => false -- set to true if package comes with auxiliary files
-    	)
+    "CellularResolutions",
+    Version => "0.1",
+    Date => "July 22, 2019",
+    Authors => {
+        {Name => "Jay Yang", Email => "jkyang@umn.edu"},
+        {Name => "Aleksandra Sobieska", Email => "ola@math.tamu.edu"}
+        },
+    Headline => "A package for cellular resolutions of monomial ideals",
+    AuxiliaryFiles => false, -- set to true if package comes with auxiliary files
+    PackageExports => {"SimplicialComplexes"}
+    )
 
 export {"CellComplex",
         "Cell",
@@ -19,13 +20,11 @@ export {"CellComplex",
         "isCycle",
         "attachSimplex",
         "isSimplex",
-	"cells",
-	"boundary",
-	"boundaryMap"
+	"cells"
         }
 protect labelRing
 protect cellDimension
-protect label
+-- protect label
 
 CellComplex = new Type of HashTable
 --Note, the mutable hash table means that equality works "Correctly"
@@ -68,7 +67,6 @@ chainToVirtualTally := (lst) -> (
     sum(lst, (cell,deg) -> new VirtualTally from {cell => deg})
     )
 
-boundary = method()
 boundary(Cell) := (cell) -> cell.boundary
 --Boundary function, returns the boundary as a VirtualTally
 boundaryTally := (cell) -> chainToVirtualTally cell.boundary
@@ -180,8 +178,7 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     )
 
 --Create chain complex from cell complex 
-boundaryMap = method();
-boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
+boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     R := cellComplex.labelRing;
     t := r-1;
     if r == 0 then (
@@ -204,7 +201,7 @@ boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
     );
 
 chainComplex(CellComplex) := (cellComplex) -> (
-    (chainComplex apply((dim cellComplex) + 1, r -> boundaryMap(r,cellComplex)))[1]
+    (chainComplex apply((dim cellComplex) + 1, r -> boundary(r,cellComplex)))[1]
     ); -- should this be shifted by a degree? i.e. r -> bM(r-1,cellComplex) ?
 
 ----------------------------
@@ -307,11 +304,11 @@ assert(HH_2(CchainComplex)==0);
 f1 = attach(C,{l1,l2});
 assert(dim C==2);
 assert(dim f1==2);
-delneg1 = boundaryMap(-1,C);
-del0 = boundaryMap(0,C);
-del1 = boundaryMap(1,C);
-del2 = boundaryMap(2,C);
-del100 = boundaryMap(100,C);
+delneg1 = boundary(-1,C);
+del0 = boundary(0,C);
+del1 = boundary(1,C);
+del2 = boundary(2,C);
+del100 = boundary(100,C);
 assert(delneg1 == map(QQ^0,QQ^1,0));
 assert(del0 == map(QQ^1,QQ^2, {{1,1}}));
 assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}));
