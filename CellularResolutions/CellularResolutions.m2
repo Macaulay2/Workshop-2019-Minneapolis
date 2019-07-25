@@ -134,6 +134,14 @@ inferOrientation := (lst) -> (
         )
     )
 
+inferLabel := (boundary,R) -> (
+    if boundary == {}
+    then 1_R
+    else if instance(boundary#0,Sequence)
+         then inferLabel(boundary/first,R)
+         else lcm(boundary/cellLabel)
+    )
+
 --Attach a cell
 attach = method()
 attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
@@ -152,7 +160,8 @@ attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
 	);
     c
     )
-attach(CellComplex,List) := (baseComplex,cells) -> attach(baseComplex,cells,1)
+attach(CellComplex,List) := (baseComplex,cells) ->
+    attach(baseComplex,cells,inferLabel(cells,baseComplex.labelRing))
 
 isSimplexBoundary := (lst) -> (
     if #lst==0 then return true;
@@ -488,6 +497,20 @@ assert(HH_0(DchainComplex)==0);
 R = ring D;
 assert(prune HH_1(DchainComplex)==R^2);
 assert(HH_2(DchainComplex)==0);
+///
+
+TEST ///
+R = QQ[x,y,z];
+D = cellComplex(R);
+vx = attachSimplex(D,{},x);
+vy = attachSimplex(D,{},y);
+vz = attachSimplex(D,{},z);
+lxy = attachSimplex(D,{vx,vy});
+lyz = attachSimplex(D,{vy,vz});
+lxz = attachSimplex(D,{vx,vz});
+fxyz = attachSimplex(D,{lxy,lyz,lxz});
+assert(cellLabel fxyz == x*y*z);
+C = (chainComplex D)[-1];
 ///
 
 
