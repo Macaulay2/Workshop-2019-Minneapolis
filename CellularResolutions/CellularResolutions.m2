@@ -197,11 +197,6 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
 boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     R := cellComplex.labelRing;
     t := r-1;
-    if r == 0 then (
-	return matrix { apply(toList cellComplex.cells#0,i->1_R) };
-	);
---    if r == -1 then (
---	return map(R^0,R^1,0) );
     rCells := cells(r,cellComplex);
     tCells := cells(t,cellComplex);
     domain := R^(#rCells);
@@ -209,7 +204,7 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
     i := 0;
     L := flatten for F in rCells list (
-	l := apply(pairs boundaryTally F, (cell,deg) -> (tCellsIndexed#cell,i) => deg_R);
+	l := apply(pairs boundaryTally F, (cell,deg) -> (tCellsIndexed#cell,i) => deg_R*(cellLabel F/cellLabel cell)_R);
 	i = i+1;
 	l
 	);
