@@ -31,12 +31,22 @@ CellComplex = new Type of HashTable
 --Note, the mutable hash table means that equality works "Correctly"
 Cell = new Type of MutableHashTable
 
---TODO: Add an option to allow/disallow a single -1 cell
+--Creates a single negative 1 dimensional cell 
+neg1Cell := new Cell from {
+    symbol cellDimension => -1,
+    symbol boundary => {},
+    symbol label => 1 
+    };
+
+--Adds a single -1 cell by default
+--TODO: create an option to make a void complex
 cellComplex = method()
 cellComplex(Ring) := (R) -> (
     new CellComplex from {
     	symbol labelRing => R,
-    	symbol cells => new MutableHashTable from {}}
+    	symbol cells => new MutableHashTable from 
+	    {-1 => new MutableList from {neg1Cell}}
+	}
     )
 
 --Define dimension for cell
@@ -57,15 +67,18 @@ makeCell := (lst, l) -> (
 	else assert(bdim == dim cell#0)
 	);
     n := bdim + 1;
+    bd := if lst == {} then {(neg1Cell,1)} else lst;
     new Cell from {
 	symbol cellDimension => n, --FIGURE IT OUT
-	symbol boundary => lst, -- could verify that it's a list
+	symbol boundary => bd, -- could verify that it's a list
 	symbol label => l
     	}
     );
 
 chainToVirtualTally := (lst) -> (
-    sum(lst, (cell,deg) -> new VirtualTally from {cell => deg})
+    if lst == {}
+    then new VirtualTally from {}
+    else sum(lst, (cell,deg) -> new VirtualTally from {cell => deg})
     )
 
 boundary = method()
@@ -179,8 +192,8 @@ boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
     if r == 0 then (
 	return matrix { apply(toList cellComplex.cells#0,i->1_R) };
 	);
-    if r == -1 then (
-	return map(R^0,R^1,0) );
+--    if r == -1 then (
+--	return map(R^0,R^1,0) );
     rCells := cells(r,cellComplex);
     tCells := cells(t,cellComplex);
     domain := R^(#rCells);
@@ -197,7 +210,7 @@ boundaryMap(ZZ,CellComplex) := (r,cellComplex) -> (
 
 chainComplex(CellComplex) := (cellComplex) -> (
     (chainComplex apply((dim cellComplex) + 1, r -> boundaryMap(r,cellComplex)))[1]
-    ); -- should this be shifted by a degree? i.e. r -> bM(r-1,cellComplex) ?
+    ); 
 
 ----------------------------
 
@@ -329,8 +342,6 @@ R = ring D;
 assert(prune HH_1(DchainComplex)==R^2);
 assert(HH_2(DchainComplex)==0);
 ///
---assert(prune HH_0 DchainComplex == (QQ[x])^0); --this is triggering an error
---assert(prune HH_1 DchainComplex == (QQ[x])^2); --this is triggering an error
 
 
 end
