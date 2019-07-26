@@ -390,13 +390,30 @@ doc ///
             that was attached
     Description
         Text
-            This funciton will only attach simplicies, and it will verify that
+            This function will only attach simplices, and it will verify that
             the attached cell is a simplex, as such does not have the caveat of
             @TO attach@. Otherwise it has the same behavior. This is
             particularly useful in constructing \Delta-complexes.
     SeeAlso
         cellComplex
         attach
+///
+
+doc /// 
+    Key 
+    	cellLabel 
+	(cellLabel,Cell)
+    Headline 
+    	return the label of a cell 
+    Usage 
+    	cellLabel C
+    Inputs
+    	C : Cell 
+    Outputs
+    	: Thing 
+	    the label of the cell
+    SeeAlso
+    	Cell
 ///
 
 doc ///
@@ -427,10 +444,28 @@ doc ///
         C : Cell
             the cell to compute the dimension of
     Outputs
-        :ZZ
+        : ZZ
             the dimension of the cell
     SeeAlso
         (dim,CellComplex)
+///
+
+doc ///
+    Key 
+    	(cells,CellComplex)
+    Headline 
+    	return the cells of a cell complex
+    Usage
+    	cells C
+    Inputs 
+    	C : CellComplex  
+	    the CellComplex whose cells are to be returned 
+    Outputs 
+    	: MutableHashTable 
+	    the cells of C 
+    SeeAlso 
+    	(cells,ZZ,CellComplex)
+    	
 ///
 
 doc ///
@@ -461,6 +496,8 @@ doc ///
         (boundary,ZZ,CellComplex)
         (chainComplex,SimplicialComplex)
 ///
+
+
 
 
 TEST ///
