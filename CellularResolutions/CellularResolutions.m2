@@ -134,12 +134,21 @@ inferOrientation := (lst) -> (
         )
     )
 
+--Convert it to a submodule of R^1 if possible
+toModule := (R,x) -> (
+    if instance(x,Module) then return x;
+    if instance(x,Ideal) then return module x;
+    if instance(x,RingElement) then return image matrix {{x}};
+    if instance(x,Number) then return image matrix {{x_R}};
+    error "Expected a Module, Ideal, RingElement, or Number"
+    )
+
 inferLabel := (boundary,R) -> (
-    if boundary == {}
-    then 1_R
-    else if instance(boundary#0,Sequence)
-         then inferLabel(boundary/first,R)
-         else lcm(boundary/cellLabel)
+    if boundary == {} then return 1_R;
+    if instance(boundary#0,Sequence) then return inferLabel(boundary/first,R);
+    if all(boundary/cellLabel,b -> instance(b,RingElement) or instance(b,Number))
+    then lcm(boundary/cellLabel)
+    else intersect(boundary/cellLabel/(x -> toModule(R,x)))
     )
 
 --Attach a cell
@@ -202,25 +211,38 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     else {}
     )
 
+--take a hash table of RingElements/Matricies, and make a matrix, or 0
+sparseBlockMatrix := (ht) -> (
+    ks := keys ht;
+    if ks === {} then return 0;
+    rows := max (ks/first) + 1;
+    columns := max (ks/(p->p#1)) + 1;
+    maybeHt := p -> (
+        if ht#?p then ht#p else 0
+        );
+    matrix apply(rows,i -> apply(columns, j -> maybeHt(i,j))))
+
 --Create chain complex from cell complex 
 boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     R := cellComplex.labelRing;
     t := r-1;
     rCells := cells(r,cellComplex);
     tCells := cells(t,cellComplex);
-    domainModules := apply(toList rCells,c -> image matrix {{(cellLabel c)_R}})
-    codomainModules := apply(toList tCells,c -> image matrix {{(cellLabel c)_R}})
-    domain := fold((a,b) -> a ++ b, R^0, domainModules);
-    codomain := fold((a,b) -> a ++ b, R^0, codomainModules);
+    domainModules :=
+        new HashTable from apply(toList rCells, c-> (c,toModule(R,cellLabel c)));
+    codomainModules :=
+        new HashTable from apply(toList tCells,c -> (c,toModule(R,cellLabel c)));
+    domain := fold((a,b) -> a ++ b, R^0, values domainModules);
+    codomain := fold((a,b) -> a ++ b, R^0, values codomainModules);
     tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
     i := 0;
     L := flatten for F in rCells list (
 	l := apply(pairs boundaryTally F,
-            (cell,deg) -> (tCellsIndexed#cell,i) => deg_R*(cellLabel F//cellLabel cell));
+            (cell,deg) -> (tCellsIndexed#cell,i) => deg_R*inducedMap(codomainModules#cell,domainModules#F));
 	i = i+1;
 	l
 	);
-    map(codomain,domain,L)
+    map(codomain,domain,sparseBlockMatrix new HashTable from L)
     );
 
 chainComplex(CellComplex) := (cellComplex) -> (
@@ -497,6 +519,7 @@ assert(prune HH_1(DchainComplex)==R^2);
 assert(HH_2(DchainComplex)==0);
 ///
 
+--Koszul Complex via Talyor resolutions
 TEST ///
 R = QQ[x,y,z];
 D = cellComplex(R);
@@ -511,6 +534,42 @@ assert(cellLabel fxyz == x*y*z);
 C = (chainComplex D)[-1];
 assert(HH_0(C)==cokernel matrix {{x,y,z}});
 ///
+
+--Monomial ideal labels
+TEST ///
+R = QQ[x,y,z];
+D = cellComplex(R);
+vx = attachSimplex(D,{},ideal(x));
+vy = attachSimplex(D,{},ideal(y));
+vz = attachSimplex(D,{},ideal(z));
+lxy = attachSimplex(D,{vx,vy});
+lyz = attachSimplex(D,{vy,vz});
+lxz = attachSimplex(D,{vx,vz});
+fxyz = attachSimplex(D,{lxy,lyz,lxz});
+C = (chainComplex D)[-1];
+HH_0(C)==R^1/module ideal(x,y,z)
+HH_1(C)==0
+
+///
+
+--Non principal labels
+TEST ///
+R = QQ[x,y,z];
+D = cellComplex(R);
+vx = attachSimplex(D,{},ideal(x,y));
+vy = attachSimplex(D,{},ideal(y,z));
+vz = attachSimplex(D,{},ideal(x,z));
+lxy = attachSimplex(D,{vx,vy});
+lyz = attachSimplex(D,{vy,vz});
+lxz = attachSimplex(D,{vx,vz});
+fxyz = attachSimplex(D,{lxy,lyz,lxz});
+C = (chainComplex D)[-1];
+prune C
+needsPackage "ChainComplexExtras"
+prune HH source cartanEilenbergResolution C
+prune HH C
+///
+
 
 
 end
