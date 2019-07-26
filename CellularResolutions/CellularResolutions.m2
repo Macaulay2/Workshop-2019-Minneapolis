@@ -567,6 +567,19 @@ assert(HH_1(CchainComplex)==0);
 assert(HH_2(CchainComplex)==0);
 ///
 
+-- RP2
+TEST ///
+v = newCell {};
+l = newCell {v,v};
+f = newCell {(l,1),(l,1)};
+C = cellComplex(ZZ,{f});
+f
+C
+assert(dim C===2);
+prune HH chainComplex C
+assert(HH_1 chainComplex C == cokernel matrix {{2}})
+///
+
 TEST /// 
 a = newCell {};
 b1 = newCell {(a,1),(a,-1)};
@@ -581,6 +594,20 @@ assert(HH_0(DchainComplex)==0);
 R = ring D;
 assert(prune HH_1(DchainComplex)==R^2);
 assert(HH_2(DchainComplex)==0);
+///
+
+
+TEST ///
+R = QQ[w,x,y,z]
+C = simplicialComplex monomialIdeal(w*x,w*y);
+dim C
+D = cellComplex(QQ,C);
+D
+assert(dim D==2);
+assert(#cells(2,D)==1);
+assert(#cells(1,D)==4);
+assert(#cells(0,D)==4);
+assert(#cells(-1,D)==1);
 ///
 
 --Koszul Complex via Talyor resolutions
@@ -631,19 +658,6 @@ D = cellComplex(R,{fxyz});
 C = (chainComplex D)[-1];
 assert(C.dd^2==0);
 ///
-
-TEST ///
-R = QQ[w,x,y,z]
-C = simplicialComplex monomialIdeal(w*x,w*y);
-D = cellComplex(QQ,C);
-assert(dim D==2);
-assert(#cells(2,D)==1);
-assert(#cells(1,D)==4);
-assert(#cells(0,D)==4);
-assert(#cells(-1,D)==1);
-///
-
-
 
 end
 
