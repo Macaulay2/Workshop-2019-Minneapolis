@@ -21,7 +21,10 @@ export {"CellComplex",
         "attachSimplex",
         "isSimplex",
 	"cells",
-        "cellLabel"
+        "cellLabel",
+        "newCell",
+        "newSimplexCell",
+        "neg1Cell"
         }
 protect labelRing
 protect cellDimension
@@ -31,20 +34,31 @@ CellComplex = new Type of HashTable
 Cell = new Type of MutableHashTable
 
 --Creates a single negative 1 dimensional cell 
-neg1Cell := new Cell from {
+neg1Cell = new Cell from {
     symbol cellDimension => -1,
     symbol boundary => {},
     symbol label => 1 
     };
 
+--returns a hashtable of lists of cells indexed by dimension
+cellsFromMaxCells := lst -> (
+    pendingCells := set lst;
+    finishedCells := {};
+    while #pendingCells !=0 do (
+        c := (elements pendingCells)#0;
+        pendingCells = pendingCells + ((set ((boundary c)/first)) - finishedCells) - {c};
+        finishedCells = append(finishedCells,c);
+        );
+    partition(dim,finishedCells)
+    )
+
 --Adds a single -1 cell by default
 --TODO: create an option to make a void complex
 cellComplex = method()
-cellComplex(Ring) := (R) -> (
+cellComplex(Ring,List) := (R,maxCells) -> (
     new CellComplex from {
     	symbol labelRing => R,
-    	symbol cells => new MutableHashTable from 
-	    {-1 => new MutableList from {neg1Cell}}
+        symbol cells => cellsFromMaxCells maxCells
 	}
     )
 
@@ -143,34 +157,30 @@ toModule := (R,x) -> (
     error "Expected a Module, Ideal, RingElement, or Number"
     )
 
-inferLabel := (boundary,R) -> (
-    if boundary == {} then return 1_R;
-    if instance(boundary#0,Sequence) then return inferLabel(boundary/first,R);
+inferLabel := boundary -> (
+    if boundary == {} then return 1;
+    if instance(boundary#0,Sequence) then return boundary/first//inferLabel;
     if all(boundary/cellLabel,b -> instance(b,RingElement) or instance(b,Number))
-    then lcm(boundary/cellLabel)
-    else intersect(boundary/cellLabel/(x -> toModule(R,x)))
+    then boundary/cellLabel//lcm
+    else (
+        rings := select(boundary/cellLabel, b -> not (instance(b,RingElement) or instance(b,Number)))/ring;
+        nonNumberRings := select(rings,r -> ancestor(Number,r));
+        R := if nonNumberRings==={} then rings#0 else nonNumberRings#0;
+        boundary/cellLabel/(x -> toModule(R,x))//intersect
+        )
     )
 
 --Attach a cell
-attach = method()
-attach(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
+newCell = method()
+newCell(List,Thing) := (boundary,label) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
-    then return attach(baseComplex,inferOrientation boundary,label);
-    c := makeCell(boundary,label);
+    then return newCell(inferOrientation boundary,label);
     if not isCycle boundary then error "Expected the boundary to be a cycle";
-    n := dim c;
-    if baseComplex.cells#?n 
-    then(
-        i := #baseComplex.cells#n;
-        baseComplex.cells#n#i=c;
-	)
-    else (
-	baseComplex.cells#n = new MutableList from {c};
-	);
+    c := makeCell(boundary,label);
     c
     )
-attach(CellComplex,List) := (baseComplex,cells) ->
-    attach(baseComplex,cells,inferLabel(cells,baseComplex.labelRing))
+newCell(List) := (cells) ->
+    newCell(cells,inferLabel cells)
 
 isSimplexBoundary := (lst) -> (
     if #lst==0 then return true;
@@ -186,18 +196,18 @@ isSimplex = method();
 isSimplex(Cell) := cell ->
      isSimplexBoundary boundary cell
 
-attachSimplex = method();
-attachSimplex(CellComplex,List) := (baseComplex,boundary) -> (
+newSimplexCell = method();
+newSimplexCell(List) := (boundary) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
-    then return attachSimplex(baseComplex,inferOrientation boundary);
+    then return newSimplexCell inferOrientation boundary;
     if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
-    attach(baseComplex,boundary)
+    newCell boundary
     )
-attachSimplex(CellComplex,List,Thing) := (baseComplex,boundary,label) -> (
+newSimplexCell(List,Thing) := (boundary,label) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
-    then return attachSimplex(baseComplex,inferOrientation boundary);
+    then return newSimplexCell(inferOrientation boundary,label);
     if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
-    attach(baseComplex,boundary,label)
+    newCell(boundary,label)
     )
 
 
@@ -293,110 +303,110 @@ doc ///
 doc ///
     Key
         cellComplex
-        (cellComplex,Ring)
+        (cellComplex,Ring,List)
     Headline
-        create an empty cell complex
+        create an cell complex
     Usage
-        cellComplex R
+        cellComplex(R,maxCells)
     Inputs
         R : Ring
-            that specifies the base ring for the labels
+            that specifies the base ring for interpreting the labels
+        naxCells : List
+            that specifies the maximal cells for the complex
     Outputs
         : CellComplex
-            an empty cell complex
+            a cell complex
     Description
         Text
-            This constructs an empty cell complex to which cells can be attached
+            This function constructs a cell complex from a list of cells
         Example
-            C = cellComplex QQ;
+            c = newCell {}
+            C = cellComplex(QQ,{c});
             R = QQ[x,y];
-            C = cellComplex R;
+            C = cellComplex(R,{c});
     SeeAlso
-        (attach,CellComplex,List)
-        (attach,CellComplex,List,Thing)
+        (newCell,List)
+        (newCell,List,Thing)
 ///
 
 doc ///
     Key
-        attach
-        (attach,CellComplex,List,Thing)
-        (attach,CellComplex,List)
+        newCell
+        (newCell,List,Thing)
+        (newCell,List)
     Headline
-        attach a cell to a cell complex
+        creates a new cell
     Usage
-        attach(C,boundary,label)
-        attach(C,boundary)
+        newCell(boundary,label)
+        newCell(boundary)
     Inputs
-        C : CellComplex
-            the complex to attach a cell to
         boundary : List
-            that gives the boundary of the cell to attach either as a list of pairs
+            that gives the boundary of the new cell either as a list of pairs
             of cells and their orientation, or a list of cells.
         label : Thing
             that gives a label to associate to the cell, otherwise attempt to
             infer it based on the labels on the boundary
     Outputs
         : Cell
-            that was attached
+            that was created
     Description
         Text
-            This function adds cells to a cell complex, if given a list of cells
-            without any orientation information, then it attempts to infer the
-            orientation.
+            This function creates a new cell, to be added to a cell complex,
+            if given a list of cells without any orientation information, it
+            attempts to infer the orientation.
         Text
-            If given an empty list for the boundary, the function adds a 0-cell
-            (a vertex).
+            If given an empty list for the boundary, the function creates a
+            0-cell (a vertex).
         Text
             If not given a label, and the labels on the boundary are monomials
             or monomial ideals, from the same ring, then the label is the lcm
             of the labels of the boundary
         Example
-            C = cellComplex(QQ[x,y]);
-            a = attach(C,{},x);
-            b = attach(C,{},y);
-            c1 = attach(C,{(a,1),(a,-1)});
-            c2 = attach(C,{a,a});
-            c3 = attach(C,{a,b});
+            R = QQ[x,y]
+            a = newCell({},x);
+            b = newCell({},y);
+            c1 = newCell {(a,1),(a,-1)};
+            c2 = newCell {a,a};
+            c3 = newCell {a,b};
+            C = cellComplex(R,{c1,c2,c3});
     Caveat
         This function does not check that there is a valid map from the boundary
         of a n-cell to the given boundary. It only checks that the boundary
         forms a cycle in homology.
     SeeAlso
         cellComplex
-        attachSimplex
+        newSimplexCell
 ///
 
 doc ///
     Key
-        attachSimplex
-        (attachSimplex,CellComplex,List,Thing)
-        (attachSimplex,CellComplex,List)
+        newSimplexCell
+        (newSimplexCell,List,Thing)
+        (newSimplexCell,List)
     Headline
-        attach a simplex to a cell complex
+        create a new cell
     Usage
-        attachSimplex(C,boundary,label)
-        attachSimplex(C,boundary)
+        newSimplexCell(boundary,label)
+        newSimplexCell(boundary)
     Inputs
-        C : CellComplex
-            the complex to attach a cell to
         boundary : List
-            that gives the boundary of the cell to attach either as a list of pairs
+            that gives the boundary of the new cell either as a list of pairs
             of cells and their orientation, or a list of cells.
         label : Thing
             that gives a label to associate to the cell, otherwise attempt to
             infer it based on the labels on the boundary
     Outputs
         : Cell
-            that was attached
+            that was created
     Description
         Text
-            This function will only attach simplices, and it will verify that
-            the attached cell is a simplex, as such does not have the caveat of
-            @TO attach@. Otherwise it has the same behavior. This is
+            This function will only create simplices, and it will verify that
+            the new cell is a simplex, as such does not have the caveat of
+            @TO newCell@. Otherwise it has the same behavior. This is
             particularly useful in constructing \Delta-complexes.
     SeeAlso
         cellComplex
-        attach
+        newCell
 ///
 
 doc /// 
@@ -487,41 +497,45 @@ doc ///
             taking into account the labels on the cells
         Example
             R = QQ[x]
-            C = cellComplex(R);
-            a = attachSimplex(C,{},x);
-            b1 = attach(C,{a,a});
-            b2 = attach(C,{a,a});
+            a = newSimplexCell({},x);
+            b1 = newCell {a,a};
+            b2 = newCell {a,a};
+            C = cellComplex(R,{b1,b2});
             chainComplex C
     SeeAlso
         (boundary,ZZ,CellComplex)
         (chainComplex,SimplicialComplex)
 ///
 
-
+TEST ///
+assert(dim cellComplex(QQ,{}) === -infinity);
+assert(dim cellComplex(QQ,{neg1Cell}) === -1);
+///
 
 
 TEST ///
-C = cellComplex(QQ);
-v1 = attachSimplex(C,{});
-v2 = attachSimplex(C,{});
+v1 = newSimplexCell {};
+v2 = newSimplexCell {};
 assert(isSimplex v1);
 assert(isSimplex v2);
-assert(dim C==0);
-assert(dim v1==0);
-assert(dim v2==0);
-assert(cellLabel v1 == 1)
-l1 = attachSimplex(C,{(v1,1),(v2,-1)});
-l2 = attachSimplex(C,{v1,v2});
+assert(dim v1===0);
+assert(dim v2===0);
+assert(v1 =!= v2);
+assert(cellLabel v1 === 1)
+l1 = newSimplexCell {(v1,1),(v2,-1)};
+l2 = newSimplexCell {v1,v2};
 assert(isSimplex l1);
 assert(isSimplex l2);
-assert(dim C==1);
+assert(l1=!=l2);
 assert(dim l1==1);
 assert(dim l2==1);
+C = cellComplex(QQ,{l1,l2});
 CchainComplex = chainComplex C;
 assert(HH_0(CchainComplex)==0);
 assert(prune HH_1(CchainComplex)==QQ^1);
 assert(HH_2(CchainComplex)==0);
-f1 = attach(C,{l1,l2});
+f1 = newCell {l1,l2};
+C = cellComplex(QQ,{f1});
 assert(dim C==2);
 assert(dim f1==2);
 assert(cellLabel f1 == 1);
@@ -541,10 +555,10 @@ assert(HH_2(CchainComplex)==0);
 ///
 
 TEST /// 
-D = cellComplex(QQ[x]);
-a = attach(D,{});
-b1 = attach(D,{(a,1),(a,-1)});
-b2 = attach(D,{(a,1),(a,-1)});
+a = newCell({});
+b1 = newCell({(a,1),(a,-1)});
+b2 = newCell({(a,1),(a,-1)});
+D = cellComplex(QQ[x],{b1,b2});
 assert(dim D == 1);
 assert(isSimplex a);
 assert(not isSimplex b1);
@@ -559,15 +573,15 @@ assert(HH_2(DchainComplex)==0);
 --Koszul Complex via Talyor resolutions
 TEST ///
 R = QQ[x,y,z];
-D = cellComplex(R);
-vx = attachSimplex(D,{},x);
-vy = attachSimplex(D,{},y);
-vz = attachSimplex(D,{},z);
-lxy = attachSimplex(D,{vx,vy});
-lyz = attachSimplex(D,{vy,vz});
-lxz = attachSimplex(D,{vx,vz});
-fxyz = attachSimplex(D,{lxy,lyz,lxz});
-assert(cellLabel fxyz == x*y*z);
+vx = newSimplexCell({},x);
+vy = newSimplexCell({},y);
+vz = newSimplexCell({},z);
+lxy = newSimplexCell({vx,vy});
+lyz = newSimplexCell({vy,vz});
+lxz = newSimplexCell({vx,vz});
+fxyz = newSimplexCell({lxy,lyz,lxz});
+assert(cellLabel fxyz === x*y*z);
+D = cellComplex(R,{fxyz});
 C = (chainComplex D)[-1];
 assert(HH_0(C)==cokernel matrix {{x,y,z}});
 ///
@@ -575,14 +589,14 @@ assert(HH_0(C)==cokernel matrix {{x,y,z}});
 --Monomial ideal labels
 TEST ///
 R = QQ[x,y,z];
-D = cellComplex(R);
-vx = attachSimplex(D,{},ideal(x));
-vy = attachSimplex(D,{},ideal(y));
-vz = attachSimplex(D,{},ideal(z));
-lxy = attachSimplex(D,{vx,vy});
-lyz = attachSimplex(D,{vy,vz});
-lxz = attachSimplex(D,{vx,vz});
-fxyz = attachSimplex(D,{lxy,lyz,lxz});
+vx = newSimplexCell({},ideal(x));
+vy = newSimplexCell({},ideal(y));
+vz = newSimplexCell({},ideal(z));
+lxy = newSimplexCell({vx,vy});
+lyz = newSimplexCell({vy,vz});
+lxz = newSimplexCell({vx,vz});
+fxyz = newSimplexCell({lxy,lyz,lxz});
+D = cellComplex(R,{fxyz});
 C = (chainComplex D)[-1];
 HH_0(C)==R^1/module ideal(x,y,z)
 HH_1(C)==0
@@ -592,19 +606,16 @@ HH_1(C)==0
 --Non principal labels
 TEST ///
 R = QQ[x,y,z];
-D = cellComplex(R);
-vx = attachSimplex(D,{},ideal(x,y));
-vy = attachSimplex(D,{},ideal(y,z));
-vz = attachSimplex(D,{},ideal(x,z));
-lxy = attachSimplex(D,{vx,vy});
-lyz = attachSimplex(D,{vy,vz});
-lxz = attachSimplex(D,{vx,vz});
-fxyz = attachSimplex(D,{lxy,lyz,lxz});
+vx = newSimplexCell({},ideal(x,y));
+vy = newSimplexCell({},ideal(y,z));
+vz = newSimplexCell({},ideal(x,z));
+lxy = newSimplexCell {vx,vy};
+lyz = newSimplexCell {vy,vz};
+lxz = newSimplexCell {vx,vz};
+fxyz = newSimplexCell {lxy,lyz,lxz};
+D = cellComplex(R,{fxyz});
 C = (chainComplex D)[-1];
 prune C
-needsPackage "ChainComplexExtras"
-prune HH source cartanEilenbergResolution C
-prune HH C
 ///
 
 
@@ -616,24 +627,4 @@ installPackage("CellularResolutions")
 loadPackage("CellularResolutions", Reload => true)
 check(CellularResolutions)
 viewHelp CellularResolutions
-
-C = cellComplex()
-a = attach(C,{});
-b = attach(C,{});
-
-C = cellComplex(R);
-a = attach0Cell(C,"a");
-b = attach0Cell(C,"b");
-
-C = cellComplex({"a","b"})
-
-
-a = make0Cell("a");
-b = make0Cell("b");
-C = cellComplex({a,b});
-
-l1 = attach(C,{a,b});
-l2 = attach(C,{a,b});
-attach(C,{l1,l2});
-
 
