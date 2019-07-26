@@ -233,7 +233,7 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     else {}
     )
 
---take a hash table of RingElements/Matricies, and make a matrix, or 0
+--take a hash table of RingElements/Matrices, and make a matrix, or 0
 sparseBlockMatrix := (ht) -> (
     ks := keys ht;
     if ks === {} then return 0;
@@ -449,7 +449,7 @@ doc ///
         C : CellComplex
             the complex to compute the dimension of
     Outputs
-        :ZZ
+        : ZZ
             the dimension of the complex
     SeeAlso
         (dim,Cell)
@@ -490,6 +490,45 @@ doc ///
     	
 ///
 
+doc /// 
+    Key
+    	(cells,ZZ,CellComplex)
+    Headline 
+    	return the cells of a cell complex 
+    Usage 
+    	cells(ZZ,C)
+    Inputs 
+    	r : ZZ
+	    the dimension of the cells to be returned 
+    	C : CellComplex 
+	    the CellComplex whose r-cells are to be returned
+    Outputs
+    	: MutableList 
+	    the r-cells of C
+///
+
+doc /// 
+    Key 
+    	boundary 
+	(boundary, ZZ, CellComplex) 
+    Headline 
+    	compute the boundary map of a cell complex from r-faces to (r-1)-faces 
+    Usage 
+    	boundary(ZZ,CellComplex) 
+    Inputs 
+    	r : ZZ
+	    the source cell-dimension 
+	C : CellComplex 
+	    the CellComplex 
+    Outputs 
+    	: Matrix 
+	    the boundary map from r-faces to (r-1)-faces of C
+    SeeAlso 
+    (chainComplex,CellComplex)
+    (boundary,SimplicialComplex)
+    (chainComplex,SimplicialComplex) 
+///
+
 doc ///
     Key
         (chainComplex,CellComplex)
@@ -516,6 +555,7 @@ doc ///
             chainComplex C
     SeeAlso
         (boundary,ZZ,CellComplex)
+	(boundary,SimplicialComplex)
         (chainComplex,SimplicialComplex)
 ///
 
@@ -583,7 +623,7 @@ assert(prune HH_1(DchainComplex)==R^2);
 assert(HH_2(DchainComplex)==0);
 ///
 
---Koszul Complex via Talyor resolutions
+--Koszul Complex via Taylor resolutions
 TEST ///
 R = QQ[x,y,z];
 vx = newSimplexCell({},x);
