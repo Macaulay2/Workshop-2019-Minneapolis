@@ -1,0 +1,9 @@
+Our group worked to implement the construction of and methods relating to toric maps.
+
+1) Old code was debugged and documented.
+
+2) Method "isProper" was rewritten. Significant speedup.
+
+3) Pullbacks of Cartier divisors was implemented and documented.
+
+4) Currently considering pullbacks of coherent sheaves and a "isSurjective" method.
