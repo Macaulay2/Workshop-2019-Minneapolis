@@ -1,0 +1,19 @@
+TO DO in CellularResolutions package: 
+
+General: 
+-- Documentation documentation documentation 
+-- Clean up the SimplicialComplexes package
+
+Specific: 
+-- Add tools for cohomology 
+-- Add homology function that can be applied directly to the cell complex
+-- Create a way of giving nice output for cells/cell complexes (net)
+-- Figure out a "good solution" for the -1 cell
+-- Get a cell complex from a polytope 
+-- Make a relabel function 
+-- New attach function that takes for input a cell complex and a boundary (and a label?), 
+    and returns a new cell complex with a cell attached there
+-- Cache results 
+-- Options for including a -1 cell 
+-- Make labelRing optional (just make it QQ (or ZZ?) by default) 
+-- Add a database of common complexes 
