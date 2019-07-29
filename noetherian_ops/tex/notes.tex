@@ -1,0 +1,324 @@
+\documentclass[letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts,amssymb,amsbsy,amsmath} % Math
+\usepackage{bm} % Bold
+\usepackage[inline,shortlabels]{enumitem} % Inline enumeration
+\usepackage{listings} % Code snippets
+\usepackage{fouriernc} %Aalto font
+\usepackage{amsthm} % Theorems
+\usepackage{cleveref} % Clever reference
+\usepackage{commath} % Common math
+\usepackage{booktabs} % Tables
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{relsize}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{booktabs}
+
+\usetikzlibrary{patterns}
+
+
+
+
+%%%%% THEOREMS %%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{theoremq}[theorem]{Theorem(maybe?)}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+%%%%% OPERATORS %%%%%%
+\DeclareMathOperator*{\Aut}{Aut}
+\DeclareMathOperator*{\sgn}{sgn}
+\DeclareMathOperator*{\im}{Im}
+\DeclareMathOperator*{\End}{End}
+\DeclareMathOperator*{\Tr}{Tr}
+\DeclareMathOperator*{\N}{N}
+\DeclareMathOperator*{\Spec}{Spec}
+\DeclareMathOperator*{\Relint}{Relint}
+\DeclareMathOperator*{\Conv}{Conv}
+\DeclareMathOperator*{\Cone}{Cone}
+\DeclareMathOperator*{\id}{id}
+\DeclareMathOperator*{\proj}{proj}
+\DeclareMathOperator*{\tr}{tr}
+\DeclareMathOperator*{\Hom}{Hom}
+\newcommand{\bigast}{\mathop{\Huge \mathlarger{\mathlarger{*}}}}
+\newcommand{\ot}{\leftarrow}
+% \DeclareMathOperator*{\bigast}{\raisebox{-0.6ex}{\scalebox{2.5}{$\ast$}}}
+
+
+\title{Noetherian operators}
+\author{Marc Harkonen}
+
+\begin{document}
+\maketitle
+\section{Intro} % (fold)
+\label{sec:intro}
+\begin{definition}
+	Let $I \in \mathbb{C}[x_1,\dotsc,x_n]$ be an ideal. The set $N \subset \mathbb{C}[x_1,\dotsc,x_n]\langle \partial_1 ,\dotsc, \partial_n \rangle$ is a set of \emph{Noetherian operators} for $I$ if
+	\begin{align*}
+		f \in I \iff d \bullet f \in \sqrt{I} \; \forall d \in N.
+	\end{align*}
+\end{definition}
+
+The article \cite{damiano} has algorithms to compute Noetherian operators in the zero dimensional case. These algorithms are implemented in \texttt{nops.m2}. The caveat is that we assume that the variety corresponding to the ideal is the origin.
+
+For higher dimensions, we assume the ideal is in general position. If not, use Noether Normalization to find a linear change of coordinates that puts the ideal in general position. Then we can compute Noetherian operators with the changed coordinates, and change coordinates back to get Noetherian operators for the original ideal. TODO: details on this procedure.
+% section intro (end)
+
+
+\section{Macaulay matrices} % (fold)
+\label{sec:macaulay_matrices}
+We can attempt to compute annihilators of an ideal $I = \langle f_1,\dotsc,f_n \rangle$ by using Macaulay matrix based approach. Fix a limit for the degrees of monomials: $n_x$ is the highest degree of and $x$ monomial, and $n_\partial$ is the highest degree of a $\partial$ monomial. Then, create a (large) vector $R = \{x^\alpha f_i\}$ for all $|\alpha| \leq n_x$ and all generators $f_i$ of $I$. Next create a vector $C = \{\partial^\beta\}$ for all $|\beta| \leq n_\partial$. We will create a matrix $M$ of dimensions $|R| \times |C|$ indexed by elements of $R,C$. The entry corresponding to row $x^\alpha f_i$ and column $\partial^\beta$ will be
+\begin{align}
+	M_{\alpha,i;\beta} = \partial^\beta \bullet x^\alpha f_i \pmod{\sqrt I} \label{eq:macaulay_matrix_entries}
+\end{align}
+
+Let $v \in \ker M \subset (\mathbb{C}[x])^{|C|}$. This means that for all $\alpha,i$ we have
+\begin{align}
+	\left(\sum_{|\beta|\leq n_\partial} v_\beta \partial^\beta\right) \bullet x^\alpha f_i = 0 \pmod{\sqrt I}. \label{eq:operators_from_macaulay_matrix}
+\end{align}
+
+Since $x^\alpha f_i \in I$, the property above is a necessary condition of a set of Noetherian operators.
+
+Questions:
+\begin{itemize}
+	\item Does the kernel of $M$ give Noetherian operators? Basis of the kernel?
+	\item How to choose $n_x$, $n_\partial$? Ideally we want them to be small, but not too small
+	\begin{itemize}
+		\item It is clear by construction that $n_\partial$ gives an upper bound on the degree of the potential Noetherian operator that is found. I.e. if we know that an ideal has 
+	\end{itemize}
+	\item Can we increment $n_x, n_\partial$ until stabilization?
+\end{itemize}
+
+% section macaulay_matrices (end)
+
+\section{Examples and experiments} % (fold)
+\label{sec:examples}
+In the following examples, all ideals are primary.
+
+\begin{example}[Point at origin in $\mathbb{R}^2$] \label{ex:origin_r2}
+	Let $I=\langle x^2 - y, y^2 \rangle$. This is zero dimensional, and the correct Noetherian operators are $\{1, dx, dx^2+2*dy, dx^3+6*dx*dy\}$. We get these by running the Macaulay matrix method with $n_x = 20, n_\partial = 5$.
+
+	We see that by incrementing, we eventually get all operators. Also we notice that by taking a large $n_x$ and incrementing, we get all operators. However, a large $n_\partial$ and small $n_x$ gives the wrong answer. The smallest pair that gives the right answer is $(1,3)$.
+	\begin{table}[h]
+		\begin{tabular}{cc}
+		\toprule
+		$(n_x,n_\partial)$ & Nops\\
+		\midrule
+		$(1,1)$  & $1$\\
+		$(2,2)$  & $1, \partial_x$\\
+		$(3,3)$  & $1, \partial_x, \partial_x^2+2 \partial_y$\\
+		$(4,4)$  & $1, \partial_x, \partial_x^2+2 \partial_y, \partial_x^3 + 6 \partial_x \partial_y$\\
+		$(5,5)$  & $1, \partial_x, \partial_x^2+2 \partial_y, \partial_x^3 + 6 \partial_x \partial_y$\\
+		$(6,6)$  & $1, \partial_x, \partial_x^2+2 \partial_y, \partial_x^3 + 6 \partial_x \partial_y$\\
+		$(7,7)$  & $1, \partial_x, \partial_x^2+2 \partial_y, \partial_x^3 + 6 \partial_x \partial_y$\\
+		\midrule
+		$(10,1)$  & $1$\\
+		$(10,2)$  & $1, \partial_x$\\
+		$(10,3)$  & $1, \partial_x, \partial_x^2+2 \partial_y$\\
+		$(10,4)$  & $1, \partial_x, \partial_x^2+2 \partial_y, \partial_x^3 + 6 \partial_x \partial_y$\\
+		$(10,5)$  & $1, \partial_x, \partial_x^2+2 \partial_y, \partial_x^3 + 6 \partial_x \partial_y$\\
+		\midrule
+		$(6,10)$ & $1,\,\partial_x,\,\partial_x^{2}+2\,\partial_y,\,\partial_x^{3}+6\,\partial_x\,\partial_y,\,\partial_y^{9},\,\partial_x\,\partial_y^{8},\,\partial_x^{2}\partial_y^{7},\,\partial_x^{3}\partial_y^{6},\,\partial_x^{4}\partial_y^{5},\,\partial_x^{5}\partial_y^{4},\,\partial_x^{6}\partial_y^{3},\,\partial_x^{7}\partial_y^{2},\,\partial_x^{8}\partial_y,\,\partial_x^{9},\,\partial_y^{10},\,\partial_x\,\partial_y^{9},\,\partial_x^{2}\partial_y^{8},\,\partial_x^{3}\partial_y^{7},\,\partial_x^{4}\partial_y^{6},\dotsc$\\
+		\midrule
+		$(1,3)$ & $1, \partial_x, \partial_x^2+2 \partial_y, \partial_x^3 + 6 \partial_x \partial_y$\\
+		\bottomrule
+	\end{tabular}
+		\caption{\Cref{ex:origin_r2}}
+		\label{tbl:origin_r2}
+	\end{table}
+\end{example}
+
+\begin{example}[Point in origin of $\mathbb{R}^3$] \label{ex:origin_r3}
+	Let $I= \langle x^2-z, y^2-z, z^2\rangle$. We get the right answer with $(n_x, n_\partial) = (10,4)$, and the smallest value of $n_x$ that gives the right answer is 2.
+	\begin{table}[h]
+		\begin{tabular}{cc}
+			\toprule
+			$(n_x,n_\partial)$ & Nops\\
+			\midrule	
+			$(10,4)$ & $1,\,\partial_y,\,\partial_x,\,\partial_x\,\partial_y,\,\partial_x^{2}+\partial_y^{2}+2\,\partial_z,\,3\,\partial_x^{2}\partial_y+\partial_y^{3}+6\,\partial_y\,\partial_z,\,\partial_x^{3}+3\,\partial_x\,\partial_y^{2}+6\,\partial_x\,\partial_z$\\
+			\midrule
+			$(5,4)$ & $1,\,\partial_y,\,\partial_x,\,\partial_x\,\partial_y,\,\partial_x^{2}+\partial_y^{2}+2\,\partial_z,\,3\,\partial_x^{2}\partial_y+\partial_y^{3}+6\,\partial_y\,\partial_z,\,\partial_x^{3}+3\,\partial_x\,\partial_y^{2}+6\,\partial_x\,\partial_z$\\
+			$(2,4)$ & $1,\,\partial_y,\,\partial_x,\,\partial_x\,\partial_y,\,\partial_x^{2}+\partial_y^{2}+2\,\partial_z,\,3\,\partial_x^{2}\partial_y+\partial_y^{3}+6\,\partial_y\,\partial_z,\,\partial_x^{3}+3\,\partial_x\,\partial_y^{2}+6\,\partial_x\,\partial_z$\\
+			$(1,4)$ & $1,\,\partial_{y},\,\partial_{x},\,\partial_{x}\,\partial_{y},\,\partial_{x}^{2}+\partial_{y}^{2}+2\,\partial_{z},\,\partial_{x}\,\partial_{y}\,\partial_{z},\,3\,\partial_{x}^{2}\partial_{y}+\partial_{y}^{3}+6\,\partial_{y}\,\partial_{z},\,\partial_{x}^{3}+3\,\partial_{x}\,\partial_{y}^{2}+6\,\partial_{x}\,\partial_{z},\,\partial_{z}^{4},\,\partial_{y}\,\partial_{z}^{3},\,\partial_{x}\,\partial_{z}^{3},\,\partial_{y}^{2}\partial_{z}^{2},\,\partial_{x}\,\partial_{y}\,\partial_{z}^{2},\,\partial_{x}^{2}\partial_{z}^{2},\dotsc$\\
+			\bottomrule
+		\end{tabular}
+		\caption{\Cref{ex:origin_r3}}
+		\label{tbl:origin_r3}
+	\end{table}
+\end{example}
+
+\begin{example}[Point not in origin, $\mathbb{R}^2$] \label{ex:not_origin_r2}
+	Consider the ideal $\langle (x-2)^2 - (y+1), (y+1)^2$. Note that this is the same ideal as in \Cref{ex:origin_r2}, but the variety is shifted from the origin to $(2,-1)$. Hence the Noetherian operators should be the same as in \Cref{ex:origin_r2}, i.e. we expect $\{1, \partial_x, \partial_x^2+2 \partial_y, \partial_x^3 + 6 \partial_x \partial_y\}$. \Cref{tbl:not_origin_r2} shows that we get constant multiples of the operators. Also, the right answer comes at the same time $(n_x,n_\partial)$ as in \Cref{ex:origin_r2}.
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{cc}
+	\toprule
+	$(n_x,n_\partial)$ & Nops\\
+	\midrule	
+	$(10,5)$ & $1,\,\partial_{x},\,43200\,\partial_{x}^{2}+86400\,\partial_{y},\,720\,\partial_{x}^{3}+4320\,\partial_{x}\,\partial_{y}$\\
+	$(5,5)$ & $1,\,\partial_{x},\,1800\,\partial_{x}^{2}+3600\,\partial_{y},\,120\,\partial_{x}^{3}+720\,\partial_{x}\,\partial_{y}$\\
+	\midrule
+	$(3,3)$ & $1,\,\partial_{x},\,9\,\partial_{x}^{2}+18\,\partial_{y},\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y}$ \\
+	$(2,3)$ & $1,\,\partial_{x},\,6\,\partial_{x}^{2}+12\,\partial_{y},\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y}$\\
+	$(1,3)$ & $1,\,\partial_{x},\,3\,\partial_{x}^{2}+6\,\partial_{y},\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y}$\\
+	$(0,3)$ & $1,\,\partial_{x},\,\partial_{x}\,\partial_{y},\,\partial_{x}^{2}+2\,\partial_{y},\,\partial_{y}^{3},\,\partial_{x}\,\partial_{y}^{2},\,\partial_{x}^{2}\partial_{y},\,\partial_{x}^{3}$\\
+	\bottomrule
+	\end{tabular}
+	\caption{\Cref{ex:not_origin_r2}}
+	\label{tbl:not_origin_r2}
+\end{table}
+\end{example}
+
+\begin{example}[Positive dimensional in $\mathbb{R}^3$, centered]\label{ex:pos_dim_r3}
+	Consider the ideal $\langle x^2 - ty, y^2 \rangle \subseteq \mathbb{C}[x,y,t]$. This is in normal position with respect to $x,y$, i.e. the image of $I$ in $C(t)[x,y]$ is zero-dimensional. The algorithm in \cite{damiano} gives us the Noetherian operators $1, \partial_x, t \partial_x + 2 \partial_y, t \partial_x^3 + 6 \partial_x \partial_y$. 
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{cc}
+			\toprule
+			$(n_x,n_\partial)$ & Nops\\
+			\midrule
+			$(10,10)$ & $1,\,\partial_{x},\,t\,\partial_{x}^{2}+2\,\partial_{y},\,t\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y}$\\
+			\midrule
+			$(0,5)$ & $1,\,\partial_{x},\,\partial_{x}\,\partial_{y},\,\partial_{y}^{3},\,\partial_{x}\,\partial_{y}^{2},\,\partial_{x}^{2}\partial_{y},\,\partial_{x}^{3},\,t\,\partial_{x}^{2}+2\,\partial_{y},\,\partial_{y}^{4},\,\partial_{x}\,\partial_{y}^{3},\,\partial_{x}^{2}\partial_{y}^{2},\,\partial_{x}^{3}\partial_{y},\,\partial_{x}^{4},\,\partial_{y}^{5},\,\partial_{x}\,\partial_{y}^{4},\,\partial_{x}^{2}\partial_{y}^{3},\,\partial_{x}^{3}\partial_{y}^{2},\,\partial_{x}^{4}\partial_{y},\,\partial_{x}^{5}$\\
+			$(1,5)$ & $1,\,\partial_{x},\,t\,\partial_{x}^{2}+2\,\partial_{y},\,\partial_{y}^{4},\,\partial_{x}\,\partial_{y}^{3},\,\partial_{x}^{2}\partial_{y}^{2},\,\partial_{x}^{3}\partial_{y},\,\partial_{x}^{4},\,t\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y},\,\partial_{y}^{5},\,\partial_{x}\,\partial_{y}^{4},\,\partial_{x}^{2}\partial_{y}^{3},\,\partial_{x}^{3}\partial_{y}^{2},\,\partial_{x}^{4}\partial_{y},\,\partial_{x}^{5}$\\
+			$(2,5)$ & $1,\,\partial_{x},\,t\,\partial_{x}^{2}+2\,\partial_{y},\,t\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y},\,\partial_{y}^{5},\,\partial_{x}\,\partial_{y}^{4},\,\partial_{x}^{2}\partial_{y}^{3},\,\partial_{x}^{3}\partial_{y}^{2},\,\partial_{x}^{4}\partial_{y},\,\partial_{x}^{5}$\\
+			$(3,5)$ & $1,\,\partial_{x},\,t\,\partial_{x}^{2}+2\,\partial_{y},\,t\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y}$\\
+			$(4,5)$ & $1,\,\partial_{x},\,t\,\partial_{x}^{2}+2\,\partial_{y},\,t\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y}$\\
+			$(5,5)$ & $1,\,\partial_{x},\,t\,\partial_{x}^{2}+2\,\partial_{y},\,t\,\partial_{x}^{3}+6\,\partial_{x}\,\partial_{y}$\\
+		\end{tabular}
+		\caption{\Cref{ex:pos_dim_r3}}
+		\label{tbl:pos_dim_r3}
+	\end{table}
+\end{example}
+
+\begin{example}[Positive dimensional in $\mathbb{R}^2$, not centered]
+Consider the ideal from the previous example, but translate the variety by substituting $x\mapsto x+t, y\mapsto y-t$. Then setting $(n_x,n_\partial) = (5,5)$, we recover the same Noetherian operators as before: $t\,\partial_x^{3}+6\,\partial_x\,\partial_y,\,\partial_x,\,t\,\partial_x^{2}+2\,\partial_y,\,1$.
+\end{example}
+
+\begin{example}[Non-primary 0-dimensional ideal]\label{ex:non-prim-0-dim}
+Let $I = \langle x^2,y \rangle \cap \langle x-1,y-1 \rangle$. We get \Cref{tbl:non-prim-0-dim}. Modulo a constant these are all the same, except that $(5,5)$ has one extra element.
+\begin{table}[h!]
+		\centering
+		\begin{tabular}{ccc}
+			\toprule
+			$(n_x,n_\partial)$ & Nops & Nops modulo constant\\
+			\midrule
+			$(10,5)$ & $1, - 641520000y \partial_x + 641520000 \partial_x, - 641520000y \partial_x + 641520000 \partial_x$ & $1, - y \partial_x +  \partial_x, - y \partial_x +  \partial_x$\\
+			$(5,5)$ & $1,-28224000y \partial_x+28224000 \partial_x,-705600y \partial_x+705600 \partial_x,-705600y \partial_x+705600 \partial_x$ & $1,-y \partial_x+ \partial_x,-y \partial_x+ \partial_x,-y \partial_x+ \partial_x$\\
+			$(3,3)$ & $1,2160y \partial_x-2160 \partial_x,2160y \partial_x-2160 \partial_x$ & $1,y \partial_x- \partial_x,y \partial_x- \partial_x$\\
+			\bottomrule
+		\end{tabular}
+		\caption{\Cref{ex:non-prim-0-dim}}
+		\label{tbl:non-prim-0-dim}
+	\end{table}
+
+\end{example}
+% section examples (end)
+
+\section{Numerical approaches} % (fold)
+\label{sec:numerical_approaches}
+
+\subsection{Zero-dimensional case} % (fold)
+\label{sub:zero_dimensional_case}
+Assume the ideal $I$ is zero-dimensional and primary, i.e. the variety is a point $p$. Then taking modulo $\sqrt I$ in \eqref{eq:macaulay_matrix_entries} corresponds to evaluation at the point, so we get a numerical matrix whose kernel will possibly give us Noetherian operators.
+
+Questions:
+\begin{itemize}
+	\item What happens if the point is not exact?
+	\item Does numerical kernel give any meaningful results? (``numerical Noetherian operators''?)
+\end{itemize}
+
+If the ideal is not primary, the numerical approach will give us correct Noetherian operators for each primary component.
+\begin{example}
+	Consider the ideal $I = \langle x^2, y\rangle \cap \langle x-1, (y-1)^2 \rangle$. We know that the Noetherian operators should be $1, \partial_x$ for the first component and $1, \partial_y$ for the second one. The first component corresponds to the point $(0,0)$, and if we substitute this point in our Macaulay matrix with $(n_x, n_\partial) = (3,3)$, its kernel will correspond to the operator $1,\partial_x$. Likewise, if we substitute $(1,1)$, the kernel will be $1,\partial_y$.
+\end{example}
+We note that in the example above, we do not need to know the primary decomposition a priori: we only need the ideal, and points in different irreducible components.
+% subsection zero_dimensional_case (end)
+
+\subsection{Positive dimensions} % (fold)
+\label{sub:positive_dimensions}
+For primary ideals, we may again evaluate at some points, but we may also have to interpolate in addition.
+\begin{example}
+	Let $I = \langle (x+t)^2-t(y-t), (y-t)^2 \rangle \subseteq \mathbb{C}[x,y,t]$, which is in normal position with respect to $x,y$. We know also that the correct Noetherian operators are
+	\begin{align*}
+		1,\,\partial_x,\,\frac{1}{2}t \partial_x^2 + \partial_y,\, \frac{1}{6}t \partial_x^3 + \partial_x \partial_y
+	\end{align*}
+
+	Say we are given three (exact) points on the variety: $(-1,1,1)$, $(-2,2,2)$, $(-3,3,3)$. When we substitute these values in the Macaulay matrix (with $(n_x,n_\partial) = (3,3)$) and compute the kernel, we get the \Cref{tbl:ex_pos_dim_num_exact}. We also know that the Noetherian operators should be polynomials in $\partial_x,\partial_y$ and $t$, so we interpolate to find the general form $1,\,\partial_x,\,\frac{1}{2}t \partial_x^2 + \partial_y,\, \frac{1}{6}t \partial_x^3 + \partial_x \partial_y$, which is the correct answer. Also, we can match
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{cccccc}
+		\toprule
+		$(x,y,t)$ & $t$ & Nop 1 & Nop 2 & Nop 3 & Nop 4\\
+		\midrule
+		$(-1,1,1)$ & $1$ & $1$ & $\partial_x$ & $\frac{1}{6}\partial_x^3 + \partial_x \partial_y$ & $\frac{1}{2}\partial_x^2 + \partial_y$\\
+		$(-2,2,2)$ & $2$ & $1$ & $\partial_x$ & $\frac{1}{3}\partial_x^3 + \partial_x \partial_y$ & $\partial_x^2 + \partial_y$\\
+		$(-3,3,3)$ & $3$ & $1$ & $\partial_x$ & $\frac{1}{2}\partial_x^3 + \partial_x \partial_y$ & $\frac{3}{2}\partial_x^2 + \partial_y$\\
+		\bottomrule
+		\end{tabular}
+		\caption{Operators corresponding to kernel of Macaulay matrix when points are substituted. From these, we can conclude that the coeficcient}
+		\label{tbl:ex_pos_dim_num_exact}
+	\end{table}
+\end{example}
+
+Next, we will look at a non-primary, positive dimensional example
+\begin{example}\label{ex:non-primary-numerical-prim-dec}
+	Let $l_1 = \langle x^2 - zy, y^2 \rangle$ and $l_2 = \langle x+y+z, x-y+z \rangle$ be two ideals in $\mathbb{C}[x,y,z]$, corresponding to two lines. Let $I = l_1 \cap l_2$.
+
+	We will focus on $l_1$, but the procedure is the same for $l_2$. Assume we are given points on $l_1$ (that are not also on $l_2$). The results of evaluating the Macaulay matrix are summarized below.
+	\begin{table}[h!]
+	\centering
+	\begin{tabular}{ccccc}
+	\toprule
+	$(x,y,z)$ &  Nop 1 & Nop 2 & Nop 3 & Nop 4\\
+	\midrule
+	$(0,0,1)$ & $1$ & $\partial_x$ & $\partial_x^3 + 6 \partial_x \partial_y$ & $\partial_x^2 + 2 \partial_y$\\
+	$(0,0,2)$ & $1$ & $\partial_x$ & $\partial_x^3 + 3 \partial_x \partial_y$ & $\partial_x^2 + \partial_y$\\
+	$(0,0,3)$ & $1$ & $\partial_x$ & $\partial_x^3 + 2 \partial_x \partial_y$ & $-3\partial_x^2 -2 \partial_y$\\
+	$(0,0,4)$ & $1$ & $\partial_x$ & $2\partial_x^3 + 3 \partial_x \partial_y$ & $-2\partial_x^2 - \partial_y$\\
+	\bottomrule
+	\end{tabular}
+	\end{table}
+	Hence we can interpolate to conclude that the Noetherian operators for line 1 are
+	\begin{align*}
+		1,\, \partial_x,\,z \partial_x^{3}+6 \partial_x \partial_y,\,z \partial_x^{2}+2 \partial_y,
+	\end{align*}
+	up to scaling by a constant.
+
+	If we run \texttt{primaryDecomposition I} in Macaulay2, we get $I = \langle y,x+z \rangle \cap \langle y^2, x^2 - yz \rangle$. Assuming that the primary decomposition is known, using Macaulay matrices, we see that the Noetherian operators corresponding to the first primary component $\langle y,x+z \rangle$ (line 1) are the same as what we found above.
+\end{example}
+
+Questions:
+\begin{itemize}
+	\item What if exact points are not available?
+	\item How to deal with embedded components?
+	\begin{itemize}
+		\item The procedure in \Cref{ex:non-primary-numerical-prim-dec} does not work for some examples in \texttt{demo3.m2}
+	\end{itemize}
+\end{itemize}
+
+
+% subsection positive_dimensions (end)
+% section numerical_approaches (end)
+
+
+
+
+\nocite*
+\bibliography{references}{}
+\bibliographystyle{plain}
+
+
+
+\end{document}
