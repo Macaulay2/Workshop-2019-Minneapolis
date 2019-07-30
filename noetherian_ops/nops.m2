@@ -167,15 +167,15 @@ sanityCheck = (nops, I) -> (
 
 
 noethOps = method(Options => {DegreeLimit => 5}) 
-noethOps (Ideal) := List => opts -> (I) -> (
+noethOps (Ideal, Ideal) := List => opts -> (I, P) -> (
 	R := ring I;
-	var := gens R - set support first independentSets I;
+	var := gens R - set support first independentSets P;
 	bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
 	bd := basis(0,opts.DegreeLimit,R, Variables => var);
 
 	elapsedTime M := diff(bd, transpose matrix {flatten (table(bx,I_*,(i,j) -> i*j))});
-	M' := M % ideal gens radical(I);
-	K := gens trim kernel M';
+	elapsedTime M' = sub(M,R/P);
+	elapsedTime K := gens trim kernel M';
 
 	-- Return elements in WeylAlgebra for nice formatting
 	R' := makeWA (R, SetVariables => false);
@@ -183,6 +183,7 @@ noethOps (Ideal) := List => opts -> (I) -> (
 	bdd := sub(bd, dvars);
 	flatten entries (bdd * sub(K, R'))
 )
+noethOps (Ideal) := List => opts -> (I) -> noethOps(I, ideal gens radical I, opts)
 
 
 socleMonomials = method()
