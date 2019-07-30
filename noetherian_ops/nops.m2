@@ -4,7 +4,7 @@ needsPackage "Dmodules"
 
 -- Compute Noetherian operators.
 -- Caveat: variety of the extended ideal must be the origin!
-NoethOps = {Normalized => false, Verbose => false} >> opts -> J -> (
+brokenNoethOps = {Normalized => false, Verbose => false} >> opts -> J -> (
 	S := ring J;
 
 	-- Noether normalize, record parameters,
@@ -189,28 +189,21 @@ MacaulayMatrix = (nx, nd, I) -> (
 	flatten entries (bdd * sub(K, R'))
 )
 
-MacaulayMatrixPD = (var, nx, nd, I) -> (
-	-- var = list of dependent variables
-	-- nx = degree bound for x-variables (rows)
-	-- nd = degree bound for d-variables (columns)
+noethOps = method(Options => {DegreeLimit => 5}) 
+noethOps (Ideal) := List => opts -> (I) -> (
 	R := ring I;
-	fi := gens I;
-	-- bx := basis(0,nx,R, Variables => var);
-	bx := basis(0,nx,R, Variables => gens R);
-	bd := basis(0,nd,R, Variables => var);
+	var := gens R - set support first independentSets I;
+	bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
+	bd := basis(0,opts.DegreeLimit,R, Variables => var);
 
-	-- print"macaulay matrix";
-	-- macaulay matrix
-	elapsedTime M := transpose diff(transpose bd, flatten (transpose fi*bx));
-	elapsedTime S := R/radical(I);
-	elapsedTime M' := sub(M,S);
-	elapsedTime K := gens kernel M';
+	elapsedTime M := diff(bd, transpose matrix {flatten (table(bx,I_*,(i,j) -> i*j))});
+	M' := M % ideal gens radical(I);
+	K := gens trim kernel M';
 
 	-- Return elements in WeylAlgebra for nice formatting
-	R' := makeWA R;
+	R' := makeWA (R, SetVariables => false);
 	dvars := (options R').WeylAlgebra / (i -> (i#0)_R => (i#1)_R');
 	bdd := sub(bd, dvars);
-	use R;
 	flatten entries (bdd * sub(K, R'))
 )
 
