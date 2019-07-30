@@ -155,9 +155,14 @@ applyNOp = (N, f) -> (
 
 -- Try to see if gens of I applied with all Noeth Ops
 -- vanish on rad(I)
-sanityCheck = (nops, I) -> (
-	foo := table(nops, flatten entries gens I, (n,i) -> applyNOp(n,i));
+visualCheck = (nops, I) -> (
+	foo := table(nops, I_*, (n,i) -> applyNOp(n,i));
 	netList applyTable(foo, (i -> i%(radical I)))
+)
+
+sanityCheck = (nops, I) -> (
+	foo := flatten table(nops, I_*, (n,i) -> applyNOp(n,i));
+	all(foo, i -> i%(radical I) == 0)
 )
 
 
@@ -185,29 +190,27 @@ MacaulayMatrix = (nx, nd, I) -> (
 )
 
 MacaulayMatrixPD = (var, nx, nd, I) -> (
+	-- var = list of dependent variables
+	-- nx = degree bound for x-variables (rows)
+	-- nd = degree bound for d-variables (columns)
 	R := ring I;
 	fi := gens I;
-	bx := basis(0,nx,R, Variables => var);
+	-- bx := basis(0,nx,R, Variables => var);
+	bx := basis(0,nx,R, Variables => gens R);
 	bd := basis(0,nd,R, Variables => var);
 
-	print"macaulay matrix";
+	-- print"macaulay matrix";
 	-- macaulay matrix
-	M := transpose diff(transpose bd, flatten (transpose fi*bx));
-
-	print "compute radical";
-	S := R/radical(I);
-	print "sub";
-	M' := sub(M,S);
-	print "kernel";
-	K := gens kernel M';
+	elapsedTime M := transpose diff(transpose bd, flatten (transpose fi*bx));
+	elapsedTime S := R/radical(I);
+	elapsedTime M' := sub(M,S);
+	elapsedTime K := gens kernel M';
 
 	-- Return elements in WeylAlgebra for nice formatting
-	print "postprocess";
 	R' := makeWA R;
 	dvars := (options R').WeylAlgebra / (i -> (i#0)_R => (i#1)_R');
 	bdd := sub(bd, dvars);
 	use R;
-	print "return";
 	flatten entries (bdd * sub(K, R'))
 )
 
@@ -225,3 +228,33 @@ modConstant = f -> (
 	g := (flatten entries coe) / (i -> sub(i,QQ));
 	f // gcd(g)
 )
+
+
+TEST ///
+R = QQ[x,y,z]
+I = ideal(x^2 - y, y^2)
+nops = MacaulayMatrixPD({x,y}, 10, 10, I)
+assert(sanityCheck(nops, I))
+///
+
+TEST ///
+R = QQ[x_0..x_3]
+S = QQ[s,t]
+I0 = ker map(S,R,{s^5,s^3*t^2, s^2*t^3, t^5})
+depvars = gens R - set support first independentSets I0
+nops = MacaulayMatrixPD(depvars, 10, 10, I0)
+assert(sanityCheck(nops, I0))
+I1 = ideal(x_0^2, x_1^2, x_2^2)
+depvars = gens R - set support first independentSets I1
+nops = MacaulayMatrixPD(depvars, 10, 10, I1)
+///
+
+end--
+
+load "nops.m2"
+
+
+
+--TODO:
+
+-- 1) Figure out bounds for MacaulayMatrix/MacaulayMatrixPD
