@@ -166,29 +166,6 @@ sanityCheck = (nops, I) -> (
 )
 
 
--- Compute annihilators using Macaulay Matrix.
--- Consider differential monomials up to degree nd
--- and multiply generators with monomials up to degree nx
-MacaulayMatrix = (nx, nd, I) -> (
-	R := ring I;
-	fi := gens I;
-	bx := basis(0,nx,R);
-	bd := basis(0,nd,R);
-
-	-- macaulay matrix
-	M := transpose diff(transpose bd, flatten (transpose fi*bx));
-	S := R/radical(I);
-	M' := sub(M,S);
-	K := gens kernel M';
-
-	-- Return elements in WeylAlgebra for nice formatting
-	R' := makeWA R;
-	dvars := (options R').WeylAlgebra / (i -> (i#0)_R => (i#1)_R');
-	bdd := sub(bd, dvars);
-	use R;
-	flatten entries (bdd * sub(K, R'))
-)
-
 noethOps = method(Options => {DegreeLimit => 5}) 
 noethOps (Ideal) := List => opts -> (I) -> (
 	R := ring I;
@@ -207,6 +184,17 @@ noethOps (Ideal) := List => opts -> (I) -> (
 	flatten entries (bdd * sub(K, R'))
 )
 
+
+socleMonomials = method()
+socleMonomials(Ideal) := List => (I) -> (
+	R := ring I;
+	if codim I < dim R then error("Expected Artinian ideal");
+	inI := monomialIdeal leadTerm gens gb I;
+	irreducibleDecomposition inI / gens / 
+						entries / first / 
+						product / exponents / first / 
+						(i -> (i / (j -> j-1))) / (e -> R_e)
+)
 
 
 -- Tests
