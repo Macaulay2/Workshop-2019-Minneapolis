@@ -64,21 +64,21 @@
 \section{Intro} % (fold)
 \label{sec:intro}
 \begin{definition}
-	Let $I \in \mathbb{C}[x_1,\dotsc,x_n]$ be an ideal. The set $N \subset \mathbb{C}[x_1,\dotsc,x_n]\langle \partial_1 ,\dotsc, \partial_n \rangle$ is a set of \emph{Noetherian operators} for $I$ if
+	Let $I \subseteq \mathbb{C}[x_1,\dotsc,x_n]$ be a ideal. The set $N \subseteq \mathbb{C}[x_1,\dotsc,x_n]\langle \partial_1 ,\dotsc, \partial_n \rangle$ is a set of \emph{Noetherian operators} for $I$ if
 	\begin{align*}
-		f \in I \iff d \bullet f \in \sqrt{I} \; \forall d \in N.
+		f \in I \iff D \bullet f \in \sqrt{I} \; \forall D \in N.
 	\end{align*}
 \end{definition}
 
 The article \cite{damiano} has algorithms to compute Noetherian operators in the zero dimensional case. These algorithms are implemented in \texttt{nops.m2}. The caveat is that we assume that the variety corresponding to the ideal is the origin.
 
-For higher dimensions, we assume the ideal is in general position. If not, use Noether Normalization to find a linear change of coordinates that puts the ideal in general position. Then we can compute Noetherian operators with the changed coordinates, and change coordinates back to get Noetherian operators for the original ideal. TODO: details on this procedure.
+For higher dimensions, we assume the ideal is in normal position. If not, use Noether Normalization to find a linear change of coordinates that puts the ideal in normal position. Then we can compute Noetherian operators with the changed coordinates, and change coordinates back to get Noetherian operators for the original ideal. TODO: details on this procedure.
 % section intro (end)
 
 
 \section{Macaulay matrices} % (fold)
 \label{sec:macaulay_matrices}
-We can attempt to compute annihilators of an ideal $I = \langle f_1,\dotsc,f_n \rangle$ by using Macaulay matrix based approach. Fix a limit for the degrees of monomials: $n_x$ is the highest degree of and $x$ monomial, and $n_\partial$ is the highest degree of a $\partial$ monomial. Then, create a (large) vector $R = \{x^\alpha f_i\}$ for all $|\alpha| \leq n_x$ and all generators $f_i$ of $I$. Next create a vector $C = \{\partial^\beta\}$ for all $|\beta| \leq n_\partial$. We will create a matrix $M$ of dimensions $|R| \times |C|$ indexed by elements of $R,C$. The entry corresponding to row $x^\alpha f_i$ and column $\partial^\beta$ will be
+We can attempt to compute annihilators of an ideal $I = \langle f_1,\dotsc,f_n \rangle$ by using Macaulay matrix based approach. Fix a limit for the degrees of monomials: $n_x$ is the highest degree of a $x$ monomial, and $n_\partial$ is the highest degree of a $\partial$ monomial. Then, create a (large) vector $R = \{x^\alpha f_i\}$ for all $|\alpha| \leq n_x$ and all generators $f_i$ of $I$. Next create a vector $C = \{\partial^\beta\}$ for all $|\beta| \leq n_\partial$. We will create a matrix $M$ of dimensions $|R| \times |C|$ indexed by elements of $R,C$. The entry corresponding to row $x^\alpha f_i$ and column $\partial^\beta$ will be
 \begin{align}
 	M_{\alpha,i;\beta} = \partial^\beta \bullet x^\alpha f_i \pmod{\sqrt I} \label{eq:macaulay_matrix_entries}
 \end{align}
@@ -308,11 +308,59 @@ Questions:
 	\end{itemize}
 \end{itemize}
 
+Here we give a construction for a valid set of Noetherian operators for an unmixed ideal:
+\begin{proposition}
+Let $I$ be an unmixed ideal and let $I = q_1 \cap \ldots \cap q_r$ be a minimal primary decomposition of $I$. Choose $\displaystyle h_i \in \Big( \bigcap_{j \ne i} \sqrt{q_j} \Big) \setminus \sqrt{q_i}$ for each $i$. If $N_i$ is a set of Noetherian operators for $q_i$, then $N := \bigcup_i h_iN_i$ is a set of Noetherian operators for $I$ (where $h_i N_i := \{ h_i D \mid D \in N_i \}$).
+\end{proposition}
 
+\begin{proof}
+Suppose $f \in I$. Then $f \in q_i$ for all $i$, so $D \bullet f \in \sqrt{q_i}$ for every $D \in N_i$. By choice of $h_i$, this implies $h_i D \bullet f \in \sqrt{q_i} \cap \left( \bigcap_{j \ne i} \sqrt{q_j} \right) = \sqrt{I}$.
+
+Conversely, suppose $f \not \in I$. Then WLOG $f \not \in q_1$, so there exists $D \in N_1$ such that $D \bullet f \not \in \sqrt{q_1}$. Since also $h_1 \not \in \sqrt{q_1}$ and $\sqrt{q_1}$ is prime, this means $h_1 D \bullet f \not \in \sqrt{q_1}$, and thus $h_1 D \bullet f \not \in \sqrt{I}$.
+\end{proof}
 % subsection positive_dimensions (end)
 % section numerical_approaches (end)
 
+\subsection{Linear coordinate changes}
 
+Here we investigate how Noetherian operators behave with respect to a linear change of coordinates:
+
+\begin{proposition}
+Let $R := k[x_1, \ldots, x_n]$ be a polynomial ring, and $\varphi : R \to R$ a $k$-linear automorphism of $R$, given by $\varphi(x) := Ax$ for some matrix $A \in GL_n(k)$. Define a $k$-linear automorphism of the Weyl algebra $W := R[\partial_{x_1}, \ldots, \partial_{x_n}]$ by 
+\[
+\psi : \begin{pmatrix}
+x \\
+\partial 
+\end{pmatrix} \mapsto 
+\begin{pmatrix}
+Ax \\
+(A^{-1})^T \partial 
+\end{pmatrix}.
+\]
+Then, if $D_1, \ldots, D_r$ is a set of Noetherian operators for an ideal $I \subseteq R$, then $\psi(D_1), \ldots, \psi(D_r)$ is a set of Noetherian operators for $\varphi(I) \subseteq R$.
+\end{proposition}
+
+\begin{proof}
+For $f \in R$, one has
+\begin{align*}
+f \in \varphi(I) &\iff \varphi^{-1}(f) \in I \iff D_i \bullet \varphi^{-1}(f) \in \sqrt{I} \quad \forall i = 1, \ldots, r \\
+&\iff \varphi(D_i \bullet \varphi^{-1}(f)) \in \sqrt{\varphi(I)} \quad \forall i = 1, \ldots, r,
+\end{align*}
+since $\sqrt{\varphi(I)} = \varphi(\sqrt{I})$, as $\varphi$ is a $k$-linear automorphism of $R$. Writing $D_i = \sum_\alpha p_\alpha \partial^\alpha$, we have $\varphi(D_i \bullet \varphi^{-1}(f)) = \varphi( (\sum_\alpha p_\alpha \partial^\alpha) \bullet \varphi^{-1}(f)) = \sum_\alpha \varphi(p_\alpha) \varphi(\partial^\alpha \bullet \varphi^{-1}(f))$, so it suffices to show that $\varphi(\partial^\alpha \bullet \varphi^{-1}(f)) = \psi(\partial^\alpha) \bullet f$ for any $f \in R$. By linearity, it suffices to check this when $f = x^\beta$ is a monomial, i.e. we must show $\varphi(\partial^\alpha \bullet \varphi^{-1}(x^\beta)) = \psi(\partial^\alpha) \bullet x^\beta$ for all $\alpha, \beta \in \mathbb{N}^n$. 
+
+We first consider the case where $\alpha, \beta$ are standard basis vectors, i.e. $\partial^\alpha = \partial_{x_j}$ and $x^\beta = x_i$ for some $i, j \in \{1, \ldots, n\}$. Then $\varphi \left(\partial_{x_j} \bullet \varphi^{-1}(x_i) \right) = \varphi \left(\partial_{x_j} \bullet \sum_{k=1}^n (A^{-1})_{i,k} x_k \right) = \varphi \left((A^{-1})_{i,j} \right) = (A^{-1})_{i,j} = \left( \sum_{k=1}^n (A^{-1})_{k,j} \partial_{x_k} \right) \bullet x_i = \psi(\partial_{x_j}) \bullet x_i$.
+
+To show that this extends to arbitrary $\beta$, note that both $\varphi \left( \partial_{x_j} \bullet \varphi^{-1}( \rule{0.2cm}{0.15mm}) \right)$ and $\psi(\partial_{x_j}) \bullet ( \rule{0.2cm}{0.15mm})$ are both differential operators, which must satisfy the product rule, so if these agree on any variable $x_i$ then they agree on any monomial $x^\beta$. To extend to arbitrary $\alpha$, note that $\psi$ preserves multiplication in $W$ by definition, so
+\begin{align*}
+\varphi \left( \partial_{x_j} \partial_{x_k} \bullet \varphi^{-1}(\rule{0.2cm}{0.15mm}) \right) &= 
+\varphi \left( \partial_{x_j} \bullet \varphi^{-1} \varphi \left( \partial_{x_k} \bullet \varphi^{-1}(\rule{0.2cm}{0.15mm}) \right) \right) \\
+&= \varphi \left( \partial_{x_j} \bullet \varphi^{-1} (\psi(\partial_{x_k}) \bullet (\rule{0.2cm}{0.15mm}) ) \right) \\
+&= \psi(\partial_{x_j}) \bullet \psi(\partial_{x_k} \bullet ( \rule{0.2cm}{0.15mm} )) \\
+&= \psi(\partial_{x_j}) \psi(\partial_{x_k} \bullet ( \rule{0.2cm}{0.15mm} )) \\
+&= \psi(\partial_{x_j} \partial_{x_k}) \bullet ( \rule{0.2cm}{0.15mm} )
+\end{align*}
+and thus inductively $\varphi \left( \partial^\alpha \bullet \varphi^{-1}(\rule{0.2cm}{0.15mm}) \right) = \psi(\partial^\alpha) \bullet (\rule{0.2cm}{0.15mm})$ for any $\alpha$.
+\end{proof}
 
 
 \nocite*
