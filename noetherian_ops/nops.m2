@@ -113,21 +113,6 @@ matrixToMap = (M, R) -> (
 	f = map(R,R,transpose(M*(transpose vars R)))
 )
 
--- given a map f, and NOps for f(I), get NOps for I
-convertNOps = (nn,f) -> (
-	fMatrix := mapToMatrix(f);
-	W := ring (nn#0);
-	nVars := (#(gens W))//2;
-	zeroMatrix := map(QQ^nVars, nVars, 0);
-	f'Matrix := mapToMatrix(inverse f);
-	rules := matrix({{f'Matrix, zeroMatrix},{zeroMatrix,transpose fMatrix}}) * (transpose vars W);
-	rules = flatten entries rules;
-	phi := map(W,W,rules);
-
-	-- return the results
-	print"return the results";
-	nn / phi
-)
 
 addFactorials = (f, var) -> (
 	(coe, mon) := coefficients(f, Variables => var);
@@ -197,6 +182,17 @@ socleMonomials(Ideal) := List => (I) -> (
 						(i -> (i / (j -> j-1))) / (e -> R_e)
 )
 
+coordinateChangeOps = method()
+coordinateChangeOps(RingElement, RingMap) := RingElement => (D, f) -> (
+	R := f.target;
+	WA := ring D;
+	A := f.matrix // vars R;
+	A' := inverse A;
+
+	psi := transpose (sub((A ++ (transpose A')),WA) * (transpose vars WA));
+	(map(WA,WA,psi)) D
+)
+
 
 -- Tests
 -- Tests if output of NoethOps is same as output of MacaulayMatrix
@@ -229,6 +225,30 @@ assert(sanityCheck(nops, I0))
 I1 = ideal(x_0^2, x_1^2, x_2^2)
 depvars = gens R - set support first independentSets I1
 nops = MacaulayMatrixPD(depvars, 10, 10, I1)
+///
+
+
+TEST ///
+R = QQ[x,y]
+I = ideal((x-1)^2,(x-1)*(y+1),(y+1)^3)
+J = ideal((x)^2,(x)*(y),(y)^3)
+Ps = associatedPrimes I
+noethOps(I, first Ps)
+noethOps(J, ideal(x,y))
+///
+
+
+TEST ///
+R = QQ[x,y]
+I = ideal(x^2*(y-x))
+f = map(R,R,{2*x+y,x+y})
+J = f I
+NI = noethOps I
+NJ = noethOps J
+convertedNI = NI / (i-> sub(coordinateChangeOps(i,f), ring first NJ))
+assert sanityCheck(convertedNI,J)
+assert sanityCheck(NJ,J)
+assert sanityCheck(NI,I)
 ///
 
 end--
