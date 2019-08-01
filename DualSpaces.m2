@@ -1,7 +1,7 @@
 -- -*- coding: utf-8 -*-
 newPackage(
      "DualSpaces",
-     PackageExports => {"NAGtypes", "Dmodules"},
+     PackageExports => {"NAGtypes"},
      Version => "0.1", 
      Date => "Aug 1, 2019",
      Authors => {
@@ -656,6 +656,12 @@ basisIndices = (M, tol) -> (
 --    res / phi
 --)
 
+diffAlgMap = method()
+diffAlgMap(Ring) := R -> (
+    diffVars := apply(gens R, i -> value("symbol d" | toString(i)) );
+    diffAlg := R[diffVars];
+    map(R,diffAlg,vars R)
+    )
 
 addFactorials = (f, var) -> (
     (coe, mon) := coefficients(f, Variables => var);
@@ -707,28 +713,15 @@ noethOps (Ideal, Ideal) := List => opts -> (I, P) -> (
     elapsedTime K := gens trim kernel M';
 
     -- Return elements in WeylAlgebra for nice formatting
-    R' := makeWA (R, SetVariables => false);
-    dvars := (options R').WeylAlgebra / (i -> (i#0)_R => (i#1)_R');
-    bdd := sub(bd, dvars);
+    m := diffAlgMap R;
+    R' := source m;
+    bdd := sub(bd, vars R');
     flatten entries (bdd * sub(K, R'))
 )
 noethOps (Ideal) := List => opts -> (I) -> noethOps(I, ideal gens radical I, opts)
-noethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
-    R := ring I;
-    var := if opts.DependentSet === null then gens R - set support first independentSets I
-            else opts.DependentSet;
-    bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
-    bd := basis(0,opts.DegreeLimit,R, Variables => var);
-
-    elapsedTime M := diff(bd, transpose matrix {flatten (table(bx,I_*,(i,j) -> i*j))});
-    elapsedTime M' := sub(M,p);
-    elapsedTime K := gens trim kernel M';
-
-    -- Return elements in WeylAlgebra for nice formatting
-    R' := makeWA (R, SetVariables => false);
-    dvars := (options R').WeylAlgebra / (i -> (i#0)_R => (i#1)_R');
-    bdd := sub(bd, dvars);
-    flatten entries (bdd * sub(K, R'))
+noethOps (Ideal, Point) := List => opts -> (I, p) -> (
+    P := ideal ((gens ring I) - p.Coordinates);
+    noethOps(I,P,opts)
 )
 
 approxKer = method(Options => {Tolerance => 1e-5})
@@ -753,9 +746,9 @@ numNoethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
     elapsedTime K := colReduce(approxKer M', opts.Tolerance);
 
     -- Return elements in WeylAlgebra for nice formatting
-    R' := makeWA (R, SetVariables => false);
-    dvars := (options R').WeylAlgebra / (i -> (i#0)_R => (i#1)_R');
-    bdd := sub(bd, dvars);
+    m := diffAlgMap R;
+    R' := source m;
+    bdd := sub(bd, vars R');
     flatten entries (bdd * sub(K, R'))
 )
 
