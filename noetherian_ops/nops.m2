@@ -1,5 +1,6 @@
 needsPackage "NoetherNormalization"
 needsPackage "Dmodules"
+needsPackage "NumericalAlgebraicGeometry"
 
 
 -- Compute Noetherian operators.
@@ -151,10 +152,11 @@ sanityCheck = (nops, I) -> (
 )
 
 
-noethOps = method(Options => {DegreeLimit => 5}) 
+noethOps = method(Options => {DegreeLimit => 5, DependentSet => null}) 
 noethOps (Ideal, Ideal) := List => opts -> (I, P) -> (
 	R := ring I;
-	var := gens R - set support first independentSets P;
+	var := if opts.DependentSet === null then gens R - set support first independentSets P
+			else opts.DependentSet;
 	bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
 	bd := basis(0,opts.DegreeLimit,R, Variables => var);
 
@@ -169,7 +171,65 @@ noethOps (Ideal, Ideal) := List => opts -> (I, P) -> (
 	flatten entries (bdd * sub(K, R'))
 )
 noethOps (Ideal) := List => opts -> (I) -> noethOps(I, ideal gens radical I, opts)
+noethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
+	R := ring I;
+	var := if opts.DependentSet === null then gens R - set support first independentSets I
+			else opts.DependentSet;
+	bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
+	bd := basis(0,opts.DegreeLimit,R, Variables => var);
 
+	elapsedTime M := diff(bd, transpose matrix {flatten (table(bx,I_*,(i,j) -> i*j))});
+	elapsedTime M' = sub(M,p);
+	elapsedTime K := gens trim kernel M';
+
+	-- Return elements in WeylAlgebra for nice formatting
+	R' := makeWA (R, SetVariables => false);
+	dvars := (options R').WeylAlgebra / (i -> (i#0)_R => (i#1)_R');
+	bdd := sub(bd, dvars);
+	flatten entries (bdd * sub(K, R'))
+)
+
+approxKer = method(Options => {Tolerance => 1e-5})
+approxKer(Matrix) := Matrix => opts -> A -> (
+	d := numcols A;
+	(S,U,Vh) := SVD A;
+	n := #select(S, s -> clean(opts.Tolerance, s) == 0);
+	K := transpose Vh^{d-n..d-1};
+	if K == 0 then K else conjugate K
+)
+
+
+numNoethOps = method(Options => options noethOps ++ options approxKer)
+numNoethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
+	R := ring I;
+	var := gens R - set support first independentSets I;
+	bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
+	bd := basis(0,opts.DegreeLimit,R, Variables => var);
+
+	elapsedTime M := diff(bd, transpose matrix {flatten (table(bx,I_*,(i,j) -> i*j))});
+	elapsedTime M' = sub(M,p);
+	elapsedTime K := approxKer M';
+
+	-- Return elements in WeylAlgebra for nice formatting
+	R' := makeWA (R, SetVariables => false);
+	dvars := (options R').WeylAlgebra / (i -> (i#0)_R => (i#1)_R');
+	bdd := sub(bd, dvars);
+	flatten entries (bdd * sub(K, R'))
+)
+
+TEST ///
+R = CC[x,y]
+I = ideal((random(1,R))^2)
+nv = numericalIrreducibleDecomposition I
+Wsets = flatten values nv
+Wpoints = Wsets / sample / matrix / (p-> numNoethOps(I,p))
+///
+
+
+
+conjugate(Matrix) := Matrix => M -> (
+	matrix table(numrows M, numcols M, (i,j) -> conjugate(M_(i,j)))
+)
 
 socleMonomials = method()
 socleMonomials(Ideal) := List => (I) -> (
@@ -192,6 +252,28 @@ coordinateChangeOps(RingElement, RingMap) := RingElement => (D, f) -> (
 	psi := transpose (sub((A ++ (transpose A')),WA) * (transpose vars WA));
 	(map(WA,WA,psi)) D
 )
+
+
+noethOpsFromComponents = method()
+noethOpsFromComponents(HashTable) := List => H -> (
+	nops := flatten values H;
+	R := ring first nops;
+	nops = unique (nops / (f -> sub(f, R)));
+	Ps := apply(nops, D -> select(keys H, P -> any(H#P, D' -> D == sub(D',ring D))));
+	
+	mults := Ps / (Lp -> 
+		if set Lp === set keys H then 1_R else (
+			J := intersect(keys H - set Lp);
+			(sub(gens J,R) * random(R^(#J_*), R^1))_(0,0)
+		)
+	);
+
+	apply(mults, nops, (i,j) -> i*j)
+)
+
+
+
+
 
 
 -- Tests
@@ -251,6 +333,12 @@ assert sanityCheck(NJ,J)
 assert sanityCheck(NI,I)
 ///
 
+TEST ///
+A = approxKer (matrix{{1_RR,0},{0,0.01}},Tolerance => .1)
+B = approxKer (matrix{{1_RR,0},{0,0.01}},Tolerance => .001)
+assert(A == matrix{{0_RR},{1}})
+assert(B == 0)
+///
 end--
 
 load "nops.m2"

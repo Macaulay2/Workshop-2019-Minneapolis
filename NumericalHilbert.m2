@@ -1006,15 +1006,18 @@ doc ///
 
 doc ///
      Key
-	  (hilbertFunction,DualSpace)
 	  (hilbertFunction,ZZ,DualSpace)
+	  (hilbertFunction,DualSpace)
 	  (hilbertFunction,List,DualSpace)
      Usage
-          T = hilbertFunction(S)
           k = hilbertFunction(d,S)
+	  T = hilbertFunction(S)
 	  K = hilbertFunction(D,S)
      Inputs
-     	  S:DualSpace
+     	  d:
+		an integer, or a @TO List@ of arguments
+	  S:DualSpace
+		a dual space
      Outputs
           T:Tally
 	      of dimensions for each degree
@@ -1226,6 +1229,7 @@ end
 
 
 restart
+installPackage("NumericalHilbert", RemakeAllDocumentation => true)
 --loadPackage "NumericalHilbert"
 R = CC[x,y]
 M = matrix {{x^2-x*y^2,x^3}}
