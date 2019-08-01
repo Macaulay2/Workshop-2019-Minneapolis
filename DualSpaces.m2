@@ -729,7 +729,7 @@ noethOps (Ideal, Point) := List => opts -> (I, p) -> (
 
 approxKer = method(Options => {Tolerance => null})
 approxKer(Matrix) := Matrix => o -> A -> (
-    tol := if o.Tolerance === null then defaultT(R) else o.Tolerance;
+    tol := if o.Tolerance === null then defaultT(ring A) else o.Tolerance;
     d := numcols A;
     (S,U,Vh) := SVD A;
     n := #select(S, s -> clean(tol, s) == 0);
@@ -1396,6 +1396,8 @@ doc ///
      Key
           numericalImage
 	  (numericalImage,Matrix,Number)
+	  (numericalImage,Matrix)
+	  [numericalImage,Tolerance]
      Headline
           Image of a matrix
      Usage
@@ -1429,6 +1431,8 @@ doc ///
      Key
           numericalKernel
 	  (numericalKernel,Matrix,Number)
+	  (numericalKernel,Matrix)
+	  [numericalKernel,Tolerance]
      Headline
           Kernel of a matrix
      Usage
