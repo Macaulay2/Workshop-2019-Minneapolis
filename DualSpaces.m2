@@ -481,20 +481,21 @@ numericalImage (Matrix, Number) := (M, tol) -> (
 	)
     )
 
-numericalKernel = method()
-numericalKernel (Matrix, Number) := (M, tol) -> (
+numericalKernel = method(Options => {Tolerance => 1e-6})
+numericalKernel Matrix := Matrix => opts -> M -> (
     R := ring M;
     M = sub(M, ultimate(coefficientRing, R));
     if numrows M == 0 then return id_(source M);
     if numcols M == 0 then return map(R^0,R^0,0);
     if precision 1_R < infinity then (
 	(svs, U, Vt) := SVD M;
-	cols := positions(svs, sv->(sv > tol));
+	cols := positions(svs, sv->(sv > opts.Tolerance));
 	submatrix'(adjointMatrix Vt,,cols)
 	) else (
 	gens kernel M
 	)
     )
+numericalKernel (Matrix, Number) := Matrix => opts -> (M, tol) -> numericalKernel(M, Tolerance => tol)
 
 -- produces the conjugate transpose
 adjointMatrix = method(TypicalValue => Matrix)
@@ -657,12 +658,12 @@ basisIndices = (M, tol) -> (
 --)
 
 
-addFactorials = (f, var) -> (
-    (coe, mon) := coefficients(f, Variables => var);
-    factorials := first entries coe / (i -> first exponents(i)) / (i -> product( i / (j -> j!)));
-    res := apply(flatten entries mon, factorials, (i,j) -> i/j);
-    sum apply(first entries coe, res, (i,j) -> i*j)
-)
+-- addFactorials = (f, var) -> (
+--     (coe, mon) := coefficients(f, Variables => var);
+--     factorials := first entries coe / (i -> first exponents(i)) / (i -> product( i / (j -> j!)));
+--     res := apply(flatten entries mon, factorials, (i,j) -> i/j);
+--     sum apply(first entries coe, res, (i,j) -> i*j)
+-- )
 
 
 -- Given an element N in Weyl algebra and a polynomial
@@ -750,7 +751,7 @@ numNoethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
 
     elapsedTime M := diff(bd, transpose matrix {flatten (table(bx,I_*,(i,j) -> i*j))});
     elapsedTime M' := sub(M,p);
-    elapsedTime K := colReduce(approxKer M', opts.Tolerance);
+    elapsedTime K := colReduce(numericalKernel M', opts.Tolerance);
 
     -- Return elements in WeylAlgebra for nice formatting
     R' := makeWA (R, SetVariables => false);
@@ -1515,7 +1516,7 @@ doc ///
 TEST ///
 R = QQ[x,y,z]
 I = ideal(x^2 - y, y^2)
-nops = MacaulayMatrixPD({x,y}, 10, 10, I)
+nops = noethOps(I, DegreeLimit => 10)
 assert(sanityCheck(nops, I))
 ///
 
@@ -1523,12 +1524,11 @@ TEST ///
 R = QQ[x_0..x_3]
 S = QQ[s,t]
 I0 = ker map(S,R,{s^5,s^3*t^2, s^2*t^3, t^5})
-depvars = gens R - set support first independentSets I0
-nops = MacaulayMatrixPD(depvars, 10, 10, I0)
+nops = noethOps(I0, DegreeLimit => 10)
 assert(sanityCheck(nops, I0))
 I1 = ideal(x_0^2, x_1^2, x_2^2)
-depvars = gens R - set support first independentSets I1
-nops = MacaulayMatrixPD(depvars, 10, 10, I1)
+nops = noethOps(I1, DegreeLimit => 10)
+assert(sanityCheck(nops,I1))
 ///
 
 
@@ -1537,31 +1537,42 @@ R = QQ[x,y]
 I = ideal((x-1)^2,(x-1)*(y+1),(y+1)^3)
 J = ideal((x)^2,(x)*(y),(y)^3)
 Ps = associatedPrimes I
-noethOps(I, first Ps)
-noethOps(J, ideal(x,y))
+nopsI = noethOps(I, first Ps)
+W = ring first nopsI
+assert(set nopsI === set{W_3^2, W_2, W_3, 1_W})
+nopsJ = noethOps(J, ideal gens R)
+W = ring first nopsJ
+assert(set nopsJ === set{W_3^2, W_2, W_3, 1_W})
 ///
 
 
-TEST ///
+TEST /// -- Linear coordinate change test
 R = QQ[x,y]
 I = ideal(x^2*(y-x))
 f = map(R,R,{2*x+y,x+y})
 J = f I
 NI = noethOps I
 NJ = noethOps J
-convertedNI = NI / (i-> sub(coordinateChangeOps(i,f), ring first NJ))
+WI = ring first NI
+WJ = ring first NJ
+convertedNI = NI / (i-> sub(coordinateChangeOps(i,f), WJ))
 assert sanityCheck(convertedNI,J)
 assert sanityCheck(NJ,J)
 assert sanityCheck(NI,I)
+assert(set NI === set{1_WI, WI_0*WI_2 - WI_1*WI_2})
+assert(set NJ === set{1_WJ, WJ_0*WJ_2})
+assert(set convertedNI === set{1_WJ, WJ_0*WJ_2 - WJ_0*WJ_3})
 ///
 
-TEST ///
-A = approxKer (matrix{{1_RR,0},{0,0.01}},Tolerance => .1)
-B = approxKer (matrix{{1_RR,0},{0,0.01}},Tolerance => .001)
-assert(A == matrix{{0_RR},{1}})
-assert(B == 0)
+TEST /// -- numNoethOps test
+R = CC[x,y,t]
+I = ideal(x^2-t*y, y^2)
+nv = numericalIrreducibleDecomposition(I, Software => BERTINI)
+Wsets = select(flatten values nv, x -> class x === WitnessSet )
+pt = first (Wsets / sample / matrix)
+l = numNoethOps(I, pt, Tolerance => 1e-2)
+assert(toString(l/terms/(m -> m/exponents)) === "{{{{0, 0, 0, 0, 0, 0}}}, {{{0, 0, 0, 1, 0, 0}}}, {{{0, 0, 0, 2, 0, 0}}, {{0, 0, 0, 0, 1, 0}}}, {{{0, 0, 0, 3, 0, 0}}, {{0, 0, 0, 1, 1, 0}}}}")
 ///
-
 
 end
 
@@ -1570,6 +1581,11 @@ restart
 debug loadPackage("DualSpaces", Reload => true)
 installPackage("DualSpaces", RemakeAllDocumentation => true)
 --loadPackage "DualSpaces"
+
+
+needsPackage "NumericalAlgebraicGeometry"
+
+
 R = CC[x,y]
 M = matrix {{x^2-x*y^2,x^3}}
 --M = matrix {{x*y}}
