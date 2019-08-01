@@ -506,7 +506,6 @@ numericalKernel (Matrix, Number) := o -> (M, tol) -> (
 	gens kernel M
 	)
     )
-numericalKernel (Matrix, Number) := Matrix => opts -> (M, tol) -> numericalKernel(M, Tolerance => tol)
 
 -- produces the conjugate transpose
 adjointMatrix = method(TypicalValue => Matrix)
