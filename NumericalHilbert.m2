@@ -15,7 +15,7 @@ export {
      "truncatedDual",
      "zeroDimensionalDual",
      "gCorners",
-     "sCorners",
+     "socles",
      "localHilbertRegularity",
      "eliminatingDual",
      "innerProduct",
@@ -31,23 +31,38 @@ export {
      }
 
 --TruncDualData private keys
-protect Igens, protect syl, protect strategy, protect deg,
-protect dBasis, protect hIgens, protect BMintegrals, protect BMcoefs, protect BMbasis, protect Seeds
+protect \ {
+    Igens,
+    syl,
+    strategy,
+    deg,
+    dBasis,
+    hIgens,
+    BMintegrals,
+    BMcoefs,
+    BMbasis,
+    Seeds
+    }
 
 -----------------------------------------------------------------------------------------
 
 -- Default tolerance value respectively for exact fields and inexact fields
 defaultT := R -> if precision 1_R == infinity then 0 else 1e-6;
 
+shiftGens := (p,Igens) -> (
+    R := ring Igens;
+    sub(Igens, matrix{gens R + apply(p.Coordinates,c->sub(c,R))})
+    )
+    
 
 truncatedDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null})
 truncatedDual (Point,Ideal,ZZ) := o -> (p,I,d) -> truncatedDual(p,gens I,d,o)
-truncatedDual (Point,Matrix,ZZ) := o -> (p,igens,d) -> (
-    R := ring igens;
+truncatedDual (Point,Matrix,ZZ) := o -> (p,Igens,d) -> (
+    R := ring Igens;
     if d < 0 then return dualSpace(map(R^1,R^0,0),p);
     t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
-    igens = sub(igens, matrix{gens R + apply(p.Coordinates,c->sub(c,R))});
-    TDD := truncDualData(igens,false,t,Strategy=>o.Strategy);
+    Igens = shiftGens(p,Igens);
+    TDD := initializeDualData(Igens,false,t,Strategy=>o.Strategy);
     TDD = nextTDD(d,TDD,t);
     dualSpace(TDD,p)
     )
@@ -58,15 +73,15 @@ zeroDimensionalDual (Point,Ideal) := o -> (p,I) -> zeroDimensionalDual(p,gens I,
 zeroDimensionalDual (Point,Matrix) := o -> (p,Igens) -> (
     R := ring Igens;
     t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
-    Igens = sub(Igens, matrix{gens R + apply(p.Coordinates,c->sub(c,R))});
-    TDD := truncDualData(Igens,false,t,Strategy=>o.Strategy);
+    Igens = shiftGens(p,Igens);
+    TDD := initializeDualData(Igens,false,t,Strategy=>o.Strategy);
     dBasis := polySpace map(R^1,R^0,0);
     d := 0;
-    while true do (
-	dDim := dim dBasis;
+    dDim := -1;
+    while dim dBasis != dDim do (
+	dDim = dim dBasis;
     	TDD = nextTDD(d,TDD,t);
 	dBasis = polySpace TDD;
-	if dim dBasis == dDim then break;
 	d = d+1;
 	);
     dualSpace(dBasis,p)
@@ -74,8 +89,8 @@ zeroDimensionalDual (Point,Matrix) := o -> (p,Igens) -> (
 
 --An object that stores the data for an ongoing iterative tuncated dual space computation
 TruncDualData = new Type of MutableHashTable
-truncDualData = method(Options => {Strategy => BM})
-truncDualData (Matrix,Boolean,Number) := o -> (Igens,syl,t) -> (
+initializeDualData = method(Options => {Strategy => BM})
+initializeDualData (Matrix,Boolean,Number) := o -> (Igens,syl,t) -> (
     H := new MutableHashTable;
     R := ring Igens;
     H.Igens = Igens;
@@ -105,7 +120,7 @@ nextTDD (ZZ,TruncDualData,Number) := (d,H,t) -> (
     S := ring H.hIgens;
     if H.strategy == DZ then (
 	Rd := polySpace basis(0,d,R);
-	Id := DZspace(H.Igens,d,H.syl);
+	Id := idealBasis(H.Igens,d,H.syl);
 	H.dBasis = gens orthogonalInSubspace(Id,Rd,t);
 	); 
     if H.strategy == BM then (
@@ -139,20 +154,18 @@ eliminatingDual (Point,Matrix,List,ZZ) := o -> (p,Igens,ind,d) -> (
     R := ring Igens;
     if d < 0 then return dualSpace(map(R^1,R^0,0),p);
     t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
-    Igens = sub(Igens, matrix{gens R + apply(p.Coordinates,c->sub(c,R))});
+    Igens = shiftGens(p,Igens);
     n := numgens R;
     if not all(ind, i->class i === ZZ) or not all(ind, i -> i>=0 and i<n)
     then error ("expected a list of nonnegative integers in the range [0," | n | "] as 2nd parameter");
-    TDD := truncDualData(Igens,false,t);
+    TDD := initializeDualData(Igens,false,t);
     RdBasis := dualSpace(TDD,p);
     dBold := 0;
-    dBnew := dim RdBasis;
-    while dBold != dBnew do (
+    while dBold != dim RdBasis do (
+	dBold = dim RdBasis;
 	TDD = nextTDD(TDD,t);
 	RdBasis = truncate(dualSpace(TDD,p),ind,d);
 	--print(dualSpace(TDD,p),RdBasis);
-	dBold = dBnew;
-	dBnew = dim RdBasis;
 	);
     RdBasis
     )
@@ -195,7 +208,7 @@ gCorners (Point,Matrix) := o -> (p,Igens) -> (
     finalDegree := max(flatten entries Igens / gDegree);
     d := 0;
     dBasis := dBasisReduced := polySpace map(R^1,R^0,0); -- Sylvester truncated dual space
-    TDD := truncDualData(Igens,true,t,Strategy=>o.Strategy); -- initial parameters for computing truncated duals
+    TDD := initializeDualData(Igens,true,t,Strategy=>o.Strategy); -- initial parameters for computing truncated duals
     while d <= finalDegree do (
     	TDD = nextTDD(d,TDD,t);
 	dBasis = polySpace TDD;
@@ -207,7 +220,11 @@ gCorners (Point,Matrix) := o -> (p,Igens) -> (
 	if o.ProduceSB and #newGCs > 0 then SBs = SBs|newSBasis(dBasis,newGCs,d,t);
 	-- Update stopping degree if there were new g-corners found.
 	if #newGCs > 0 then (
-	    topLCMdegree := max apply(subsets(#GCs,2),s->homogenizedLCMdegree(GCs#(s#0), GCs#(s#1)));
+	    topLCMdegree := max apply(subsets(#GCs,2),s->(
+		    (a,b) := (GCs#(s#0), GCs#(s#1));
+		    tdegree := max(a#1 - first degree a#0, b#1 - first degree b#0);
+    		    (first degree mylcm {a#0,b#0}) + tdegree
+		    ));
 	    finalDegree = max(finalDegree,topLCMdegree);
 	    );
 	<< "-- at degree " << d << ": dim " << dim dBasisReduced << ", new corners " << newGCs/first << endl;
@@ -218,19 +235,26 @@ gCorners (Point,Matrix) := o -> (p,Igens) -> (
     sbReduce matrix {GCs}
     )
 
+mylcm = L -> (
+    k := #(first exponents L#0);
+    exps := apply(k, i->max apply(L, l->(first exponents l)#i));
+    (ring L#0)_exps
+    )
+
 -- computes s-corners from the g-corners
 -- i.e. the maximal monomials not in the ideal generated by the g-corners
-sCorners = method(TypicalValue => Matrix)
-sCorners MonomialIdeal := I -> sCorners gens I
-sCorners Matrix := gCs -> (
+socles = method(TypicalValue => Matrix)
+socles MonomialIdeal := I -> socles gens I
+socles Matrix := gCs -> (
     R := ring gCs;
     n := numgens R;
     G := flatten entries gCs;
-    candidates := subsets(G, n) / listLCM;
+    candidates := subsets(G, n) / mylcm;
     S := select(candidates, c -> (
 	    c != 0 and
 	    all(G, g -> not isDivisible(c,g)) and
-	    all(gens R, v -> any(G, g -> isDivisible(v*c,g)))));
+	    all(gens R, v -> any(G, g -> isDivisible(v*c,g)))
+	    ));
     S = unique S;
     matrix{S}
     )
@@ -239,15 +263,15 @@ hilbertFunction DualSpace := L -> (
     if not L.Space.Reduced then L = reduceSpace L;
     tally(flatten entries gens L / first @@ degree)
     )
-hilbertFunction (List,DualSpace) := (LL,L) -> (
+hilbertFunction(List,DualSpace) := (LL,L) -> (
     h := hilbertFunction L;
     apply(LL, d->(if h#?d then h#d else 0))
     )
-hilbertFunction (ZZ,DualSpace) := (d,L) -> first hilbertFunction({d},L)
+hilbertFunction(ZZ,DualSpace) := (d,L) -> first hilbertFunction({d},L)
 
 localHilbertRegularity = method(TypicalValue => ZZ, Options=>{Tolerance => null})
-localHilbertRegularity (Point, Ideal) := o -> (p,I) -> localHilbertRegularity(p,gens I,o)
-localHilbertRegularity (Point, Matrix) := o -> (p,Igens) -> (
+localHilbertRegularity(Point, Ideal) := o -> (p,I) -> localHilbertRegularity(p,gens I,o)
+localHilbertRegularity(Point, Matrix) := o -> (p,Igens) -> (
     n := numgens ring Igens;
     gCs := gCorners(p,Igens,o);
     gCLists := apply(flatten entries gCs, l -> (listForm l)#0#0);
@@ -258,16 +282,7 @@ localHilbertRegularity (Point, Matrix) := o -> (p,Igens) -> (
     while hilbertFunction(s-1,J) == sub(HP,(ring HP)_0 => s-1) do s = s-1;
     s
     )
-    
-
-listLCM = L -> (
-    R := ring L#0;
-    L = apply(L, l -> (listForm l)#0#0);
-    LCMexp := apply(numgens R, i -> max(apply(L, l->l#i)));
-    LCMexp = LCMexp - toList ((numgens R):1);
-    if not all(LCMexp, a -> a >= 0) then return 0;
-    product(numgens R, i -> R_i^(LCMexp#i))
-    )    
+     
 
 -- Implementation of algorithm from 1996 paper of Bernard Mourrain.
 -- M is the main matrix
@@ -338,17 +353,10 @@ newSBasis = (dBasis,newGCs,d,t) -> (
     new List from apply(newGCs, n->first select(1,iBasis, b->(lLeadMonomial b == n#0)))
     )
 
-homogenizedLCMdegree = (a,b) -> (
-     alist := ((listForm(a#0))#0#0);
-     blist := ((listForm(b#0))#0#0);
-     lcmlist := apply(alist,blist, (i,j)->max(i,j));
-     tdegree := max(a#1 - sum alist, b#1 - sum blist);
-     sum lcmlist + tdegree
-     )
 
---Dayton-Zeng matrix to find the the dual space up to degree d.
-DZspace = method(TypicalValue => Matrix)
-DZspace (Matrix, ZZ, Boolean) := (igens, d, syl) -> (
+-- PolySpace of ideal basis through degree d.
+idealBasis = method()
+idealBasis (Matrix, ZZ, Boolean) := (igens, d, syl) -> (
      R := ring igens;
      igens = first entries igens;
      genDeg := if syl then gDegree else lDegree;
@@ -357,37 +365,6 @@ DZspace (Matrix, ZZ, Boolean) := (igens, d, syl) -> (
 	 p = p|(matrix{{g}}*basis(0, d - genDeg g, R));
      polySpace p
      )
-
---checks each monomial of degree d and counts ones in the monomial basis of the quotient space
-hilbertB = method(TypicalValue => ZZ)
-hilbertB (List, ZZ) := (sbElements, d) -> (
-     R := ring first sbElements;
-     G := sbElements / leadMonomial;
-     #select(first entries basis(d,R), m->(#select(G, g->isDivisible(m,g)) == 0))
-     )
-
---finds Hilbert series values combinatorially using inclusion-exclusion
-hilbertC = method(TypicalValue => ZZ)
-hilbertC (List, ZZ) := (sbElements, d) -> (
-     R := ring first sbElements;
-     n := #gens R;
-     sbListForm := apply(sbElements, e -> (listForm e)#0#0); --store lead monomials as n-tuples of integers
-     listFormLcm := L -> apply(n, i->max{max(apply(L,l->l#i)), 0});
-     coef := s -> if even(#s) then 1 else -1;
-     hsum := 0;
-     for s in subsets sbListForm do
-	  hsum = hsum + (coef s)*bin(d - sum listFormLcm s + n-1, n-1);
-     hsum
-     )
-
---returns if lead term of a is divisible by lead term of b
-isDivisible = (a, b) -> (
-     dif := (listForm a)#0#0 - (listForm b)#0#0;
-     all(dif, i->(i >= 0))
-     )
-
---binomial coefficient 
-bin = (m,k) -> if m >= 0 then binomial(m,k) else 0
 
 --lead monomial and lead monomial degree according to ordering associated with
 --the ring (local) and reverse ordering (global)
@@ -404,6 +381,22 @@ sbReduce = L -> (
 	    ));
     L_goodi
     )
+
+contract (PolySpace, PolySpace) := (S, T) -> (
+    T = gens T;
+    S = gens S;
+    cols := for s in flatten entries S list transpose contract(s,T);
+    matrix {cols}
+    )
+
+diff (PolySpace, PolySpace) := (S, T) -> (
+    T = gens T;
+    S = gens S;
+    cols := for s in flatten entries S list transpose diff(s,T);
+    matrix {cols}
+    )
+
+
 
 -- Matrix of inner products
 -- PolySpace generators as rows, DualSpace generators as columns
@@ -444,6 +437,18 @@ orthogonalInSubspace (PolySpace, PolySpace, Number) := (T,S,t) -> (
     T' := dualSpace(T, origin(ring S));
     orthogonalInSubspace(T',S,t)
     )
+
+isDivisible = (a, b) -> (
+     dif := (listForm a)#0#0 - (listForm b)#0#0;
+     all(dif, i->(i >= 0))
+     )
+
+check PolySpace := S -> (
+    assert(numrows gens S == 1);
+    M := last coefficients gens S;
+    assert(rank M == numcols M);
+    )
+check DualSpace := D -> check polySpace gens D
 
 ---------------------------------------------
 -- Numerical Linear Algebra
@@ -552,7 +557,7 @@ doc ///
 		   {TO "eliminatingDual"},
 		   {TO "localHilbertRegularity"},
 		   {TO "gCorners"},
-		   {TO "sCorners"},
+		   {TO "socles"},
 		   {TO "innerProduct"},
                    {TO "reduceSpace"}
 		   }@
@@ -619,6 +624,13 @@ doc ///
 	       See also @TO zeroDimensionalDual@.
 ///
 
+TEST ///
+R = CC[x,y]
+I1 = ideal{x^2,x*y}
+D1 = truncatedDual(origin R, I1, 4)
+assert(hilbertFunction({0,1,2,3,4}, D1) == {1,2,1,1,1})
+///
+
 doc ///
      Key
           zeroDimensionalDual
@@ -661,9 +673,6 @@ doc ///
 
 TEST ///
 R = CC[x,y]
-I1 = ideal{x^2,x*y}
-D1 = truncatedDual(origin R, I1, 4)
-assert(hilbertFunction({0,1,2,3,4}, D1) == {1,2,1,1,1})
 I2 = ideal{x^2,y^2}
 D2 = zeroDimensionalDual(origin R, I2)
 assert(hilbertFunction({0,1,2,3,4}, D2) == {1,2,1,0,0})
@@ -728,14 +737,14 @@ assert(dim LDZ == dim LBM)
 
 doc ///
      Key
-          sCorners
-          (sCorners,MonomialIdeal)
-	  (sCorners,Matrix)
+          socles
+          (socles,MonomialIdeal)
+	  (socles,Matrix)
      Headline
           socle corners of a monomial ideal
      Usage
-          S = sCorners I
-	  S = sCorners G
+          S = socles I
+	  S = socles G
      Inputs
           I:MonomialIdeal
 	  G:Matrix
@@ -749,20 +758,20 @@ doc ///
 	  Example
 	       R = CC[x,y,z];
 	       I = monomialIdeal{x^2,y^2,z^2}
-	       sCorners I
-	       sCorners I^2
+	       socles I
+	       socles I^2
 	       G = vars R
-	       sCorners G
+	       socles G
 ///
 
 TEST ///
 R = CC[x,y]
 G1 = matrix{{x^2,x*y^2,y^4}}
-assert(sCorners G1 == matrix {{x*y, y^3}})
+assert(socles G1 == matrix {{x*y, y^3}})
 G2 = matrix{{x*y^2,x^2*y^2,y^4}}
-assert(sCorners G2 == matrix {{y^3}})
+assert(socles G2 == matrix {{y^3}})
 G3 = matrix{{x*y^2,x^2*y^2}}
-assert(sCorners G3 == matrix {{}})
+assert(socles G3 == matrix {{}})
 ///
 
 doc ///
@@ -880,6 +889,13 @@ doc ///
 	       innerProduct(x, 1+x)
 ///
 
+TEST ///
+R = CC[x,y]
+S = polySpace(basis(3,R))
+P = innerProduct(S,S)
+assert(all((0,0)..(3,3), i->(P_i == if i#0 == i#1 then 1 else 0)))
+///
+
 doc ///
      Key
           orthogonalInSubspace
@@ -990,6 +1006,36 @@ doc ///
 
 doc ///
      Key
+	  (hilbertFunction,DualSpace)
+	  (hilbertFunction,ZZ,DualSpace)
+	  (hilbertFunction,List,DualSpace)
+     Usage
+          T = hilbertFunction(S)
+          k = hilbertFunction(d,S)
+	  K = hilbertFunction(D,S)
+     Inputs
+     	  S:DualSpace
+     Outputs
+          T:Tally
+	      of dimensions for each degree
+	  k:ZZ
+	      dimensions
+	  K:List
+	      of dimensions
+     Description
+          Text
+	      counts the dimension of the dual space in each degree.  A single degree can be
+	      specified, or a list of degrees.  If no degree is specified, then a Tally
+	      is returned pairing each degree with its dimension.
+	  Example
+	       R = CC[x,y];
+	       I = (ideal {x,y})^4;
+	       D = zeroDimensionalDual(origin R, I)
+	       hilbertFunction D
+///
+
+doc ///
+     Key
           "Tolerance (NumericalHilbert)"
 	  [localHilbertRegularity,Tolerance]
 	  [eliminatingDual,Tolerance]
@@ -1089,6 +1135,12 @@ doc ///
 	       numericalImage(M, 0.01)
 ///
 
+TEST ///
+M = matrix {{0.999, 2}, {1, 2}}
+Mimage = numericalImage(M, 0.01)
+assert(numcols Mimage == 1)
+///
+
 doc ///
      Key
           numericalKernel
@@ -1144,6 +1196,12 @@ doc ///
 	       colReduce(N, 0.01)
 ///
 
+TEST ///
+N = matrix {{0.001, 0, 0}, {1, 1, 3}, {2, 2, 5.999}}
+N = colReduce(N, 0.01)
+assert(numcols N == 1)
+///
+
 doc ///
      Key
           adjointMatrix
@@ -1179,7 +1237,7 @@ L = reduceSpace truncatedDual(M,p,6,Strategy=>DZ)
 L = reduceSpace truncatedDual(M,p,6,Strategy=>BM)
 --shiftDual(L,q,8)
 G = matrix{{x^2,x*y^2,y^4}}
-sCorners G
+socles G
 
 hilbertFunction(toList(0..8),L)
 dualInfo(M,p,Truncate=>8)
