@@ -446,7 +446,7 @@ isDivisible = (a, b) -> (
 check PolySpace := S -> (
     assert(numrows gens S == 1);
     M := last coefficients gens S;
-    assert(rank M == numcols M);
+    assert(numgens numericalImage M == numcols M);
     )
 check DualSpace := D -> check polySpace gens D
 
