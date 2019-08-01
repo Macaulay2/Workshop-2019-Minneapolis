@@ -39,7 +39,8 @@ export {
      "DependentSet",
      "numNoethOps",
      "noethOpsFromComponents",
-     "coordinateChangeOps"
+     "coordinateChangeOps",
+     "sanityCheck"
      }
 
 --TruncDualData private keys
@@ -466,8 +467,13 @@ check DualSpace := D -> check polySpace gens D
 -- Numerical Linear Algebra
 ---------------------------------------------
 
-numericalImage = method()
-numericalImage (Matrix, Number) := (M, tol) -> (
+numericalImage = method(Options => {Tolerance => null})
+numericalImage Matrix := o -> M -> (
+    R := ultimate(coefficientRing, ring M);
+    tol := if o.Tolerance === null then defaultT(R) else o.Tolerance;
+    numericalImage(M,tol)
+    )
+numericalImage (Matrix, Number) := o -> (M, tol) -> (
     R := ultimate(coefficientRing, ring M);
     M = sub(M, R);
     if numcols M == 0 then return M;
@@ -481,8 +487,13 @@ numericalImage (Matrix, Number) := (M, tol) -> (
 	)
     )
 
-numericalKernel = method()
-numericalKernel (Matrix, Number) := (M, tol) -> (
+numericalKernel = method(Options => {Tolerance => null})
+numericalKernel Matrix := o -> M -> (
+    R := ultimate(coefficientRing, ring M);
+    tol := if o.Tolerance === null then defaultT(R) else o.Tolerance;
+    numericalKernel(M,tol)
+    )
+numericalKernel (Matrix, Number) := o -> (M, tol) -> (
     R := ring M;
     M = sub(M, ultimate(coefficientRing, R));
     if numrows M == 0 then return id_(source M);
@@ -656,11 +667,10 @@ basisIndices = (M, tol) -> (
 --    res / phi
 --)
 
-diffAlgMap = method()
-diffAlgMap(Ring) := R -> (
+diffAlg = method()
+diffAlg(Ring) := R -> (
     diffVars := apply(gens R, i -> value("symbol d" | toString(i)) );
-    diffAlg := R[diffVars];
-    map(R,diffAlg,vars R)
+    R[diffVars]
     )
 
 addFactorials = (f, var) -> (
@@ -674,18 +684,11 @@ addFactorials = (f, var) -> (
 -- Given an element N in Weyl algebra and a polynomial
 -- f, compute the result of applying N to f.
 applyNOp = (N, f) -> (
-    WW := ring N;
-    diffVars := first entries vars WW;
-    n := #diffVars;
-    DOs := (options(WW))#WeylAlgebra / (i -> i#1) / (i-> i_WW);
-    (mon,coe) := coefficients(N, Variables => DOs);
-    moncoe := apply(flatten entries mon, flatten entries coe, (i,j) -> (i,j));
-    sum for i in moncoe list (
-        exps := (first exponents i#0)_{n//2..(n-1)};
-        deriv := product(apply(exps, diffVars_{0..n//2-1}, (i,j) -> j^i));
-        diff(sub(deriv, (ring f)), f)*sub((i#1), ring f)
+    m := map(ring f, ring N, vars ring f);
+    (a,b) := coefficients matrix{{N}};
+    b = b*matrix{{f}};
+    sum for d from 0 to (numcols a)-1 list diff(m a_(0,d),b_(d,0))
     )
-)
 
 -- Try to see if gens of I applied with all Noeth Ops
 -- vanish on rad(I)
@@ -713,8 +716,8 @@ noethOps (Ideal, Ideal) := List => opts -> (I, P) -> (
     elapsedTime K := gens trim kernel M';
 
     -- Return elements in WeylAlgebra for nice formatting
-    m := diffAlgMap R;
-    R' := source m;
+    R' := diffAlg R;
+    m := map(R, R', vars R);
     bdd := sub(bd, vars R');
     flatten entries (bdd * sub(K, R'))
 )
@@ -724,11 +727,12 @@ noethOps (Ideal, Point) := List => opts -> (I, p) -> (
     noethOps(I,P,opts)
 )
 
-approxKer = method(Options => {Tolerance => 1e-5})
-approxKer(Matrix) := Matrix => opts -> A -> (
+approxKer = method(Options => {Tolerance => null})
+approxKer(Matrix) := Matrix => o -> A -> (
+    tol := if o.Tolerance === null then defaultT(R) else o.Tolerance;
     d := numcols A;
     (S,U,Vh) := SVD A;
-    n := #select(S, s -> clean(opts.Tolerance, s) == 0);
+    n := #select(S, s -> clean(tol, s) == 0);
     K := transpose Vh^{d-n..d-1};
     if K == 0 then K else conjugate K
 )
@@ -746,8 +750,8 @@ numNoethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
     elapsedTime K := colReduce(approxKer M', opts.Tolerance);
 
     -- Return elements in WeylAlgebra for nice formatting
-    m := diffAlgMap R;
-    R' := source m;
+    R' := diffAlg R;
+    m := map(R, R', vars R);
     bdd := sub(bd, vars R');
     flatten entries (bdd * sub(K, R'))
 )
@@ -773,9 +777,13 @@ coordinateChangeOps(RingElement, RingMap) := RingElement => (D, f) -> (
     WA := ring D;
     A := f.matrix // vars R;
     A' := inverse A;
+    (a,b) := coefficients D;
+    b = sub(f sub(b,R), WA);
+    
 
-    psi := transpose (sub((A ++ (transpose A')),WA) * (transpose vars WA));
-    (map(WA,WA,psi)) D
+    psi := transpose (sub(transpose A',WA) * (transpose vars WA));
+    a = (map(WA,WA,psi)) a;
+    (a*b)_(0,0)
 )
 
 
