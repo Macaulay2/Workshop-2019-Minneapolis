@@ -500,7 +500,7 @@ numericalKernel (Matrix, Number) := o -> (M, tol) -> (
     if numcols M == 0 then return map(R^0,R^0,0);
     if precision 1_R < infinity then (
 	(svs, U, Vt) := SVD M;
-	cols := positions(svs, sv->(sv > opts.Tolerance));
+	cols := positions(svs, sv->(sv > tol));
 	submatrix'(adjointMatrix Vt,,cols)
 	) else (
 	gens kernel M
