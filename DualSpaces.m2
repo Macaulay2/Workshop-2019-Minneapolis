@@ -29,6 +29,7 @@ export {
      "orthogonalInSubspace",
      "DZ",
      "BM",
+     "Normalize",
      "ProduceSB",
      "numericalKernel",
      "numericalImage",
@@ -40,7 +41,8 @@ export {
      "numNoethOps",
      "noethOpsFromComponents",
      "coordinateChangeOps",
-     "sanityCheck"
+     "sanityCheck",
+     "applyNOp"
      }
 
 --TruncDualData private keys
@@ -68,36 +70,64 @@ shiftGens := (p,Igens) -> (
     )
     
 
-truncatedDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null})
-truncatedDual (Point,Ideal,ZZ) := o -> (p,I,d) -> truncatedDual(p,gens I,d,o)
-truncatedDual (Point,Matrix,ZZ) := o -> (p,Igens,d) -> (
+vanishingOps = method(Options => {Tolerance => null})
+vanishingOps(PolySpace,Matrix,Boolean,Ideal) := o -> (polys,ops,normalize,P) -> vanishingOps(gens polys,ops,normalize,P,o)
+vanishingOps(Matrix,Matrix,Boolean,Ideal) := o -> (polys,ops,normalize,P) -> (
+    R := ring polys;
+    t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
+    M := if normalize then contract(ops,transpose polys) else diff(ops,transpose polys);
+    M = sub(M,R/P);
+    kern := gens trim kernel M;
+    print(M,ops,polys,kern);
+    sub(kern,R)
+    )
+
+listFactorial = L -> product(L, l->l!)
+
+truncatedDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null, Normalize=>true})
+truncatedDual(Point,Ideal,ZZ) := o -> (p,I,d) -> truncatedDual(p,gens I,d,o)
+truncatedDual(Point,Matrix,ZZ) := o -> (p,Igens,d) -> (
     R := ring Igens;
     if d < 0 then return dualSpace(map(R^1,R^0,0),p);
     t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
-    Igens = shiftGens(p,Igens);
-    TDD := initializeDualData(Igens,false,t,Strategy=>o.Strategy);
-    TDD = nextTDD(d,TDD,t);
-    dualSpace(TDD,p)
+    R' := diffAlg R;
+    P := ideal ((gens R) - p.Coordinates);
+    ops := basis(0,d,R);
+    dBasis := vanishingOps(idealBasis(Igens,d,false),ops,o.Normalize,P);
+    dBasis = sub(ops,vars R')*dBasis;
+    dualSpace(dBasis,p)    
+    --TDD := initializeDualData(Igens,false,t,Strategy=>o.Strategy);
+    --TDD = nextTDD(d,TDD,t);
+    --dualSpace(TDD,p)
     )
 
 
-zeroDimensionalDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null})
-zeroDimensionalDual (Point,Ideal) := o -> (p,I) -> zeroDimensionalDual(p,gens I,o)
-zeroDimensionalDual (Point,Matrix) := o -> (p,Igens) -> (
+zeroDimensionalDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null, Normalize=>true})
+zeroDimensionalDual(Point,Ideal) := o -> (p,I) -> zeroDimensionalDual(p,gens I,o)
+zeroDimensionalDual(Ideal,Ideal) := o -> (P,I) -> zeroDimensionalDual(P,gens I,o)
+zeroDimensionalDual(Point,Matrix) := o -> (p,Igens) -> (
+    R := ring Igens;
+    P := ideal ((gens R) - p.Coordinates);
+    zeroDimensionalDual(P,Igens,o)
+    )
+zeroDimensionalDual(Ideal,Matrix) := o -> (P,Igens) -> (
     R := ring Igens;
     t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
-    Igens = shiftGens(p,Igens);
-    TDD := initializeDualData(Igens,false,t,Strategy=>o.Strategy);
-    dBasis := polySpace map(R^1,R^0,0);
+    --TDD := initializeDualData(Igens,false,t,Strategy=>o.Strategy);
+    dBasis := map(R^1,R^0,0);
     d := 0;
     dDim := -1;
-    while dim dBasis != dDim do (
-	dDim = dim dBasis;
-    	TDD = nextTDD(d,TDD,t);
-	dBasis = polySpace TDD;
+    R' := diffAlg R;
+    while numcols dBasis != dDim do (
+	dDim = numcols dBasis;
+	ops := basis(0,d,R);
+	dBasis = vanishingOps(idealBasis(Igens,d,false),ops,o.Normalize,P);
+	dBasis = sub(ops,vars R')*dBasis;
+    	--TDD = nextTDD(d,TDD,t);
+	--dBasis = polySpace TDD;
 	d = d+1;
 	);
-    dualSpace(dBasis,p)
+    dualSpace(dBasis,origin(R))
     )
 
 --An object that stores the data for an ongoing iterative tuncated dual space computation
@@ -369,10 +399,11 @@ newSBasis = (dBasis,newGCs,d,t) -> (
 
 -- PolySpace of ideal basis through degree d.
 idealBasis = method()
-idealBasis (Matrix, ZZ, Boolean) := (igens, d, syl) -> (
+idealBasis(Ideal, ZZ, Boolean) := (I, d, useGDegree) -> idealBasis(gens I, d, useGDegree)
+idealBasis(Matrix, ZZ, Boolean) := (igens, d, useGDegree) -> (
      R := ring igens;
      igens = first entries igens;
-     genDeg := if syl then gDegree else lDegree;
+     genDeg := if useGDegree then gDegree else lDegree;
      p := map(R^1,R^0,0);
      for g in igens do
 	 p = p|(matrix{{g}}*basis(0, d - genDeg g, R));
@@ -686,8 +717,7 @@ diffAlg(Ring) := R -> (
 applyNOp = (N, f) -> (
     m := map(ring f, ring N, vars ring f);
     (a,b) := coefficients matrix{{N}};
-    b = b*matrix{{f}};
-    sum for d from 0 to (numcols a)-1 list diff(m a_(0,d),b_(d,0))
+    diff(m a,f)*sub(b,ring f)
     )
 
 -- Try to see if gens of I applied with all Noeth Ops
@@ -699,27 +729,30 @@ visualCheck = (nops, I) -> (
 
 sanityCheck = (nops, I) -> (
     foo := flatten table(nops, I_*, (n,i) -> applyNOp(n,i));
-    all(foo, i -> i%(radical I) == 0)
+    all(foo, i -> sub(i,ring I)%(radical I) == 0)
 )
 
 
 noethOps = method(Options => {DegreeLimit => 5, DependentSet => null}) 
 noethOps (Ideal, Ideal) := List => opts -> (I, P) -> (
     R := ring I;
-    var := if opts.DependentSet === null then gens R - set support first independentSets P
+    depVars := if opts.DependentSet === null then gens R - set support first independentSets P
             else opts.DependentSet;
-    bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
-    bd := basis(0,opts.DegreeLimit,R, Variables => var);
+    indVars := gens R - set depVars;
+    S := ((coefficientRing R)[indVars])[depVars];
+    dS := zeroDimensionalDual(sub(P,S),sub(I,S),Normalize=>false);
+    R' := diffAlg R;
+    return flatten entries sub(gens dS,R');
+--    bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
+--    bd := basis(0,opts.DegreeLimit,R, Variables => depVars);
 
-    elapsedTime M := diff(bd, transpose matrix {flatten (table(bx,I_*,(i,j) -> i*j))});
-    elapsedTime M' := sub(M,R/P);
-    elapsedTime K := gens trim kernel M';
+--    elapsedTime M := diff(bd, transpose gens idealBasis(I,opts.DegreeLimit,false));
+--    elapsedTime M' := sub(M,R/P);
+--    elapsedTime K := gens trim kernel M';
 
     -- Return elements in WeylAlgebra for nice formatting
-    R' := diffAlg R;
-    m := map(R, R', vars R);
-    bdd := sub(bd, vars R');
-    flatten entries (bdd * sub(K, R'))
+--    bdd := sub(bd, vars R');
+--    flatten entries (bdd * sub(K, R'))
 )
 noethOps (Ideal) := List => opts -> (I) -> noethOps(I, ideal gens radical I, opts)
 noethOps (Ideal, Point) := List => opts -> (I, p) -> (
@@ -751,7 +784,6 @@ numNoethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
 
     -- Return elements in WeylAlgebra for nice formatting
     R' := diffAlg R;
-    m := map(R, R', vars R);
     bdd := sub(bd, vars R');
     flatten entries (bdd * sub(K, R'))
 )
@@ -1542,11 +1574,11 @@ I = ideal((x-1)^2,(x-1)*(y+1),(y+1)^3)
 J = ideal((x)^2,(x)*(y),(y)^3)
 Ps = associatedPrimes I
 nopsI = noethOps(I, first Ps)
-W = ring first nopsI
-assert(set nopsI === set{W_3^2, W_2, W_3, 1_W})
+W = ring nopsI
+assert(set flatten entries gens nopsI === set{W_1^2, W_0, W_1, 1_W})
 nopsJ = noethOps(J, ideal gens R)
-W = ring first nopsJ
-assert(set nopsJ === set{W_3^2, W_2, W_3, 1_W})
+W = ring nopsJ
+assert((sort flatten entries gens nopsJ) == sort{W_1^2, W_0, W_1, 1_W})
 ///
 
 
