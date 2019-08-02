@@ -774,7 +774,8 @@ approxKer(Matrix) := Matrix => o -> A -> (
 numNoethOps = method(Options => options noethOps ++ options approxKer)
 numNoethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
     R := ring I;
-    var := gens R - set support first independentSets I;
+    var := if opts.DependentSet === null then gens R - set support first independentSets I
+            else opts.DependentSet;
     bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
     bd := basis(0,opts.DegreeLimit,R, Variables => var);
 

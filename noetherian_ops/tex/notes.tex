@@ -318,6 +318,11 @@ Suppose $f \in I$. Then $f \in q_i$ for all $i$, so $D \bullet f \in \sqrt{q_i}$
 
 Conversely, suppose $f \not \in I$. Then WLOG $f \not \in q_1$, so there exists $D \in N_1$ such that $D \bullet f \not \in \sqrt{q_1}$. Since also $h_1 \not \in \sqrt{q_1}$ and $\sqrt{q_1}$ is prime, this means $h_1 D \bullet f \not \in \sqrt{q_1}$, and thus $h_1 D \bullet f \not \in \sqrt{I}$.
 \end{proof}
+
+We note if $I$ is a primary ideal, and $N$ a set of Noetherian operators, then applying all Noetherian operators to the generators of $I$ does not result in a generating set for $\sqrt{I}$
+\begin{example}
+	Let $I = \langle xy - z^2 \rangle^2 \subseteq \mathbb{C}[x,y,z]$. Then $N = \{1, \partial_y\}$ is a set of Noetherian operators. Applying these operators to the generator of $I$ yields a new ideal $N(I) = \langle (xy-z^2)^2, 2x(xy-z^2) \rangle$. This ideal does not contain $xy - z^2$.
+\end{example}
 % subsection positive_dimensions (end)
 % section numerical_approaches (end)
 
