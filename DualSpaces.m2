@@ -77,14 +77,16 @@ vanishingOps(Matrix,Matrix,Boolean,Ideal) := o -> (polys,ops,normalize,P) -> (
     t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
     M := if normalize then contract(ops,transpose polys) else diff(ops,transpose polys);
     M = sub(M,R/P);
-    kern := gens trim kernel M;
-    print(M,ops,polys,kern);
+    kern := if numgens coefficientRing R == 0 and t > 0 then (
+	colReduce(numericalKernel(M,t),t)
+	) else gens trim kernel M;
+    --print(M,gens P,ops,polys,kern);
     sub(kern,R)
     )
 
 listFactorial = L -> product(L, l->l!)
 
-truncatedDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null, Normalize=>true})
+truncatedDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null, Normalize=>false})
 truncatedDual(Point,Ideal,ZZ) := o -> (p,I,d) -> truncatedDual(p,gens I,d,o)
 truncatedDual(Point,Matrix,ZZ) := o -> (p,Igens,d) -> (
     R := ring Igens;
@@ -102,7 +104,7 @@ truncatedDual(Point,Matrix,ZZ) := o -> (p,Igens,d) -> (
     )
 
 
-zeroDimensionalDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null, Normalize=>true})
+zeroDimensionalDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null, Normalize=>false})
 zeroDimensionalDual(Point,Ideal) := o -> (p,I) -> zeroDimensionalDual(p,gens I,o)
 zeroDimensionalDual(Ideal,Ideal) := o -> (P,I) -> zeroDimensionalDual(P,gens I,o)
 zeroDimensionalDual(Point,Matrix) := o -> (p,Igens) -> (
