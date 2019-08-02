@@ -840,6 +840,18 @@ noethOpsFromComponents(HashTable) := List => H -> (
     apply(mults, nops, (i,j) -> i*j)
 )
 
+rationalInterpolation = method(Options => {Tolerance => 1e-6})
+rationalInterpolation(List, List, Matrix, Matrix) := (RingElement, RingElement) => opts -> (pts, vals, numBasis, denBasis) -> (
+    R := ring numBasis_(0,0);
+    nn := numColumns numBasis;
+    nd := numColumns denBasis;
+    M := apply(pts, vals, (pt,val) -> evaluate(numBasis, pt) | -val * evaluate(denBasis, pt));
+    M = fold(M, (i,j) -> i || j);
+    ker := clean(opts.Tolerance, approxKer(M, Tolerance => opts.Tolerance));
+    (numBasis * foo_0^{0..(nn - 1)}, denBasis * foo_0^{nn .. (nn+nd-1)})
+)
+
+
 testMM = (nop, mm) -> (
     (sub(nop, ring mm) % mm) == 0
 )
