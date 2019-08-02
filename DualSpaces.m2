@@ -773,6 +773,7 @@ approxKer(Matrix) := Matrix => o -> A -> (
 
 numNoethOps = method(Options => options noethOps ++ options approxKer)
 numNoethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
+    tol := if opts.Tolerance === null then defaultT(ring I) else opts.Tolerance;
     R := ring I;
     var := if opts.DependentSet === null then gens R - set support first independentSets I
             else opts.DependentSet;
@@ -781,7 +782,7 @@ numNoethOps (Ideal, Matrix) := List => opts -> (I, p) -> (
 
     elapsedTime M := diff(bd, transpose matrix {flatten (table(bx,I_*,(i,j) -> i*j))});
     elapsedTime M' := sub(M,p);
-    elapsedTime K := colReduce(numericalKernel M', opts.Tolerance);
+    elapsedTime K := colReduce(numericalKernel M', tol);
 
     -- Return elements in WeylAlgebra for nice formatting
     R' := diffAlg R;
