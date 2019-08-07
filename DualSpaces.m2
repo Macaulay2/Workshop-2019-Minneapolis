@@ -68,36 +68,32 @@ shiftGens := (p,Igens) -> (
     R := ring Igens;
     sub(Igens, matrix{gens R + apply(p.Coordinates,c->sub(c,R))})
     )
-    
-
-vanishingOps = method(Options => {Tolerance => null})
-vanishingOps(PolySpace,Matrix,Boolean,Ideal) := o -> (polys,ops,normalize,P) -> vanishingOps(gens polys,ops,normalize,P,o)
-vanishingOps(Matrix,Matrix,Boolean,Ideal) := o -> (polys,ops,normalize,P) -> (
-    R := ring polys;
-    t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
-    M := if normalize then contract(ops,transpose polys) else diff(ops,transpose polys);
-    M = sub(M,R/P);
-    kern := if numgens coefficientRing R == 0 and t > 0 then (
-	colReduce(numericalKernel(M,t),t)
-	) else gens trim kernel M;
-    --print(M,gens P,ops,polys,kern);
-    sub(kern,R)
-    )
 
 listFactorial = L -> product(L, l->l!)
 
 truncatedDual = method(TypicalValue => DualSpace, Options => {Strategy => BM, Tolerance => null, Normalize=>false})
 truncatedDual(Point,Ideal,ZZ) := o -> (p,I,d) -> truncatedDual(p,gens I,d,o)
+truncatedDual(Ideal,Ideal,ZZ) := o -> (P,I,d) -> truncatedDual(P,gens I,d,o)
 truncatedDual(Point,Matrix,ZZ) := o -> (p,Igens,d) -> (
     R := ring Igens;
-    if d < 0 then return dualSpace(map(R^1,R^0,0),p);
+    P := ideal ((gens R) - p.Coordinates);
+    truncatedDual(P,Igens,d,o)
+    )
+truncatedDual(Ideal,Matrix,ZZ) := o -> (P,Igens,d) -> (
+    R := ring Igens;
+    if d < 0 then return dualSpace(map(R^1,R^0,0),origin(R));
     t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
     R' := diffAlg R;
-    P := ideal ((gens R) - p.Coordinates);
     ops := basis(0,d,R);
-    dBasis := vanishingOps(idealBasis(Igens,d,false),ops,o.Normalize,P);
-    dBasis = sub(ops,vars R')*dBasis;
-    dualSpace(dBasis,p)    
+    polys := gens idealBasis(Igens,d,false);
+    M := if o.Normalize then contract(ops,transpose polys) else diff(ops,transpose polys);
+    M = sub(M,R/P);
+    kern := if numgens coefficientRing R == 0 and t > 0 then (
+	colReduce(numericalKernel(M,t),t)
+	) else gens trim kernel M;
+    --print(M,gens P,ops,polys,kern);
+    dBasis := sub(ops,vars R')*sub(kern,R);
+    dualSpace(dBasis,origin(R))
     --TDD := initializeDualData(Igens,false,t,Strategy=>o.Strategy);
     --TDD = nextTDD(d,TDD,t);
     --dualSpace(TDD,p)
@@ -112,24 +108,17 @@ zeroDimensionalDual(Point,Matrix) := o -> (p,Igens) -> (
     P := ideal ((gens R) - p.Coordinates);
     zeroDimensionalDual(P,Igens,o)
     )
-zeroDimensionalDual(Ideal,Matrix) := o -> (P,Igens) -> (
-    R := ring Igens;
-    t := if o.Tolerance === null then defaultT(R) else o.Tolerance;
-    --TDD := initializeDualData(Igens,false,t,Strategy=>o.Strategy);
-    dBasis := map(R^1,R^0,0);
+zeroDimensionalDual(Ideal,Matrix) := o -> (P,Igens) -> (  
+    R := ring Igens;  
+    dBasis := polySpace map(R^1,R^0,0);
     d := 0;
     dDim := -1;
-    R' := diffAlg R;
-    while numcols dBasis != dDim do (
-	dDim = numcols dBasis;
-	ops := basis(0,d,R);
-	dBasis = vanishingOps(idealBasis(Igens,d,false),ops,o.Normalize,P);
-	dBasis = sub(ops,vars R')*dBasis;
-    	--TDD = nextTDD(d,TDD,t);
-	--dBasis = polySpace TDD;
+    while dim dBasis != dDim do (
+	dDim = dim dBasis;
+	dBasis = truncatedDual(P,Igens,d,o);
 	d = d+1;
 	);
-    dualSpace(dBasis,origin(R))
+    dBasis
     )
 
 --An object that stores the data for an ongoing iterative tuncated dual space computation
@@ -745,16 +734,6 @@ noethOps (Ideal, Ideal) := List => opts -> (I, P) -> (
     dS := zeroDimensionalDual(sub(P,S),sub(I,S),Normalize=>false);
     R' := diffAlg R;
     return flatten entries sub(gens dS,R');
---    bx := flatten entries basis(0,opts.DegreeLimit,R, Variables => gens R);
---    bd := basis(0,opts.DegreeLimit,R, Variables => depVars);
-
---    elapsedTime M := diff(bd, transpose gens idealBasis(I,opts.DegreeLimit,false));
---    elapsedTime M' := sub(M,R/P);
---    elapsedTime K := gens trim kernel M';
-
-    -- Return elements in WeylAlgebra for nice formatting
---    bdd := sub(bd, vars R');
---    flatten entries (bdd * sub(K, R'))
 )
 noethOps (Ideal) := List => opts -> (I) -> noethOps(I, ideal gens radical I, opts)
 noethOps (Ideal, Point) := List => opts -> (I, p) -> (
