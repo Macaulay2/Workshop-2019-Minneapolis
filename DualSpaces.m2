@@ -819,6 +819,12 @@ noethOpsFromComponents(HashTable) := List => H -> (
     apply(mults, nops, (i,j) -> i*j)
 )
 
+-- Inputs
+-- pts: list of points (each point as a row matrix)
+-- vals: list of values
+-- numBasis: basis for numerator (row matrix)
+-- colBasis: basis for denominator (row matrix)
+-- Outputs a sequence (numerator, denominator)
 rationalInterpolation = method(Options => {Tolerance => 1e-6})
 rationalInterpolation(List, List, Matrix, Matrix) := (RingElement, RingElement) => opts -> (pts, vals, numBasis, denBasis) -> (
     R := ring numBasis_(0,0);
@@ -827,7 +833,10 @@ rationalInterpolation(List, List, Matrix, Matrix) := (RingElement, RingElement) 
     M := apply(pts, vals, (pt,val) -> evaluate(numBasis, pt) | -val * evaluate(denBasis, pt));
     M = fold(M, (i,j) -> i || j);
     ker := clean(opts.Tolerance, approxKer(M, Tolerance => opts.Tolerance));
-    (numBasis * foo_0^{0..(nn - 1)}, denBasis * foo_0^{nn .. (nn+nd-1)})
+    if numColumns ker == 0 then print "Warning: no kernel found" else if numColumns ker > 1 then print "Warning: kernel has more than one column";
+    -- Normalize
+    K := colReduce(ker, opts.Tolerance);
+    ((numBasis * K_0^{0..(nn - 1)})_0, (denBasis * K_0^{nn .. (nn+nd-1)})_0)
 )
 
 
