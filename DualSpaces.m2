@@ -730,7 +730,7 @@ noethOps (Ideal, Ideal) := List => opts -> (I, P) -> (
     depVars := if opts.DependentSet === null then gens R - set support first independentSets P
             else opts.DependentSet;
     indVars := gens R - set depVars;
-    S := ((coefficientRing R)[indVars])[depVars];
+    S := (frac((coefficientRing R)[indVars]))[depVars];
     dS := zeroDimensionalDual(sub(P,S),sub(I,S),Normalize=>false);
     R' := diffAlg R;
     return flatten entries sub(gens dS,R');
