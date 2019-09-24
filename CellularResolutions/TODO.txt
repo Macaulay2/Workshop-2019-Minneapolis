@@ -8,7 +8,7 @@ Specific: (In approximate order of importance)
 1) Add homology function that can be applied directly to the cell complex
 2) Add tools for cohomology
 3) Add a database of common complexes
-4) Get a cell complex from a polytope
+4) Get a cell complex from a polytope/simplicial complex
 5) Be able to check at the cell complex level minimality/resolutionness
 6) Figure out a "good solution" for the -1 cell/Options for including a -1 cell 
 7) New attach function that takes for input a cell complex and a boundary (and a label?), and returns a new cell complex with a cell attached there
