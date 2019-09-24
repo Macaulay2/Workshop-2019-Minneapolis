@@ -1,0 +1,23 @@
+TO DO in CellularResolutions package: 
+
+General: 
+-- Documentation documentation documentation 
+-- Clean up the SimplicialComplexes package
+
+Specific: (In approximate order of importance)
+1) Add homology function that can be applied directly to the cell complex
+2) Add tools for cohomology
+3) Add a database of common complexes
+4) Get a cell complex from a polytope
+5) Be able to check at the cell complex level minimality/resolutionness
+6) Figure out a "good solution" for the -1 cell/Options for including a -1 cell 
+7) New attach function that takes for input a cell complex and a boundary (and a label?), and returns a new cell complex with a cell attached there
+8) Make labelRing optional (just make it QQ (or ZZ?) by default) 
+9) Make a relabel function 
+10) Create a way of giving nice output for cells/cell complexes (net)
+11) Cache results
+12) Figure out how carefully we can check if something is a CW complex
+
+
+Issues:
+1) Make sure boundary maps are indexed correctly
