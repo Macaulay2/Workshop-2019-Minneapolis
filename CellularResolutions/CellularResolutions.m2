@@ -24,7 +24,8 @@ export {"CellComplex",
         "cellLabel",
         "newCell",
         "newSimplexCell",
-        "neg1Cell"
+        "neg1Cell",
+	"testhomology"
         }
 protect labelRing
 protect cellDimension
@@ -97,7 +98,7 @@ makeCell := (lst, l) -> (
     n := bdim + 1;
     bd := if lst == {} then {(neg1Cell,1)} else lst;
     new Cell from {
-	symbol cellDimension => n, --FIGURE IT OUT
+	symbol cellDimension => n, 
 	symbol boundary => bd, -- could verify that it's a list
 	symbol label => l
     	}
@@ -270,6 +271,21 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
 chainComplex(CellComplex) := (cellComplex) -> (
     (chainComplex apply((dim cellComplex) + 1, r -> boundary(r,cellComplex)))[1]
     );
+
+--Get homology directly from cell complex
+homology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
+    homology_i chainComplex cellComplex
+    );
+
+homology(CellComplex) := opts -> (cellComplex) -> (
+    homology chainComplex cellComplex
+    );
+
+--Get cohomology directly from cell complex
+cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> ( 
+    cohomology_i chainComplex cellComplex
+    );
+
 
 ----------------------------
 
@@ -508,8 +524,7 @@ doc ///
 ///
 
 doc /// 
-    Key 
-    	boundary 
+    Key  
 	(boundary, ZZ, CellComplex) 
     Headline 
     	compute the boundary map of a cell complex from r-faces to (r-1)-faces 
@@ -524,9 +539,9 @@ doc ///
     	: Matrix 
 	    the boundary map from r-faces to (r-1)-faces of C
     SeeAlso 
-    (chainComplex,CellComplex)
-    (boundary,SimplicialComplex)
-    (chainComplex,SimplicialComplex) 
+        (chainComplex,CellComplex)
+        (boundary,SimplicialComplex)
+        (chainComplex,SimplicialComplex) 
 ///
 
 doc ///
@@ -650,7 +665,7 @@ assert(#cells(0,D)==4);
 assert(#cells(-1,D)==1);
 ///
 
---Koszul Complex via Talyor resolutions
+--Koszul Complex via Taylor resolutions
 TEST ///
 R = QQ[x,y,z];
 vx = newSimplexCell({},x);
@@ -696,7 +711,7 @@ lxz = newSimplexCell {vx,vz};
 fxyz = newSimplexCell {lxy,lyz,lxz};
 D = cellComplex(R,{fxyz});
 C = (chainComplex D)[-1];
-assert(C.dd^2==0);
+assert(C.dd^2==0); -- this fails as of 16.VIII.2019 (C.dd_2 * C.dd_3 != 0)
 ///
 
 end
