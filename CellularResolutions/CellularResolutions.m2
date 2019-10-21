@@ -9,7 +9,7 @@ newPackage(
         },
     Headline => "A package for cellular resolutions of monomial ideals",
     AuxiliaryFiles => false, -- set to true if package comes with auxiliary files
-    PackageExports => {"SimplicialComplexes"}
+    PackageExports => {"Polyhedra", "SimplicialComplexes"}
     )
 
 export {"CellComplex",
@@ -24,8 +24,7 @@ export {"CellComplex",
         "cellLabel",
         "newCell",
         "newSimplexCell",
-        "neg1Cell",
-	"testhomology"
+        "neg1Cell"
         }
 protect labelRing
 protect cellDimension
@@ -286,6 +285,27 @@ cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
     cohomology_i chainComplex cellComplex
     );
 
+----------
+---Here there be polyhedra 
+----------
+
+faces(Polyhedron) := opts -> (P) -> Polyhedra$faces P
+faces(ZZ,Polyhedron) := opts -> (r,P) ->Polyhedra$faces(r,P)
+vertices(Polyhedron) := (P) -> Polyhedra$vertices P
+
+cellComplex(Ring,Polyhedron) := (R,P) -> (
+    Pdim := dim P;
+    Pfaces := applyKeys(faces P, i -> Pdim-i); --flips from codim to dim
+    Pfaces = applyValues(Pfaces, lst -> if lst != {} then apply(lst, lst -> first lst) else {});
+    cells := new MutableHashTable from {{} => neg1Cell};
+    for i from 0 to Pdim do (
+        for face in Pfaces#i do (
+	    bd := for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue);
+            cells#face = newCell bd
+            );
+        );
+    cellComplex(R,flatten values cells)    
+    );
 
 ----------------------------
 
@@ -489,17 +509,18 @@ doc ///
 ///
 
 doc ///
-    Key 
+    Key
+    	cells 
     	(cells,CellComplex)
     Headline 
     	return the cells of a cell complex
     Usage
-    	cells C
+    	cells(C)
     Inputs 
     	C : CellComplex  
 	    the CellComplex whose cells are to be returned 
     Outputs 
-    	: MutableHashTable 
+    	: HashTable 
 	    the cells of C 
     SeeAlso 
     	(cells,ZZ,CellComplex)
@@ -519,13 +540,13 @@ doc ///
     	C : CellComplex 
 	    the CellComplex whose r-cells are to be returned
     Outputs
-    	: MutableList 
+    	: List 
 	    the r-cells of C
 ///
 
 doc /// 
     Key  
-	(boundary, ZZ, CellComplex) 
+	(boundary,ZZ,CellComplex) 
     Headline 
     	compute the boundary map of a cell complex from r-faces to (r-1)-faces 
     Usage 
@@ -553,7 +574,7 @@ doc ///
         chainComplex C
     Inputs
         C : CellComplex
-            the complex to compute the chain complex
+            the cell complex for which to compute the chain complex
     Outputs
         :ChainComplex
             the dimension of the complex
@@ -573,6 +594,44 @@ doc ///
 	(boundary,SimplicialComplex)
         (chainComplex,SimplicialComplex)
 ///
+
+doc ///
+    Key
+        (homology,CellComplex)
+    Headline
+        compute the homology modules of a cell complex
+    Usage
+        homology(C)
+    Inputs
+        C : CellComplex
+            a cell complex with labels in ring(C)
+    Outputs
+        : GradedModule
+            the graded module, the homology of C with coefficients in ring(C)
+    SeeAlso
+        (homology,ZZ,CellComplex)
+///
+
+doc ///
+    Key
+        (homology,ZZ,CellComplex)
+    Headline
+        compute the homology modules of a cell complex
+    Usage
+        homology(r,C)
+    Inputs
+        r : ZZ
+	    an integer
+	C : CellComplex
+            a cell complex with labels in ring(C)
+    Outputs
+        : Module
+            the r-th homology module of C with coefficients in ring(C)
+    SeeAlso
+        (homology,ZZ,CellComplex)
+///
+
+
 
 TEST ///
 assert(dim cellComplex(QQ,{}) === -infinity);
@@ -620,6 +679,7 @@ CchainComplex = chainComplex C;
 assert(HH_0(CchainComplex)==0);
 assert(HH_1(CchainComplex)==0);
 assert(HH_2(CchainComplex)==0);
+assert(HH C == HH CchainComplex);
 ///
 
 -- RP2
