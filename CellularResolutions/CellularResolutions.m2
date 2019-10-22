@@ -284,7 +284,7 @@ homology(CellComplex) := opts -> (cellComplex) -> (
 
 --Get cohomology directly from cell complex
 cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> ( 
-    cohomology_i chainComplex cellComplex
+    cohomology_i Hom(chainComplex cellComplex,cellComplex.labelRing^1)
     );
 
 ----------
@@ -713,6 +713,8 @@ C
 assert(dim C===2);
 prune HH chainComplex C
 assert(HH_1 chainComplex C == cokernel matrix {{2}})
+assert(HH^2 C == cokernel matrix {{2}});
+assert(HH^1 C == 0);
 ///
 
 TEST /// 
