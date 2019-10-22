@@ -18,6 +18,7 @@ Specific: (In approximate order of importance)
 11) Cache results
 12) Figure out how carefully we can check if something is a CW complex
 13) Add a n-skeleton function
+14) Function for cell poset
 
 
 Issues:
