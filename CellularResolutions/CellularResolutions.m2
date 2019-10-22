@@ -25,7 +25,9 @@ export {"CellComplex",
         "newCell",
         "newSimplexCell",
         "neg1Cell",
-	"testhomology"
+	"testhomology",
+        "isFree",
+        "isMinimal"
         }
 protect labelRing
 protect cellDimension
@@ -286,6 +288,23 @@ cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
     cohomology_i chainComplex cellComplex
     );
 
+isFree = method(TypicalValue => Boolean);
+--check if all the labels are free modules
+isFree(CellComplex) := (cellComplex) -> (
+    R := cellComplex.labelRing;
+    all(cells cellComplex,c -> isFree toModule(R,cellLabel c))
+    )
+
+isCellMinimal := (R,cell) -> (
+    label := toModule(R,cellLabel cell);
+    all(boundary cell, c -> toModule(R,cellLabel first c) != label)
+    )
+
+isMinimal = method(TypicalValue => Boolean)
+--Check if a labeled cell complex is minimal, Note: we assume the cell complex is free (see isFree)
+isMinimal(CellComplex) := (cellComplex) -> (
+    all(cells cellComplex,isCellMinimal)
+    )
 
 ----------------------------
 
