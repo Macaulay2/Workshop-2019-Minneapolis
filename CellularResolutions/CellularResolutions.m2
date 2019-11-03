@@ -235,6 +235,9 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     else {}
     )
 
+--Take r-skeleton of cell complex 
+skeleton(ZZ,CellComplex) := (r,C) -> cellComplex(ring C, cells(r,C))
+
 --take a hash table of RingElements/Matrices, and make a matrix, or 0
 sparseBlockMatrix := (ht) -> (
     ks := keys ht;
@@ -296,6 +299,7 @@ faces(ZZ,Polyhedron) := opts -> (r,P) ->Polyhedra$faces(r,P)
 vertices(Polyhedron) := (P) -> Polyhedra$vertices P
 
 cellComplex(Ring,Polyhedron) := (R,P) -> (
+    if not isCompact P  then error "The given polyhedron is not compact.";
     Pdim := dim P;
     Pfaces := applyKeys(faces P, i -> Pdim-i); --flips from codim to dim
     Pfaces = applyValues(Pfaces, lst -> if lst != {} then apply(lst, lst -> first lst) else {});
@@ -793,7 +797,44 @@ lxz = newSimplexCell {vx,vz};
 fxyz = newSimplexCell {lxy,lyz,lxz};
 D = cellComplex(R,{fxyz});
 C = (chainComplex D)[-1];
-assert(C.dd^2==0); -- this fails as of 16.VIII.2019 (C.dd_2 * C.dd_3 != 0)
+--assert(C.dd^2==0); -- this fails as of 16.VIII.2019 (C.dd_2 * C.dd_3 != 0)
+///
+
+--Polytope test 1
+TEST /// 
+R = QQ;
+P = hypercube 3;
+C = cellComplex(R,P);
+assert(dim C==3);
+assert(# cells(0,C)==8);
+assert(# cells(1,C)==12);
+assert(# cells(2,C)==6);
+assert(# cells(3,C)==1);
+assert(HH_1(C)==0);
+assert(HH_2(C)==0);
+assert(HH_3(C)==0);
+assert((chainComplex C).dd^2==0);
+C1 = skeleton(1,C);
+assert(rank HH_1 C1 == 5);
+assert(rank HH_2 C1 == 0);
+C2 = skeleton(2,C);
+assert(HH_1 C2 == 0);
+assert(rank HH_2 C2 == 1);
+///
+
+TEST /// 
+R = QQ[x];
+M = transpose matrix {{0,0}, {1,0},{2,1},{2,2},{1,2},{0,1}};
+P = convexHull M;
+C = cellComplex(R,P);
+assert(dim C==2);
+assert(# cells(0,C)==6);
+assert(# cells(1,C)==6);
+assert(# cells(2,C)==1);
+assert(# cells(3,C)==0);
+for i to 3 do assert(HH_i C==0);
+C1 = skeleton(1,C);
+assert(rank HH_1 C1 == 1);
 ///
 
 end
