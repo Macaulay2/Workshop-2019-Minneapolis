@@ -236,10 +236,6 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     else {}
     )
 
-<<<<<<< HEAD
---Take r-skeleton of cell complex 
-skeleton(ZZ,CellComplex) := (r,C) -> cellComplex(ring C, cells(r,C))
-=======
 --TODO polyhedra also defines skeleton
 -- skeleton = method();
 skeleton(ZZ,CellComplex) := (n,cellComplex) -> (
@@ -249,7 +245,6 @@ skeleton(ZZ,CellComplex) := (n,cellComplex) -> (
         symbol cells => c
 	}
     )
->>>>>>> bedd919ee97776d211edf64a6a6bddf277f72f59
 
 --take a hash table of RingElements/Matrices, and make a matrix, or 0
 sparseBlockMatrix := (ht) -> (
