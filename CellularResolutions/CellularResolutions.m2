@@ -309,6 +309,10 @@ cellComplex(Ring,Polyhedron) := (R,P) -> (
     cellComplex(R,flatten values cells)    
     );
 
+-------------
+-- Minimality
+-------------
+
 isFree = method(TypicalValue => Boolean);
 --check if all the labels are free modules
 isFree(CellComplex) := (cellComplex) -> (
@@ -326,6 +330,17 @@ isMinimal = method(TypicalValue => Boolean)
 isMinimal(CellComplex) := (cellComplex) -> (
     all(cells cellComplex,isCellMinimal)
     )
+
+---------
+-- Output
+---------
+
+net(CellComplex) := (cellComplex) -> (
+    d := dim cellComplex;
+    nMaxCells := #(cells(d,cellComplex));
+    nTotalCells := #(cells cellComplex);
+    "CellComplex of dimension " | d | " with " | nMaxCells | " maximal cells and " | nTotalCells | " total cells"
+    );
 
 ----------------------------
 
