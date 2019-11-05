@@ -27,6 +27,7 @@ export {"CellComplex",
         "neg1Cell",
         "isFree",
         "isMinimal"
+--        "skeleton"
         }
 protect labelRing
 protect cellDimension
@@ -233,6 +234,16 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     if cellComplex.cells#?r 
     then cellComplex.cells#r
     else {}
+    )
+
+--TODO polyhedra also defines skeleton
+-- skeleton = method();
+skeleton(ZZ,CellComplex) := (n,cellComplex) -> (
+    c := new HashTable from select(pairs cellComplex.cells, (k,v) -> k<=n);
+    new CellComplex from {
+        symbol labelRing => cellComplex.labelRing,
+        symbol cells => c
+	}
     )
 
 --take a hash table of RingElements/Matrices, and make a matrix, or 0
@@ -730,6 +741,7 @@ prune HH chainComplex C
 assert(HH_1 chainComplex C == cokernel matrix {{2}})
 assert(HH^2 C == cokernel matrix {{2}});
 assert(HH^1 C == 0);
+assert(dim skeleton_1 C == 1);
 ///
 
 TEST /// 
