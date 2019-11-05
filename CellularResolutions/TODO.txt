@@ -13,12 +13,13 @@ Specific: (In approximate order of importance)
 6) Figure out a "good solution" for the -1 cell/Options for including a -1 cell 
 7) New attach function that takes for input a cell complex and a boundary (and a label?), and returns a new cell complex with a cell attached there
 8) Make labelRing optional (just make it QQ (or ZZ?) by default) 
-9) Make a relabel function 
-10) Create a way of giving nice output for cells/cell complexes (net)
+9) Make a relabel function (something that maps old values to new values)
+10) Create a way of giving nice output for cells/cell complexes (net) (Done for cell complexes)
 11) Cache results
 12) Figure out how carefully we can check if something is a CW complex
-13) Add a n-skeleton function
+13) Add a n-skeleton function (Done)
 14) Function for cell poset
+15) Add polyhedral complex -> cell complex code
 
 
 Issues:
