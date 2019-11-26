@@ -340,7 +340,8 @@ isCellMinimal := (R,cell) -> (
 isMinimal = method(TypicalValue => Boolean)
 --Check if a labeled cell complex is minimal, Note: we assume the cell complex is free (see isFree)
 isMinimal(CellComplex) := (cellComplex) -> (
-    all(cells cellComplex,isCellMinimal)
+    R := cellComplex.labelRing;
+    all(flatten values cells cellComplex,c -> isCellMinimal(R,c))
     )
 
 ---------

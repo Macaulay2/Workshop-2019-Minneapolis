@@ -165,9 +165,10 @@ assert(HH_1 C2 == 0);
 assert(rank HH_2 C2 == 1);
 ///
 
+--Polytope test 2
 TEST /// 
 R = QQ[x];
-M = transpose matrix {{0,0}, {1,0},{2,1},{2,2},{1,2},{0,1}};
+M = transpose matrix {{0,0},{1,0},{2,1},{2,2},{1,2},{0,1}}; -- this is a hexagon
 P = convexHull M;
 C = cellComplex(R,P);
 assert(dim C==2);
@@ -178,4 +179,34 @@ assert(# cells(3,C)==0);
 for i to 3 do assert(HH_i C==0);
 C1 = skeleton(1,C);
 assert(rank HH_1 C1 == 1);
+///
+
+--Polytope test 3 
+TEST ///
+R = ZZ[x];
+M = transpose matrix {{0,0,0},{0,1,0},{0,0,1},{1,0,0},{1,1,0},{1,0,1}};
+P = convexHull M;
+C = cellComplex(R,P);
+assert(dim C==3);
+assert(# cells(0,C)==6);
+assert(# cells(1,C)==9);
+assert(# cells(2,C)==5);
+assert(# cells(3,C)==1);
+assert(# cells(4,C)==0);
+///
+
+--Minimality check 
+TEST ///
+R = QQ[x,y,z];
+v1 = newCell({},x^2*y);
+v2 = newCell({},y*z);
+v3 = newCell({},z^3);
+e12 = newCell({v1,v2});
+e13 = newCell({v1,v3});
+e23 = newCell({v2,v3});
+f123 = newCell({e12,e13,e23});
+Cnonmin = cellComplex(R,{f123});
+assert(isMinimal(Cnonmin) != true);
+Cmin = cellComplex(R,{e12,e23});
+assert(isMinimal(Cmin) == true);
 ///
