@@ -61,7 +61,8 @@ cellComplex = method()
 cellComplex(Ring,List) := (R,maxCells) -> (
     new CellComplex from {
     	symbol labelRing => R,
-        symbol cells => cellsFromMaxCells maxCells
+        symbol cells => cellsFromMaxCells maxCells,
+        cache => new CacheTable
 	}
     )
 cellComplex(Ring,SimplicialComplex) := (R,C) -> (
@@ -281,7 +282,10 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     );
 
 chainComplex(CellComplex) := (cellComplex) -> (
-    (chainComplex apply((dim cellComplex) + 1, r -> boundary(r,cellComplex)))[1]
+    if not cellComplex.cache.?chainComplex then (
+        cellComplex.cache.chainComplex = (chainComplex apply((dim cellComplex) + 1, r -> boundary(r,cellComplex)))[1]
+        );
+    cellComplex.cache.chainComplex
     );
 
 --Get homology directly from cell complex
