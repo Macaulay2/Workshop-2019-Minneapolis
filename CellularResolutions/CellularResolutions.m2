@@ -55,15 +55,20 @@ cellsFromMaxCells := lst -> (
     partition(dim,finishedCells)
     )
 
+--Private constructor, creates the cache
+mkCellComplex := (labelRingVal,cellsVal) -> (
+    new CellComplex from {
+        symbol labelRing => labelRingVal,
+        symbol cells => cellsVal,
+        cache => new CacheTable
+	}
+    )
+
 --Adds a single -1 cell by default
 --TODO: create an option to make a void complex
 cellComplex = method()
 cellComplex(Ring,List) := (R,maxCells) -> (
-    new CellComplex from {
-    	symbol labelRing => R,
-        symbol cells => cellsFromMaxCells maxCells,
-        cache => new CacheTable
-	}
+    mkCellComplex(R,cellsFromMaxCells maxCells)
     )
 cellComplex(Ring,SimplicialComplex) := (R,C) -> (
     S := ring C;
@@ -241,10 +246,7 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
 -- skeleton = method();
 skeleton(ZZ,CellComplex) := (n,cellComplex) -> (
     c := new HashTable from select(pairs cellComplex.cells, (k,v) -> k<=n);
-    new CellComplex from {
-        symbol labelRing => cellComplex.labelRing,
-        symbol cells => c
-	}
+    mkCellComplex(cellComplex.labelRing,c)
     )
 
 --take a hash table of RingElements/Matrices, and make a matrix, or 0
