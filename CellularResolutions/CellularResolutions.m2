@@ -354,6 +354,10 @@ isMinimal(CellComplex) := (cellComplex) -> (
 -- Output
 ---------
 
+net(Cell) := (cell) -> (
+    "Cell of dimension " | (dim cell)
+    )
+
 net(CellComplex) := (cellComplex) -> (
     d := dim cellComplex;
     nMaxCells := #(cells(d,cellComplex));

@@ -8,19 +8,22 @@ Specific: (In approximate order of importance)
 1) Add homology function that can be applied directly to the cell complex (Done)
 2) Add tools for cohomology (Partial)
 3) Add a database of common complexes
+   a) Sphere
+   b) RP^n
+   c) Torus
 4) Get a cell complex from a polytope/simplicial complex (Done, needs more tests)
 5) Be able to check at the cell complex level minimality/resolutionness (Minimality: done)
-6) Figure out a "good solution" for the -1 cell/Options for including a -1 cell 
+6) Use options in homology/chainComplex to allow the user to choose reduced homology.
 7) New attach function that takes for input a cell complex and a boundary (and a label?), and returns a new cell complex with a cell attached there
 8) Make labelRing optional (just make it QQ (or ZZ?) by default) 
 9) Make a relabel function (something that maps old values to new values)
-10) Create a way of giving nice output for cells/cell complexes (net) (Done for cell complexes)
-11) Cache results
+10) Create a way of giving nice output for cells/cell complexes (net) (Done)
+11) Cache results (chainComplex cached)
 12) Figure out how carefully we can check if something is a CW complex
 13) Add a n-skeleton function (Done)
-14) Function for cell poset
+14) Function for cell poset (Ola)
 15) Add polyhedral complex -> cell complex code
-
+16) Wedge/Connect Sum/cone/etc of cell complexes
 
 Issues:
 1) Make sure boundary maps are indexed correctly
