@@ -9,7 +9,7 @@ newPackage(
         },
     Headline => "A package for cellular resolutions of monomial ideals",
     AuxiliaryFiles => true, -- set to true if package comes with auxiliary files
-    PackageExports => {"Polyhedra", "SimplicialComplexes"}
+    PackageExports => {"Polyhedra", "SimplicialComplexes", "Posets"}
     )
 
 export {"CellComplex",
@@ -113,8 +113,11 @@ chainToVirtualTally := (lst) -> (
     )
 
 boundary(Cell) := (cell) -> cell.boundary
+boundaryCells = method()
+boundaryCells(Cell) := (cell) -> apply(boundary(cell), c -> first c)
 --Boundary function, returns the boundary as a VirtualTally
 boundaryTally := (cell) -> chainToVirtualTally cell.boundary
+
 
 --Check if a chain, represented by a list is a boundary
 isCycle = method()
@@ -307,7 +310,7 @@ faces(ZZ,Polyhedron) := opts -> (r,P) ->Polyhedra$faces(r,P)
 vertices(Polyhedron) := (P) -> Polyhedra$vertices P
 
 cellComplex(Ring,Polyhedron) := (R,P) -> (
-    if not isCompact P  then error "The given polyhedron is not compact.";
+    if not isCompact P then error "The given polyhedron is not compact.";
     Pdim := dim P;
     Pfaces := applyKeys(faces P, i -> Pdim-i); --flips from codim to dim
     Pfaces = applyValues(Pfaces, lst -> if lst != {} then apply(lst, lst -> first lst) else {});
@@ -320,6 +323,16 @@ cellComplex(Ring,Polyhedron) := (R,P) -> (
         );
     cellComplex(R,flatten values cells)    
     );
+
+-------------
+-- Posets
+-------------
+
+facePoset(CellComplex) := (cellComplex) -> (
+    G := flatten values cells cellComplex;
+    contain := (a,b) -> member(a,boundaryCells b) or a == b;-- a contained or equal b
+    poset(G,contain)
+    ) -- rn this is throwing me the error "The relations are not anti-symmetric."
 
 -------------
 -- Minimality
@@ -353,7 +366,7 @@ net(CellComplex) := (cellComplex) -> (
     nMaxCells := #(cells(d,cellComplex));
     nTotalCells := #(cells cellComplex);
     "CellComplex of dimension " | d | " with " | nMaxCells | " maximal cells and " | nTotalCells | " total cells"
-    );
+    ); 
 
 ----------------------------
 
