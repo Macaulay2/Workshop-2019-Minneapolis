@@ -351,3 +351,34 @@ doc ///
 	    D = cellComplex(R,{f123});
 	    isMinimal D
 ///
+
+doc /// 
+    Key 
+    	(facePoset,CellComplex)
+    Headline
+    	generates the face poset of a cell complex 
+    Usage 
+        facePoset C
+    Inputs 
+    	C : CellComplex 
+	        a cell complex
+    Outputs 
+    	: Poset
+	        the face poset of C 
+    Description 
+    	Text
+	    The face poset of a cell complex is the poset of cells with partial ordering given by inclusion
+	Example
+	    R = QQ;
+	    v1 = newCell {};
+	    v2 = newCell {};
+	    v3 = newCell {};
+	    v4 = newCell {};
+	    e12 = newCell({v1,v2});
+	    e23 = newCell({v2,v3});
+	    e34 = newCell({v3,v4});
+	    e41 = newCell({v4,v1});
+	    f = newCell({e12,e23,e34,e41});
+	    C = cellComplex(R,{f});
+	    facePoset C
+///

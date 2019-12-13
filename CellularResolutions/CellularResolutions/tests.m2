@@ -195,6 +195,28 @@ assert(# cells(3,C)==1);
 assert(# cells(4,C)==0);
 ///
 
+--Face poset 
+TEST ///
+R = QQ;
+v1 = newCell {};
+v2 = newCell {};
+v3 = newCell {};
+v4 = newCell {};
+e12 = newCell({v1,v2});
+e23 = newCell({v2,v3});
+e34 = newCell({v3,v4});
+e41 = newCell({v4,v1});
+f = newCell({e12,e23,e34,e41});
+C = cellComplex(R,{f}); -- C is a square
+assert(dim C == 2);
+P = facePoset C;
+assert(compare(P,v1,e12));
+assert(compare(P,v1,e23) == false);
+assert(compare(P,P_*#0,f));
+assert(isGraded P);
+assert(maximalElements P === {f});
+///
+
 --Minimality check 
 TEST ///
 R = QQ[x,y,z];

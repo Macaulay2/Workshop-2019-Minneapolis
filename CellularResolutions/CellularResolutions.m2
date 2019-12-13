@@ -336,9 +336,13 @@ cellComplex(Ring,Polyhedron) := (R,P) -> (
 
 facePoset(CellComplex) := (cellComplex) -> (
     G := flatten values cells cellComplex;
-    contain := (a,b) -> member(a,boundaryCells b) or a == b;-- a contained or equal b
-    poset(G,contain)
-    ) -- rn this is throwing me the error "The relations are not anti-symmetric."
+    G = G_{-1 .. #G-2};
+    contain := (a,b) -> member(a,boundaryCells b) or a === b;-- a contained or equal b
+    P := poset(G,contain);
+    rel := allRelations P;
+    M := transitiveClosure(G,rel);
+    poset(G,rel,M)
+    )
 
 -------------
 -- Minimality
@@ -374,7 +378,7 @@ net(Cell) := (cell) -> (
 net(CellComplex) := (cellComplex) -> (
     d := dim cellComplex;
     nMaxCells := #(cells(d,cellComplex));
-    nTotalCells := #(cells cellComplex);
+    nTotalCells := #(flatten values cells cellComplex);
     "CellComplex of dimension " | d | " with " | nMaxCells | " maximal cells and " | nTotalCells | " total cells"
     ); 
 
