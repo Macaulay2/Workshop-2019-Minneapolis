@@ -18,7 +18,6 @@ export {"CellComplex",
         "makeCell",
         "attach",
         "isCycle",
-        "attachSimplex",
         "isSimplex",
 	"cells",
         "cellLabel",
@@ -27,7 +26,6 @@ export {"CellComplex",
         "neg1Cell",
         "isFree",
         "isMinimal"
---        "skeleton"
         }
 protect labelRing
 protect cellDimension

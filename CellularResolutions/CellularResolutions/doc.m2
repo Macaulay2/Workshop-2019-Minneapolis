@@ -264,7 +264,7 @@ doc ///
         C : CellComplex
             the cell complex for which to compute the chain complex
     Outputs
-        :ChainComplex
+        : ChainComplex
             the dimension of the complex
     Description
         Text
@@ -321,6 +321,7 @@ doc ///
 
 doc ///
     Key 
+    	isMinimal
     	(isMinimal,CellComplex)
     Headline 
     	check if a labeled cell complex supports a minimal resolution 
@@ -381,4 +382,57 @@ doc ///
 	    f = newCell({e12,e23,e34,e41});
 	    C = cellComplex(R,{f});
 	    facePoset C
+///
+
+doc /// 
+    Key 
+    	(skeleton,ZZ,CellComplex)
+    Headline 
+    	returns the $r$-skeleton of a cell complex 
+    Usage 
+    	skeleton(ZZ,CellComplex)
+    Inputs 
+    	r : ZZ 
+    	C : CellComplex
+	    a cell complex 
+    Outputs 
+    	: CellComplex 
+	    the $r$-skeleton of the cell complex $C$
+    Description 
+    	Text 
+	    The $r$-skeleton of a cell complex is the union of its cells whose dimension is at most $r$. 
+	Example 
+	    R = QQ[x];
+	    P = hypercube 3;
+	    C = cellComplex(R,P);
+	    dim C
+	    cells C
+	    S = skeleton(2,C);
+	    dim S
+	    cells S
+///
+
+doc /// 
+    Key 
+    	(cellComplex,Ring,Polyhedron)
+    Headline 
+    	creates cell complex from given polyhedron 
+    Usage 
+    	cellComplex(Ring,Polyhedron) 
+    Inputs 
+    	R : Ring 
+	    that specifies the base ring 
+	P : Polyhedron 
+    Outputs 
+    	C : CellComplex 
+	    whose cells are the faces of the given polyhedron
+    Description 
+    	Text 
+	    Given a polyhedron, this command returns the cell complex whose cells correspond to the faces of the polyhedron. 
+	Example 
+	    R = QQ;
+	    P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
+	    faces P
+	    C = cellComplex(R,P);
+	    cells C
 ///
