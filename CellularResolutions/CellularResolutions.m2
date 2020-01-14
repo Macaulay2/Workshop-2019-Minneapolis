@@ -25,7 +25,8 @@ export {"CellComplex",
         "newSimplexCell",
         "neg1Cell",
         "isFree",
-        "isMinimal"
+        "isMinimal",
+	"Reduced"
         }
 protect labelRing
 protect cellDimension
@@ -284,11 +285,16 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     map(codomain,domain,sparseBlockMatrix new HashTable from L)
     );
 
-chainComplex(CellComplex) := (cellComplex) -> (
+chainComplex(CellComplex) := {Reduced=>true} >> o -> (cellComplex) -> (
     if not cellComplex.cache.?chainComplex then (
         cellComplex.cache.chainComplex = (chainComplex apply((dim cellComplex) + 1, r -> boundary(r,cellComplex)))[1]
         );
-    cellComplex.cache.chainComplex
+    if not o.Reduced then (
+	Ccopy := chainComplex cellComplex.cache.chainComplex;
+	Ccopy_(-1) = 0;
+	Ccopy
+	)
+    else cellComplex.cache.chainComplex
     );
 
 --Get homology directly from cell complex
