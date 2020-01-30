@@ -316,13 +316,31 @@ cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
 ----------
 
 faces(Polyhedron) := opts -> (P) -> Polyhedra$faces P
-faces(ZZ,Polyhedron) := opts -> (r,P) ->Polyhedra$faces(r,P)
+faces(ZZ,Polyhedron) := opts -> (r,P) -> Polyhedra$faces(r,P)
 vertices(Polyhedron) := (P) -> Polyhedra$vertices P
+
+faces(PolyhedralComplex) := opts -> (PC) -> Polyhedra$faces PC 
+faces(ZZ,PolyhedralComplex) := opts -> (r,PC) -> Polyhedra$faces(r,PC) 
+vertices(PolyhedralComplex) := (PC) -> Polyhedra$vertices PC
 
 cellComplex(Ring,Polyhedron) := (R,P) -> (
     if not isCompact P then error "The given polyhedron is not compact.";
     Pdim := dim P;
     Pfaces := applyKeys(faces P, i -> Pdim-i); --flips from codim to dim
+    Pfaces = applyValues(Pfaces, lst -> if lst != {} then apply(lst, lst -> first lst) else {});
+    cells := new MutableHashTable from {{} => neg1Cell};
+    for i from 0 to Pdim do (
+        for face in Pfaces#i do (
+	    bd := for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue);
+            cells#face = newCell bd
+            );
+        );
+    cellComplex(R,flatten values cells)    
+    );
+
+cellComplex(Ring,PolyhedralComplex) := (R,P) -> (
+    Pdim := dim P;
+    Pfaces := applyKeys(faces P, i -> Pdim-i-1); --flips from codim to dim
     Pfaces = applyValues(Pfaces, lst -> if lst != {} then apply(lst, lst -> first lst) else {});
     cells := new MutableHashTable from {{} => neg1Cell};
     for i from 0 to Pdim do (
