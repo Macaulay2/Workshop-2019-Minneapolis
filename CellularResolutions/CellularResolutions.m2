@@ -299,16 +299,19 @@ chainComplex(CellComplex) := {Reduced=>true} >> o -> (cellComplex) -> (
 
 --Get homology directly from cell complex
 homology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
-    homology_i chainComplex cellComplex
+    reduced := if opts.?Reduced then opts.Reduced else true;
+    homology_i chainComplex(cellComplex,Reduced=>reduced)
     );
 
 homology(CellComplex) := opts -> (cellComplex) -> (
-    homology chainComplex cellComplex
+    reduced := if opts.?Reduced then opts.Reduced else true;
+    homology chainComplex(cellComplex,Reduced=>reduced)
     );
 
 --Get cohomology directly from cell complex
 cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> ( 
-    cohomology_i Hom(chainComplex cellComplex,cellComplex.labelRing^1)
+    reduced := if opts.?Reduced then opts.Reduced else true;
+    cohomology_i Hom(chainComplex(cellComplex,Reduced=>reduced),cellComplex.labelRing^1)
     );
 
 ----------
