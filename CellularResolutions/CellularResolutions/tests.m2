@@ -195,6 +195,24 @@ assert(# cells(3,C)==1);
 assert(# cells(4,C)==0);
 ///
 
+--Polyhedral complex
+TEST /// 
+R = QQ[x];
+P1 = convexHull matrix {{2,2,0},{1,-1,0}};
+P2 = convexHull matrix {{2,-2,0},{1,1,0}};
+P3 = convexHull matrix {{-2,-2,0},{1,-1,0}};
+P4 = convexHull matrix {{-2,2,0},{-1,-1,0}};
+F = polyhedralComplex {P1,P2,P3,P4};
+C = cellComplex(R,F);
+assert(# cells(0,C)==5);
+assert(# cells(1,C)==8);
+assert(# cells(2,C)==4);
+assert(# cells(3,C)==0);
+for i to 2 do assert(HH_i C==0);
+C1 = skeleton(1,C);
+assert(rank HH_1 C1 == 4);
+///
+
 --Face poset 
 TEST ///
 R = QQ;
