@@ -23,7 +23,6 @@ export {"CellComplex",
         "cellLabel",
         "newCell",
         "newSimplexCell",
-        "neg1Cell",
         "isFree",
         "isMinimal",
 	"Reduced"
@@ -34,13 +33,6 @@ protect cellDimension
 CellComplex = new Type of HashTable
 --Note, the mutable hash table means that equality works "Correctly"
 Cell = new Type of MutableHashTable
-
---Creates a single negative 1 dimensional cell 
-neg1Cell = new Cell from {
-    symbol cellDimension => -1,
-    symbol boundary => {},
-    symbol label => 1 
-    };
 
 --returns a hashtable of lists of cells indexed by dimension
 cellsFromMaxCells := lst -> (
@@ -69,17 +61,20 @@ cellComplex = method()
 cellComplex(Ring,List) := (R,maxCells) -> (
     mkCellComplex(R,cellsFromMaxCells maxCells)
     )
-cellComplex(Ring,SimplicialComplex) := (R,C) -> (
+cellComplex(SimplicialComplex) := (C) -> (
     S := ring C;
     Cfaces := applyValues(new HashTable from faces C,flatten @@ entries);
-    cells := new MutableHashTable from {1_S => neg1Cell};
+    --cells indexes Cells by monomials corresponding to faces of the simplicial complex
+    cells := new MutableHashTable from {};
     for i from 0 to dim C do (
         for simplex in Cfaces#i do (
-            bd := for x in gens S list (if simplex%x==0 then cells#(simplex//x) else continue);
+            bd := if i==0
+                  then {}
+                  else for x in gens S list (if simplex%x==0 then cells#(simplex//x) else continue);
             cells#simplex = newCell bd
             );
         );
-    cellComplex(R,values cells)
+    cellComplex(S,values cells)
     )
 
 --Define dimension for cell
@@ -103,10 +98,9 @@ makeCell := (lst, l) -> (
 	else assert(bdim == dim cell#0)
 	);
     n := bdim + 1;
-    bd := if lst == {} then {(neg1Cell,1)} else lst;
     new Cell from {
 	symbol cellDimension => n, 
-	symbol boundary => bd, -- could verify that it's a list
+	symbol boundary => lst, -- could verify that it's a list
 	symbol label => l
     	}
     );
@@ -273,12 +267,14 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     codomainModules :=
         new HashTable from apply(toList tCells,c -> (c,toModule(R,cellLabel c)));
     domain := fold((a,b) -> a ++ b, R^0, values domainModules);
-    codomain := fold((a,b) -> a ++ b, R^0, values codomainModules);
+    codomain := if t==-1 then R^1 else fold((a,b) -> a ++ b, R^0, values codomainModules);
     tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
     i := 0;
     L := flatten for F in rCells list (
-	l := apply(pairs boundaryTally F,
-            (cell,deg) -> (tCellsIndexed#cell,i) => deg_R*inducedMap(codomainModules#cell,domainModules#F));
+	l := if t==-1
+             then (0,i) => inducedMap(codomain,domainModules#F)
+             else apply(pairs boundaryTally F,
+                 (cell,deg) -> (tCellsIndexed#cell,i) => deg_R*inducedMap(codomainModules#cell,domainModules#F));
 	i = i+1;
 	l
 	);
@@ -326,31 +322,33 @@ vertices(PolyhedralComplex) := (PC) -> Polyhedra$vertices PC
 cellComplex(Ring,Polyhedron) := (R,P) -> (
     if not isCompact P then error "The given polyhedron is not compact.";
     Pdim := dim P;
-    Pfaces := applyKeys(faces P, i -> Pdim-i); --flips from codim to dim
-    Pfaces = applyValues(Pfaces, lst -> if lst != {} then apply(lst, lst -> first lst) else {});
-    cells := new MutableHashTable from {{} => neg1Cell};
+    Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i,apply(lst,first)));
+    cells := new MutableHashTable;
     for i from 0 to Pdim do (
         for face in Pfaces#i do (
-	    bd := for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue);
+            bd := if i!=0
+                  then for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue)
+                  else {};
             cells#face = newCell bd
             );
         );
-    cellComplex(R,flatten values cells)    
+    cellComplex(R,flatten values cells)
     );
 
 cellComplex(Ring,PolyhedralComplex) := (R,P) -> (
     Pdim := dim P;
-    Pfaces := applyKeys(faces P, i -> Pdim-i-1); --flips from codim to dim
-    Pfaces = applyValues(Pfaces, lst -> if lst != {} then apply(lst, lst -> first lst) else {});
-    cells := new MutableHashTable from {{} => neg1Cell};
+    Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i-1,apply(lst,first)));
+    cells := new MutableHashTable;
     for i from 0 to Pdim do (
         for face in Pfaces#i do (
-	    bd := for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue);
+	    bd := if i!=0
+                  then for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue)
+                  else {};
             cells#face = newCell bd
             );
         );
-    cellComplex(R,flatten values cells)    
-    );
+    cellComplex(R,flatten values cells)
+   );
 
 -------------
 -- Posets

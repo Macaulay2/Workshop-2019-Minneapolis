@@ -1,7 +1,6 @@
 
 TEST ///
 assert(dim cellComplex(QQ,{}) === -infinity);
-assert(dim cellComplex(QQ,{neg1Cell}) === -1);
 ///
 
 
@@ -31,12 +30,10 @@ C = cellComplex(QQ,{f1});
 assert(dim C==2);
 assert(dim f1==2);
 assert(cellLabel f1 == 1);
-delneg1 = boundary(-1,C);
 del0 = boundary(0,C);
 del1 = boundary(1,C);
 del2 = boundary(2,C);
 del100 = boundary(100,C);
-assert(delneg1 == map(QQ^0,QQ^1,0));
 assert(del0 == map(QQ^1,QQ^2, {{1,1}}));
 --This doesn't work due to issues about the ordering of the cells
 --assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}));
@@ -87,13 +84,13 @@ TEST ///
 R = QQ[w,x,y,z]
 C = simplicialComplex monomialIdeal(w*x,w*y);
 dim C
-D = cellComplex(QQ,C);
+D = cellComplex(C);
 D
 assert(dim D==2);
 assert(#cells(2,D)==1);
 assert(#cells(1,D)==4);
 assert(#cells(0,D)==4);
-assert(#cells(-1,D)==1);
+assert(#cells(-1,D)==0);
 ///
 
 --Koszul Complex via Taylor resolutions

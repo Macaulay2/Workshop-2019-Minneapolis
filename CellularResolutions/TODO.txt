@@ -22,8 +22,8 @@ Specific: (In approximate order of importance)
 11) Cache results (chainComplex cached)
 12) Figure out how carefully we can check if something is a CW complex
 13) Add a n-skeleton function (Done)
-14) Function for cell poset (Ola)
-15) Add polyhedral complex -> cell complex code
+14) Function for cell poset (Ola,Done)
+15) Add polyhedral complex -> cell complex code (Done)
 16) Wedge/Connect Sum/cone/etc of cell complexes
 
 Issues:
