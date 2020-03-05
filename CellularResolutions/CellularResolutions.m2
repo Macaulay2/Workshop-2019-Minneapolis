@@ -19,6 +19,9 @@ export {"CellComplex",
         "attach",
         "isCycle",
         "isSimplex",
+	"boundaryCells",
+	"relabelCell",
+	"relabelCellComplex",
 	"cells",
         "cellLabel",
         "newCell",
@@ -85,6 +88,7 @@ dim(CellComplex) := (cellComplex) -> max keys cellComplex.cells
 
 --Define ring for cell complex 
 ring(CellComplex) := (cellComplex) -> cellComplex.labelRing
+
 
 cellLabel = method()
 cellLabel(Cell) := (cell) -> cell.label
@@ -227,6 +231,36 @@ newSimplexCell(List,Thing) := (boundary,label) -> (
     newCell(boundary,label)
     )
 
+--Relabel function 
+relabelCell = method();
+relabelCell(Cell,Thing) := (cell,thing) -> newCell(boundary cell,thing)
+--I am worried about cell ordering in this but c'est la vie
+relabelCellComplex = method();
+relabelCellComplex(CellComplex,List) := (C,L) -> (
+    --add a check to see that L has the right amt of labels
+    dimC := dim C;
+    R := ring C;
+    celldims := for i to dimC list #cells(i,C); 
+    celldimranges := for i to dimC list {sum celldims_{0 .. i-1}, sum celldims_{0 .. i}-1};
+    Ldims := for lst in celldimranges list take(L, lst); -- this is the label list partitioned by cell dim
+    relabeledcells := new MutableHashTable from {-1 => {neg1Cell}};
+    for i to dimC do {
+	icells := cells(i,C);
+	ilabels := Ldims#i;
+	relabeledcells#i = for c in icells list {
+	    bdindices := positions(cells(i-1,C), b -> member(b,boundaryCells c));
+	    print bdindices ;
+	    newbd := flatten (relabeledcells#(i-1))_bdindices;
+	    print newbd;
+	    newlabel := ilabels#(position(icells, x -> x === c));
+	    print newlabel;
+	    newCell(newbd,newlabel)
+	    };
+	};
+    print imadeitthisfar;
+    print values(relabeledcells);
+    cellComplex(R,flatten flatten values relabeledcells)
+    )
 
 
 --Get list of cells 
@@ -238,7 +272,6 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     else {}
     )
 
---TODO polyhedra also defines skeleton
 -- skeleton = method();
 skeleton(ZZ,CellComplex) := (n,cellComplex) -> (
     c := new HashTable from select(pairs cellComplex.cells, (k,v) -> k<=n);
