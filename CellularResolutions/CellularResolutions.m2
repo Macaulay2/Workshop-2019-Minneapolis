@@ -243,23 +243,20 @@ relabelCellComplex(CellComplex,List) := (C,L) -> (
     celldims := for i to dimC list #cells(i,C); 
     celldimranges := for i to dimC list {sum celldims_{0 .. i-1}, sum celldims_{0 .. i}-1};
     Ldims := for lst in celldimranges list take(L, lst); -- this is the label list partitioned by cell dim
-    relabeledcells := new MutableHashTable from {-1 => {neg1Cell}};
-    for i to dimC do {
+    relabeledcells := new MutableHashTable;
+    relabeledcells#0 = for vlabel in Ldims#0 list newCell({},vlabel);
+    print relabeledcells#0;
+    for i from 1 to dimC do {
 	icells := cells(i,C);
 	ilabels := Ldims#i;
-	relabeledcells#i = for c in icells list {
+	relabeledcells#i = for c in icells list (
 	    bdindices := positions(cells(i-1,C), b -> member(b,boundaryCells c));
-	    print bdindices ;
 	    newbd := flatten (relabeledcells#(i-1))_bdindices;
-	    print newbd;
 	    newlabel := ilabels#(position(icells, x -> x === c));
-	    print newlabel;
 	    newCell(newbd,newlabel)
-	    };
+	    );
 	};
-    print imadeitthisfar;
-    print values(relabeledcells);
-    cellComplex(R,flatten flatten values relabeledcells)
+    cellComplex(R,flatten values relabeledcells)
     )
 
 
