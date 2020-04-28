@@ -142,6 +142,31 @@ C = (chainComplex D)[-1];
 --assert(C.dd^2==0); -- this fails as of 16.VIII.2019 (C.dd_2 * C.dd_3 != 0)
 ///
 
+--Relabel test 
+TEST /// 
+R = QQ[a,b,c];
+v1 = newSimplexCell {};
+v2 = newSimplexCell {};
+v3 = newSimplexCell {};
+v4 = newSimplexCell {};
+e12 = newSimplexCell {v1,v2};
+e23 = newSimplexCell {v2,v3};
+e34 = newSimplexCell {v3,v4};
+e14 = newSimplexCell {v1,v4};
+e24 = newSimplexCell {v2,v4};
+f124 = newSimplexCell {e12,e24,e14};
+f234 = newSimplexCell {e23,e34,e24};
+C = cellComplex(R,{f124,f234});
+T = new HashTable from {v1 => a^2*b, v2 => a*c, v3 => b*c^2, v4 => b^2};
+D = relabelCellComplex(C,T);
+assert(HH_(-1) D == 0); -- this fails, yikes
+assert(HH_0 D == 0);
+assert(HH_1 D == 0);
+assert(HH_2 D == 0);
+labelsD2 = for c in cells(2,D) list cellLabel(c);
+assert(set labelsD2 === set {a^2*b^2*c, a*b^2*c^2});
+///
+
 --Polytope test 1
 TEST /// 
 R = QQ;

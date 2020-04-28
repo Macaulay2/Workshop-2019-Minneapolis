@@ -22,6 +22,7 @@ export {"CellComplex",
 	"boundaryCells",
 	"relabelCell",
 	"relabelCellComplex",
+	"InferLabels",
 	"cells",
         "cellLabel",
         "newCell",
@@ -259,6 +260,26 @@ relabelCellComplex(CellComplex,List) := (C,L) -> (
     cellComplex(R,flatten values relabeledcells)
     )
 
+relabelCellComplex(CellComplex,HashTable) := {InferLabels=>true} >> o -> (C,T) -> (
+    dimC := dim C;
+    R := ring C;
+    tablecellsbydim := for i to dimC list select(keys T, c -> dim c == i);
+    relabeledcells := new MutableHashTable;
+    for c in cells(0,C) do relabeledcells#c = (
+	if any(tablecellsbydim#0, cell -> cell === c) then newCell({},T#c)
+	else newCell({},cellLabel c)
+	);
+    for i from 1 to dimC do (
+	for c in cells(i,C) do (
+	    newbd := for b in boundaryCells c list relabeledcells#b;
+	    newlabel := if any(tablecellsbydim#i, cell -> cell === c) then T#c 
+	    else if not o.InferLabels then cellLabel(c)
+	    else inferLabel(newbd);
+	    relabeledcells#c = newCell(newbd, newlabel);
+	    );
+	);
+    cellComplex(R, flatten values relabeledcells)
+    )
 
 --Get list of cells 
 cells = method();
@@ -386,7 +407,6 @@ cellComplex(Ring,PolyhedralComplex) := (R,P) -> (
 
 facePoset(CellComplex) := (cellComplex) -> (
     G := flatten values cells cellComplex;
-    G = G_{-1 .. #G-2};
     contain := (a,b) -> member(a,boundaryCells b) or a === b;-- a contained or equal b
     P := poset(G,contain);
     rel := allRelations P;
