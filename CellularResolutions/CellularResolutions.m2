@@ -20,7 +20,6 @@ export {"CellComplex",
         "isCycle",
         "isSimplex",
 	"boundaryCells",
-	"relabelCell",
 	"relabelCellComplex",
 	"InferLabels",
 	"cells",
@@ -233,8 +232,8 @@ newSimplexCell(List,Thing) := (boundary,label) -> (
     )
 
 --Relabel function 
-relabelCell = method();
-relabelCell(Cell,Thing) := (cell,thing) -> newCell(boundary cell,thing)
+--relabelCell = method(); %%%%%%%%%%%%%%% i don't think we need the relabelCell function anymore?
+--relabelCell(Cell,Thing) := (cell,thing) -> newCell(boundary cell,thing)
 --I am worried about cell ordering in this but c'est la vie
 relabelCellComplex = method();
 relabelCellComplex(CellComplex,List) := (C,L) -> (

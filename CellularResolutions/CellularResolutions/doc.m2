@@ -145,6 +145,25 @@ doc ///
         newCell
 ///
 
+doc ///
+    Key 
+    	(ring,CellComplex)
+    Headline 
+    	return the base ring of a cell complex
+    Usage 
+    	ring C
+    Inputs 
+    	C : CellComplex 
+    Outputs
+    	: Ring 
+	    the base ring of the cell complex C
+    Description 
+    	Text
+	    This returns the base ring associated to a cell complex C, which is used to interpret labels. 
+    SeeAlso 
+    	cellComplex
+///
+
 doc /// 
     Key 
     	cellLabel 
@@ -201,7 +220,7 @@ doc ///
     	cells 
     	(cells,CellComplex)
     Headline 
-    	return the cells of a cell complex
+    	return the cells of a cell complex as a hashtable whose keys are cell dimensions
     Usage
     	cells(C)
     Inputs 
@@ -217,7 +236,7 @@ doc ///
 
 doc /// 
     Key
-    	(cells,ZZ,CellComplex)
+	(cells,ZZ,CellComplex)
     Headline 
     	return the cells of a cell complex 
     Usage 
@@ -230,6 +249,42 @@ doc ///
     Outputs
     	: List 
 	    the r-cells of C
+///
+
+doc // 
+    Key 
+    	(boundary,Cell)
+    Headline 
+    	returns the boundary cells along with relative orientations
+    Usage 
+    	boundary(C)
+    Inputs 
+    	C : Cell 
+    Outputs 
+    	: List 
+	    two-element sequences where the first element is the boundary cell and the second element is the orientation of the boundary cell relative to C    
+    Description 
+    	Given a cell C, this command returns a list whose elements are two-element sequences. The first element of each tuple is a boundary cell of C and the second element is the orientation of that boundary cell relative to C. 
+    SeeAlso
+    	(boundaryCells,Cell)
+//
+
+doc /// 
+    Key 
+    	boundaryCells
+	(boundaryCells,Cell)
+    Headline 
+    	returns the boundary cells of the given cell
+    Usage 
+    	boundaryCells(C)
+    Inputs
+    	C : Cell
+	    the cell whose boundary is to be returned 
+    Outputs 
+    	: List
+	    the cells in the boundary of C 
+    SeeAlso 
+    	(boundary,ZZ,CellComplex)
 ///
 
 doc /// 
@@ -354,6 +409,33 @@ doc ///
 ///
 
 doc /// 
+    Key
+        isSimplex
+        (isSimplex,Cell)
+    Headline 
+    	check if a cell is a simplex 
+    Usage 
+    	isSimplex C 
+    Inputs 
+    	C : Cell 
+	    a cell
+    Outputs 
+    	: Boolean 
+	    true if the cell C is a simplex 
+	    false otherwise 
+    Description 
+    	Text
+	    This determines whether a cell C is a simplex. 
+	Example
+	    v1 = newCell {};
+	    v2 = newCell {};
+	    e1 = newCell {v1,v2};
+	    isSimplex e1
+	    e2 = newCell {v1,v1};
+	    isSimplex e2
+///
+
+doc /// 
     Key 
     	(facePoset,CellComplex)
     Headline
@@ -424,8 +506,8 @@ doc ///
 	    that specifies the base ring 
 	P : Polyhedron 
     Outputs 
-    	C : CellComplex 
-	    whose cells are the faces of the given polyhedron
+    	: CellComplex 
+	    whose cells are the faces of the given polyhedron P
     Description 
     	Text 
 	    Given a polyhedron, this command returns the cell complex whose cells correspond to the faces of the polyhedron. 
@@ -435,4 +517,21 @@ doc ///
 	    faces P
 	    C = cellComplex(R,P);
 	    cells C
+///
+
+doc /// 
+    Key 
+        relabelCellComplex 
+        (relabelCellComplex,HashTable)
+    Headline 
+    	relabels a cell complex 
+    Usage 
+    	relabelCellComplex(CellComplex,HashTable) 
+    Inputs 
+    	C : CellComplex 
+	H : HashTable 
+	    whose keys are cells of C and whose corresponding value is the cell's new label
+    Outputs 
+    	: CellComplex 
+	    whose cells are relabeled by the values in the hashtable H 
 ///
