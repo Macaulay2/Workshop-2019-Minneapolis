@@ -93,6 +93,24 @@ assert(#cells(0,D)==4);
 assert(#cells(-1,D)==0);
 ///
 
+TEST ///
+R = QQ[w,x,y,z]
+C = simplicialComplex monomialIdeal(w*x,w*y);
+dim C
+D = cellComplex(C);
+D
+S = QQ[a];
+f = map(S,R,{a,a,a,a});
+D' = f ** D;
+D'
+assert(dim D'==2);
+assert(#cells(2,D')==1);
+assert(#cells(1,D')==4);
+assert(#cells(0,D')==4);
+assert(#cells(-1,D')==0);
+///
+
+
 --Koszul Complex via Taylor resolutions
 TEST ///
 R = QQ[x,y,z];

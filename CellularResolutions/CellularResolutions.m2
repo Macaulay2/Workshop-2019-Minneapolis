@@ -280,6 +280,16 @@ relabelCellComplex(CellComplex,HashTable) := {InferLabels=>true} >> o -> (C,T) -
     cellComplex(R, flatten values relabeledcells)
     )
 
+RingMap ** CellComplex := (f,c) -> (
+    if source f =!= ring c then error "source ring should match label ring";
+    R := source f;
+    S := target f;
+    allCells := flatten values cells(c);
+    ht := hashTable apply(allCells, c -> (c,f ** toModule(R,cellLabel c)));
+    tempCellComplex := relabelCellComplex(c,ht);
+    cellComplex(R,flatten values cells tempCellComplex) 
+    )
+
 --Get list of cells 
 cells = method();
 cells(CellComplex) := (cellComplex) -> cellComplex.cells
