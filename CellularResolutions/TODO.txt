@@ -1,5 +1,7 @@
 TO DO in CellularResolutions package: 
 
+Note: We should think of these things as the posets coming from CW complexes or posets for which we can do "Cellular Resolutions"
+
 General: 
 -- Documentation documentation documentation 
 -- Clean up the SimplicialComplexes package

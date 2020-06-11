@@ -28,10 +28,12 @@ export {"CellComplex",
         "newSimplexCell",
         "isFree",
         "isMinimal",
-	"Reduced"
+	"Reduced",
+        "CellDimension"
         }
 protect labelRing
 protect cellDimension
+protect CellDimension
 
 CellComplex = new Type of HashTable
 --Note, the mutable hash table means that equality works "Correctly"
@@ -93,15 +95,15 @@ ring(CellComplex) := (cellComplex) -> cellComplex.labelRing
 cellLabel = method()
 cellLabel(Cell) := (cell) -> cell.label
 
---Make cell 
-makeCell := (lst, l) -> (
+--Make a cell, internal function
+makeCell := (lst, l, d) -> (
     bdim := -1;
     for cell in lst do ( 
 	if bdim < 0 
 	then bdim = dim cell#0
 	else assert(bdim == dim cell#0)
 	);
-    n := bdim + 1;
+    n := max(bdim + 1,d);
     new Cell from {
 	symbol cellDimension => n, 
 	symbol boundary => lst, -- could verify that it's a list
@@ -192,16 +194,19 @@ inferLabel := boundary -> (
     )
 
 --Attach a cell
-newCell = method()
-newCell(List,Thing) := (boundary,label) -> (
+newCell = method(Options => {CellDimension=>null})
+newCell(List,Thing) := opt -> (boundary,label) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
-    then return newCell(inferOrientation boundary,label);
+    then return newCell(inferOrientation boundary,label,CellDimension=>opt.CellDimension);
     if not isCycle boundary then error "Expected the boundary to be a cycle";
-    c := makeCell(boundary,label);
+    cd := if opt.CellDimension!=null then opt.CellDimension else 0;
+    c := makeCell(boundary,label,cd);
+    if opt.CellDimension!=null and cellDimension c > cd then error "Incorrect CellDimesion optional parameter";
     c
     )
-newCell(List) := (cells) ->
-    newCell(cells,inferLabel cells)
+newCell(List) := opt -> cells -> newCell(cells,inferLabel cells,CellDimension=>opt.CellDimension);
+
+
 
 isSimplexBoundary := (lst) -> (
     if #lst==0 then return true;
