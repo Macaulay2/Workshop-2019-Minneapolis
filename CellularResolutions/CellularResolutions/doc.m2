@@ -251,7 +251,7 @@ doc ///
 	    the r-cells of C
 ///
 
-doc // 
+doc ///
     Key 
     	(boundary,Cell)
     Headline 
@@ -264,10 +264,11 @@ doc //
     	: List 
 	    two-element sequences where the first element is the boundary cell and the second element is the orientation of the boundary cell relative to C    
     Description 
-    	Given a cell C, this command returns a list whose elements are two-element sequences. The first element of each tuple is a boundary cell of C and the second element is the orientation of that boundary cell relative to C. 
+    	Text 
+	    Given a cell C, this command returns a list whose elements are two-element sequences. The first element of each tuple is a boundary cell of C and the second element is the orientation of that boundary cell relative to C. 
     SeeAlso
     	(boundaryCells,Cell)
-//
+///
 
 doc /// 
     Key 
@@ -522,7 +523,7 @@ doc ///
 doc /// 
     Key 
         relabelCellComplex 
-        (relabelCellComplex,HashTable)
+        (relabelCellComplex,CellComplex,HashTable)
     Headline 
     	relabels a cell complex 
     Usage 
@@ -534,4 +535,22 @@ doc ///
     Outputs 
     	: CellComplex 
 	    whose cells are relabeled by the values in the hashtable H 
+    Description 
+    	Text 
+	    Given a cell complex C and a hashtable, whose key-value pairs are a cell from C and a new label for that cell, this command relabels C accordingly. Labels for cells not provided in the hashtable are inferred, unless the option "inferLabel" is turned off. 
+	Example 
+	    R = QQ[a,b,c];
+	    P1 = convexHull matrix {{0,1,0},{0,0,1}};
+	    P2 = convexHull matrix {{1,0,1},{0,1,1}};
+	    P = polyhedralComplex {P1,P2};
+	    C = cellComplex(R,P);
+	    verts = cells(0,C);
+	    v1 = verts#0;
+	    v2 = verts#1;
+	    v3 = verts#2;
+	    v4 = verts#3;
+	    T = new HashTable from {v1 => a^2*b, v2 => b*c^2, v3 => b^2, v4 => a*c};
+	    relabeledC = relabelCellComplex(C,T);
+	    for c in cells(0,relabeledC) list cellLabel(c)
+	    for c in cells(1,relabeledC) list cellLabel(c)
 ///
