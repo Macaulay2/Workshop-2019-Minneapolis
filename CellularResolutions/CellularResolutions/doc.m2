@@ -147,6 +147,23 @@ doc ///
 
 doc ///
     Key 
+    	(cellComplex,SimplicialComplex)
+    Headline 
+    	Creates a cell complex from a given simplicial complex
+    Usage 
+    	cellComplex SimplicialComplex 
+    Inputs 
+    	D : SimplicialComplex 
+    Outputs 
+    	: CellComplex 
+	    a cell complex that matches those of the given simplicial complex 
+    Description 
+    	Text 
+	    This returns a cellular complex whose faces are those of the given simplicial complex. These faces are labeled as they are in the 
+///
+
+doc ///
+    Key 
     	(ring,CellComplex)
     Headline 
     	return the base ring of a cell complex
@@ -372,7 +389,26 @@ doc ///
         : Module
             the r-th homology module of C with coefficients in ring(C)
     SeeAlso
-        (homology,ZZ,CellComplex)
+        (homology,CellComplex)
+///
+
+doc /// 
+    Key 
+        (cohomology,ZZ,CellComplex) 
+    Headline 
+    	cohomology of a cell complex 
+    Usage 
+    	cohomology(r,C) 
+    Inputs 
+    	r: ZZ 
+	    a non-negative integer 
+	C : CellComplex 
+    Outputs 
+    	: Module 
+	    the r-th cohomology module of C
+    SeeAlso
+    	(homology,CellComplex)
+	(homology,ZZ,CellComplex)
 ///
 
 doc ///
@@ -511,7 +547,7 @@ doc ///
 	    whose cells are the faces of the given polyhedron P
     Description 
     	Text 
-	    Given a polyhedron, this command returns the cell complex whose cells correspond to the faces of the polyhedron. 
+	    Given a polyhedron, this command returns the cell complex whose cells correspond to the faces of the polyhedron. The faces have the default label 1. 
 	Example 
 	    R = QQ;
 	    P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
@@ -522,8 +558,37 @@ doc ///
 
 doc /// 
     Key 
+    	(cellComplex,Ring,PolyhedralComplex) 
+    Headline 
+    	creates cell complex from given polyhedral complex 
+    Usage 
+    	cellComplex(Ring,PolyhedralComplex) 
+    Inputs 
+    	R : Ring 
+	    that specifies the base ring 
+        P : PolyhedralComplex 
+    Outputs 
+    	: CellComplex 
+	    whose cells are the faces of the given polyhedral complex 
+    Description 
+    	Text 
+	    Given a polyhedral complex, this commend returns the cell complex whose cells correspond to the faces of the polyhedral complex. The faces have the default label 1.
+	Example 
+	    R = QQ[x];
+	    P1 = convexHull matrix {{2,2,0},{1,-1,0}};
+	    P2 = convexHull matrix {{2,-2,0},{1,1,0}};
+	    P3 = convexHull matrix {{-2,-2,0},{1,-1,0}};
+	    P4 = convexHull matrix {{-2,2,0},{-1,-1,0}};
+	    F = polyhedralComplex {P1,P2,P3,P4};
+	    C = cellComplex(R,F);
+	    facePoset C
+///
+
+doc /// 
+    Key 
         relabelCellComplex 
         (relabelCellComplex,CellComplex,HashTable)
+	--[relabelCellComplex, InferLabels]
     Headline 
     	relabels a cell complex 
     Usage 
@@ -537,7 +602,8 @@ doc ///
 	    whose cells are relabeled by the values in the hashtable H 
     Description 
     	Text 
-	    Given a cell complex C and a hashtable, whose key-value pairs are a cell from C and a new label for that cell, this command relabels C accordingly. Labels for cells not provided in the hashtable are inferred, unless the option "inferLabel" is turned off. 
+	    Given a cell complex C and a hashtable, whose key-value pairs are a cell from C and a new label for that cell, this command relabels C accordingly. 
+	    Labels for cells not provided in the hashtable are inferred to be the lcm of the labels of their boundary cells, unless the option InferLabels is turned off. 
 	Example 
 	    R = QQ[a,b,c];
 	    P1 = convexHull matrix {{0,1,0},{0,0,1}};
@@ -554,3 +620,18 @@ doc ///
 	    for c in cells(0,relabeledC) list cellLabel(c)
 	    for c in cells(1,relabeledC) list cellLabel(c)
 ///
+
+---doc /// 
+---    Key 
+---	[relabelCellComplex, InferLabels]
+---    Headline 
+---    	determines naming convention for cells
+---    Description 
+---    	Text 
+---	    When set to true, relabelCellComplex will relabel cells which do not appear as keys in the renaming hasthable, 
+---	    but whose boundary cells have had their label changed. 
+---	    The infered label will be the lcm of the labels of the boundary cells. 
+---	    Otherwise, the cells will retain their original labels. 
+---    SeeAlso 
+---    	relabelCellComplex
+---///

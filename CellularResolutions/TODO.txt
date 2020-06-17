@@ -15,7 +15,7 @@ Specific: (In approximate order of importance)
    a) Sphere
    b) RP^n
    c) Torus
-4) Get a cell complex from a polytope/simplicial complex (Done, needs more tests)
+4) Get a cell complex from a polytope/simplicial complex (Done)
 5) Be able to check at the cell complex level minimality/resolutionness (Minimality: done)
 6) Use options in homology/chainComplex to allow the user to choose reduced homology (done, needs more tests).
 7) New attach function that takes for input a cell complex and a boundary (and a label?), and returns a new cell complex with a cell attached there (probably not doable)
@@ -26,11 +26,13 @@ Specific: (In approximate order of importance)
 11) Cache results (chainComplex cached)
 12) Figure out how carefully we can check if something is a CW complex/ figure out how to write isWellDefined
 13) Add a n-skeleton function (Done)
-14) Function for cell poset (Ola,Done)
+14) Function for cell poset (Done)
 15) Add polyhedral complex -> cell complex code (Done)
 16) Wedge/Connect Sum/cone/etc of cell complexes (future project)
 
 
 Issues:
-1) Make sure boundary maps are indexed correctly
-2) Boundaries hare horribly broken if a cell's boundary contains codimension 2 cells.
+1) Make sure boundary maps are indexed correctly -- I think this is causing the failure of the relabel test.
+2) Boundaries are horribly broken if a cell's boundary contains codimension 2 cells.
+3) The net output for a cell complex returns the number of top-dimensional cells, NOT the number of maximal cells. So this isn't quite correct if your complex isn't pure. 
+4) How do you document an optional input? Ola can't figure it out (specifically re: InferLabels on the relabel function).
