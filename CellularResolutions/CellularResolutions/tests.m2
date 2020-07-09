@@ -157,7 +157,7 @@ lxz = newSimplexCell {vx,vz};
 fxyz = newSimplexCell {lxy,lyz,lxz};
 D = cellComplex(R,{fxyz});
 C = (chainComplex D)[-1];
---assert(C.dd^2==0); -- this fails as of 16.VIII.2019 (C.dd_2 * C.dd_3 != 0)
+assert(C.dd^2==0);
 ///
 
 --Relabel test 
@@ -177,7 +177,7 @@ f234 = newSimplexCell {e23,e34,e24};
 C = cellComplex(R,{f124,f234});
 T = new HashTable from {v1 => a^2*b, v2 => a*c, v3 => b*c^2, v4 => b^2};
 D = relabelCellComplex(C,T);
-assert(HH_(-1) D == 0); -- this fails, yikes
+assert(HH_(-1) D == R^1/ideal(a^2*b,a*c,b*c^2,b^2));
 assert(HH_0 D == 0);
 assert(HH_1 D == 0);
 assert(HH_2 D == 0);
