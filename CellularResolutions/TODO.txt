@@ -32,7 +32,8 @@ Specific: (In approximate order of importance)
 
 
 Issues:
-1) Make sure boundary maps are indexed correctly -- I think this is causing the failure of the relabel test.
+1) Make sure boundary maps are indexed correctly -- I think this is causing the failure of the relabel test. (Actually, maybe the test isn't broken... We probably SHOULD have non-zero H_(-1)?)
 2) Boundaries are horribly broken if a cell's boundary contains codimension 2 cells.
 3) The net output for a cell complex returns the number of top-dimensional cells, NOT the number of maximal cells. So this isn't quite correct if your complex isn't pure. 
 4) How do you document an optional input? Ola can't figure it out (specifically re: InferLabels on the relabel function).
+5) What is the attach function that doesn't exist? And did we want to do something with it? 

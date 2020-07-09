@@ -151,7 +151,7 @@ doc ///
     Headline 
     	Creates a cell complex from a given simplicial complex
     Usage 
-    	cellComplex SimplicialComplex 
+    	cellComplex D 
     Inputs 
     	D : SimplicialComplex 
     Outputs 
@@ -159,7 +159,14 @@ doc ///
 	    a cell complex that matches those of the given simplicial complex 
     Description 
     	Text 
-	    This returns a cellular complex whose faces are those of the given simplicial complex. These faces are labeled as they are in the 
+	    This returns a cellular complex whose faces are those of the given simplicial complex. These faces are labeled as they are in the simplicial complex. 
+	Example 
+	    R = QQ[a..f];
+	    I = monomialIdeal(a*f, b*d, c*e);
+	    Delta = simplicialComplex I;
+	    C = cellComplex(Delta);
+    SeeAlso 
+    	cellComplex 
 ///
 
 doc ///
@@ -619,6 +626,8 @@ doc ///
 	    relabeledC = relabelCellComplex(C,T);
 	    for c in cells(0,relabeledC) list cellLabel(c)
 	    for c in cells(1,relabeledC) list cellLabel(c)
+    SeeAlso 
+    	cellLabel
 ///
 
 ---doc /// 
