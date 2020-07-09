@@ -327,19 +327,24 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     t := r-1;
     rCells := cells(r,cellComplex);
     tCells := cells(t,cellComplex);
-    domainModules :=
-        new HashTable from apply(toList rCells, c-> (c,toModule(R,cellLabel c)));
-    codomainModules :=
-        new HashTable from apply(toList tCells,c -> (c,toModule(R,cellLabel c)));
-    domain := fold((a,b) -> a ++ b, R^0, values domainModules);
-    codomain := if t==-1 then R^1 else fold((a,b) -> a ++ b, R^0, values codomainModules);
+    --We define these tables in two steps so that the ordering of the modules in domain and codomain
+    --is consistent, especially between calls to boundary with different values for "r".
+    domainModules := apply(toList rCells, c-> (c,toModule(R,cellLabel c)));
+    codomainModules := apply(toList tCells, c -> (c,toModule(R,cellLabel c)));
+    domainModulesTable :=
+        new HashTable from domainModules;
+    codomainModulesTable :=
+        new HashTable from codomainModules;
+    domain := fold((a,b) -> a ++ b, R^0, apply(domainModules,last));
+    codomain := if t==-1 then R^1 else fold((a,b) -> a ++ b, R^0, apply(codomainModules,last));
     tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
     i := 0;
     L := flatten for F in rCells list (
 	l := if t==-1
-             then (0,i) => inducedMap(codomain,domainModules#F)
-             else apply(pairs boundaryTally F,
-                 (cell,deg) -> (tCellsIndexed#cell,i) => deg_R*inducedMap(codomainModules#cell,domainModules#F));
+             then (0,i) => inducedMap(codomain,domainModulesTable#F)
+             else for p in pairs boundaryTally F list(
+                 (cell,deg) := p;
+                 (tCellsIndexed#cell,i) => deg_R*inducedMap(codomainModulesTable#cell,domainModulesTable#F));
 	i = i+1;
 	l
 	);
