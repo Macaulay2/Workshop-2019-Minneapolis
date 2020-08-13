@@ -539,6 +539,33 @@ doc ///
 ///
 
 doc /// 
+    Key
+    	isFree
+	(isFree,CellComplex)
+    Headline 
+    	checks if the labels of a cell complex are free modules
+    Usage 
+    	isFree(CellComplex)
+    Inputs 
+    	C : CellComplex 
+	    a cell complex 
+    Outputs 
+        : Boolean 
+	    true if all modules associated to the cell labels are free 
+    Description 
+    	Text 
+	    This command checks if the modules associated to the labels in the cell complex are all free, which is necessary to create the cellular resolution. 
+	Example 
+	    R = QQ[x,y,z];
+	    v1 = newCell({},ideal(x,y));
+	    C1 = cellComplex(R,{v1});
+	    isFree C1
+	    v2 = newCell({},x*y);
+	    C2 = cellComplex(R,{v2});
+	    isFree C2
+/// 
+
+doc /// 
     Key 
     	(cellComplex,Ring,Polyhedron)
     Headline 
@@ -595,7 +622,8 @@ doc ///
     Key 
         relabelCellComplex 
         (relabelCellComplex,CellComplex,HashTable)
-	--[relabelCellComplex, InferLabels]
+	InferLabels
+	[relabelCellComplex,InferLabels]
     Headline 
     	relabels a cell complex 
     Usage 

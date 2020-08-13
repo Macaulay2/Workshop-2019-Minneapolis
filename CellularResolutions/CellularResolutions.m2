@@ -16,7 +16,6 @@ export {"CellComplex",
         "Cell",
         "cellComplex",
         "makeCell",
-        "attach",
         "isCycle",
         "isSimplex",
 	"boundaryCells",
@@ -237,34 +236,10 @@ newSimplexCell(List,Thing) := (boundary,label) -> (
     )
 
 --Relabel function 
---relabelCell = method(); %%%%%%%%%%%%%%% i don't think we need the relabelCell function anymore?
---relabelCell(Cell,Thing) := (cell,thing) -> newCell(boundary cell,thing)
---I am worried about cell ordering in this but c'est la vie
-relabelCellComplex = method();
-relabelCellComplex(CellComplex,List) := (C,L) -> (
-    --add a check to see that L has the right amt of labels
-    dimC := dim C;
-    R := ring C;
-    celldims := for i to dimC list #cells(i,C); 
-    celldimranges := for i to dimC list {sum celldims_{0 .. i-1}, sum celldims_{0 .. i}-1};
-    Ldims := for lst in celldimranges list take(L, lst); -- this is the label list partitioned by cell dim
-    relabeledcells := new MutableHashTable;
-    relabeledcells#0 = for vlabel in Ldims#0 list newCell({},vlabel);
-    print relabeledcells#0;
-    for i from 1 to dimC do {
-	icells := cells(i,C);
-	ilabels := Ldims#i;
-	relabeledcells#i = for c in icells list (
-	    bdindices := positions(cells(i-1,C), b -> member(b,boundaryCells c));
-	    newbd := flatten (relabeledcells#(i-1))_bdindices;
-	    newlabel := ilabels#(position(icells, x -> x === c));
-	    newCell(newbd,newlabel)
-	    );
-	};
-    cellComplex(R,flatten values relabeledcells)
-    )
-
-relabelCellComplex(CellComplex,HashTable) := {InferLabels=>true} >> o -> (C,T) -> (
+--relabelCellComplex = method(Options=>true);
+--relabelCellComplex(CellComplex,HashTable) := {InferLabels=>true} >> o -> (C,T) -> (
+relabelCellComplex = method(Options=>{InferLabels=>true});
+relabelCellComplex(CellComplex,HashTable) := o -> (C,T) -> (
     dimC := dim C;
     R := ring C;
     tablecellsbydim := for i to dimC list select(keys T, c -> dim c == i);
@@ -441,7 +416,7 @@ isFree = method(TypicalValue => Boolean);
 --check if all the labels are free modules
 isFree(CellComplex) := (cellComplex) -> (
     R := cellComplex.labelRing;
-    all(cells cellComplex,c -> isFree toModule(R,cellLabel c))
+    all(flatten values cells cellComplex,c -> isFreeModule toModule(R,cellLabel c))
     )
 
 isCellMinimal := (R,cell) -> (
