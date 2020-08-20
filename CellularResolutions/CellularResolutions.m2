@@ -15,7 +15,6 @@ newPackage(
 export {"CellComplex",
         "Cell",
         "cellComplex",
-        "makeCell",
         "isCycle",
         "isSimplex",
 	"boundaryCells",
@@ -419,7 +418,7 @@ isFree = method(TypicalValue => Boolean);
 --check if all the labels are free modules
 isFree(CellComplex) := (cellComplex) -> (
     R := cellComplex.labelRing;
-    all(flatten values cells cellComplex,c -> isFreeModule toModule(R,cellLabel c))
+    all(flatten values cells cellComplex,c -> isFreeModule prune toModule(R,cellLabel c))
     )
 
 isCellMinimal := (R,cell) -> (

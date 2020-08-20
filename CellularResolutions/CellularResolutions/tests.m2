@@ -43,6 +43,7 @@ assert(HH_0(CchainComplex)==0);
 assert(HH_1(CchainComplex)==0);
 assert(HH_2(CchainComplex)==0);
 assert(HH C == HH CchainComplex);
+assert(isFree(C));
 ///
 
 -- RP2
@@ -158,6 +159,7 @@ fxyz = newSimplexCell {lxy,lyz,lxz};
 D = cellComplex(R,{fxyz});
 C = (chainComplex D)[-1];
 assert(C.dd^2==0);
+assert(not isFree(D));
 ///
 
 --Relabel test 
