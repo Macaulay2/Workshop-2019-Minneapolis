@@ -126,9 +126,12 @@ boundaryTally := (cell) -> chainToVirtualTally cell.boundary
 --Check if a chain, represented by a list is a boundary
 isCycle = method()
 isCycle(List) := (lst) ->
-    (sum(lst,(c,deg) -> if deg>0
-                        then sum(deg,i -> boundaryTally c)
-                        else - sum(deg,i -> boundaryTally c)) ? 0) == symbol ==
+    ((sum(lst,l -> (
+                c = l#0;
+                deg = l#1;
+                if deg>0
+                then sum(deg,i -> boundaryTally c)
+                else - sum(deg,i -> boundaryTally c)))) ? 0) == symbol ==
 
 
 --Figure out an orientation automatically
