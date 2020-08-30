@@ -47,7 +47,7 @@ doc ///
     Inputs
         R : Ring
             that specifies the base ring for interpreting the labels
-        naxCells : List
+        maxCells : List
             that specifies the maximal cells for the complex
     Outputs
         : CellComplex
@@ -184,6 +184,13 @@ doc ///
     Description 
     	Text
 	    This returns the base ring associated to a cell complex C, which is used to interpret labels. 
+	Example 
+	    R = QQ[x,y];
+	    vx = newSimplexCell {};
+	    vy = newSimplexCell {};
+	    e = newSimplexCell {vx,vy};
+	    C = cellComplex(R,{e});
+	    ring(C)
     SeeAlso 
     	cellComplex
 ///
@@ -336,6 +343,8 @@ doc ///
 doc ///
     Key
         (chainComplex,CellComplex)
+	Reduced
+	[(chainComplex,CellComplex),Reduced]
     Headline
         compute the cellular chain complex for a cell complex
     Usage
@@ -349,7 +358,10 @@ doc ///
     Description
         Text
             This constructs the cellular chain complex for a cell complex,
-            taking into account the labels on the cells
+            taking into account the labels on the cells. 
+	    The ambient ring is the base ring of the cell complex. 
+	    By default, the option "Reduced" is set to true, so 
+	    the resulting ChainComplex has a rank 1 free module in homological degree -1 for the empty cell. 
         Example
             R = QQ[x]
             a = newSimplexCell({},x);
@@ -357,6 +369,7 @@ doc ///
             b2 = newCell {a,a};
             C = cellComplex(R,{b1,b2});
             chainComplex C
+	    chainComplex(C,Reduced=>false)
     SeeAlso
         (boundary,ZZ,CellComplex)
 	(boundary,SimplicialComplex)
@@ -376,6 +389,17 @@ doc ///
     Outputs
         : GradedModule
             the graded module, the homology of C with coefficients in ring(C)
+    Description 
+    	Text 
+	    This computes the reduced homology of the cellular complex arising from the cell complex C.
+	Example
+	    R = QQ[x]
+            a = newSimplexCell({},x);
+            b1 = newCell {a,a};
+            b2 = newCell {a,a};
+            C = cellComplex(R,{b1,b2});
+	    HH C
+	    prune oo
     SeeAlso
         (homology,ZZ,CellComplex)
 ///
@@ -658,17 +682,9 @@ doc ///
     	cellLabel
 ///
 
----doc /// 
----    Key 
----	[relabelCellComplex, InferLabels]
----    Headline 
----    	determines naming convention for cells
----    Description 
----    	Text 
----	    When set to true, relabelCellComplex will relabel cells which do not appear as keys in the renaming hasthable, 
----	    but whose boundary cells have had their label changed. 
----	    The infered label will be the lcm of the labels of the boundary cells. 
----	    Otherwise, the cells will retain their original labels. 
----    SeeAlso 
----    	relabelCellComplex
----///
+doc /// 
+    Key
+	(symbol **,RingMap,CellComplex)
+    Headline 
+        pushes labels to another ring   
+///

@@ -125,12 +125,18 @@ boundaryTally := (cell) -> chainToVirtualTally cell.boundary
 --Check if a chain, represented by a list is a boundary
 isCycle = method()
 isCycle(List) := (lst) ->
+<<<<<<< Updated upstream
     ((sum(lst,l -> (
                 c := l#0;
                 deg := l#1;
                 if deg>0
                 then sum(deg,i -> boundaryTally c)
                 else - sum(deg,i -> boundaryTally c)))) ? 0) == symbol ==
+=======
+    ((sum(lst,(c,deg) -> if deg>0
+                        then sum(deg,i -> boundaryTally c)
+                        else - sum(deg,i -> boundaryTally c))) ? 0) == symbol ==
+>>>>>>> Stashed changes
 
 
 --Figure out an orientation automatically
@@ -238,8 +244,6 @@ newSimplexCell(List,Thing) := (boundary,label) -> (
     )
 
 --Relabel function 
---relabelCellComplex = method(Options=>true);
---relabelCellComplex(CellComplex,HashTable) := {InferLabels=>true} >> o -> (C,T) -> (
 relabelCellComplex = method(Options=>{InferLabels=>true});
 relabelCellComplex(CellComplex,HashTable) := o -> (C,T) -> (
     dimC := dim C;
