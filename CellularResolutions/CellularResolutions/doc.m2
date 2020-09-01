@@ -505,6 +505,38 @@ doc ///
 
 doc /// 
     Key 
+        isCycle
+	(isCycle,List)
+    Headline 
+    	checks if a list of cells with orientation make a cycle 
+    Usage 
+    	isCycle L
+    Inputs 
+    	L : List
+	    whose entries are pairs, whose first entry is a cell and whose second entry is a degree
+    Outputs
+    	: Boolean
+	    true if the given cell-degree pairs form a cycle
+	    false otherwise
+    Description
+    	Text 
+	    This determines whether the given pairs, whose first entry is a cell and whose second entry is its degree of attachment, 
+	    form a cycle in the homological sense. 
+	Example 
+	    R = QQ[x,y,z];
+	    vx = newSimplexCell({},x);
+	    vy = newSimplexCell({},y);
+	    vz = newSimplexCell({},z);
+	    lxy = newSimplexCell({vx,vy});
+	    lyz = newSimplexCell({vy,vz});
+	    lxz = newSimplexCell({vx,vz});
+	    isCycle {(lxy,1)}
+	    isCycle {{lxy,1},{lyz,1},{lxz,-1}}
+	    isCycle {{lxy,1},{lyz,1},{lxz,1}}
+///
+
+doc /// 
+    Key 
     	(facePoset,CellComplex)
     Headline
     	generates the face poset of a cell complex 
@@ -512,13 +544,13 @@ doc ///
         facePoset C
     Inputs 
     	C : CellComplex 
-	        a cell complex
+	    a cell complex
     Outputs 
     	: Poset
-	        the face poset of C 
+	    the face poset of C 
     Description 
     	Text
-	    The face poset of a cell complex is the poset of cells with partial ordering given by inclusion
+	    The face poset of a cell complex is the poset of cells with partial ordering given by inclusion. 
 	Example
 	    R = QQ;
 	    v1 = newCell {};
