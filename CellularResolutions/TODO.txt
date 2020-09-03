@@ -5,12 +5,11 @@ Note: We should think of these things as the posets coming from CW complexes or 
 General: 
 -- Documentation documentation documentation 
 -- Clean up the SimplicialComplexes package
-
 -- Think about whether it suffices to have the boundary be a homology sphere
 
 Specific: (In approximate order of importance)
 1) Add homology function that can be applied directly to the cell complex (Done)
-2) Add tools for cohomology (Partial)
+2) Add tools for cohomology (Done)
 3) Add a database of common complexes
    a) Sphere
    b) RP^n
@@ -23,8 +22,8 @@ Specific: (In approximate order of importance)
 8a) Be able to change labelRing (i.e. tensor with a new ring) (partially done, maybe want a substitute function?)
 9) Make a relabel function (something that maps old values to new values) (done?, see 8a)
 10) Create a way of giving nice output for cells/cell complexes (net) (Done)
-11) Cache results (chainComplex cached)
-12) Figure out how carefully we can check if something is a CW complex/ figure out how to write isWellDefined
+11) Cache results (Done)
+12) Figure out how carefully we can check if something is a CW complex/ figure out how to write isWellDefined (impossible)
 13) Add a n-skeleton function (Done)
 14) Function for cell poset (Done)
 15) Add polyhedral complex -> cell complex code (Done)
@@ -35,5 +34,5 @@ Issues:
 1) Make sure boundary maps are indexed correctly -- I think this is causing the failure of the relabel test. (Actually, maybe the test isn't broken... We probably SHOULD have non-zero H_(-1)?)
 2) Boundaries are horribly broken if a cell's boundary contains codimension 2 cells.
 3) The net output for a cell complex returns the number of top-dimensional cells, NOT the number of maximal cells. So this isn't quite correct if your complex isn't pure. 
-4) How do you document an optional input? Ola can't figure it out (specifically re: InferLabels on the relabel function).
-5) What is the attach function that doesn't exist? And did we want to do something with it? 
+4) How do you document an optional input? (done)
+5) What is the attach function that doesn't exist? And did we want to do something with it?  (removed, done)
