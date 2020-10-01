@@ -27,7 +27,8 @@ export {"CellComplex",
         "isFree",
         "isMinimal",
 	"Reduced",
-        "CellDimension"
+        "CellDimension",
+	"maximalCells"
         }
 protect labelRing
 protect cellDimension
@@ -78,6 +79,19 @@ cellComplex(SimplicialComplex) := (C) -> (
             );
         );
     cellComplex(S,values cells)
+    )
+
+maximalCells = method()
+maximalCells(List) := (lst) -> (
+    bdfn := c -> set boundaryCells c;
+    maxcells := set lst;
+    bdcells := sum (maxcells/bdfn);
+    maxcells = maxcells - bdcells;
+    while any(bdcells, b -> instance(b,Cell)) do (
+	bdcells = sum (bdcells/bdfn);
+	maxcells = maxcells - bdcells;
+	);
+    maxcells
     )
 
 --Define dimension for cell
@@ -267,7 +281,7 @@ RingMap ** CellComplex := (f,c) -> (
     allCells := flatten values cells(c);
     ht := hashTable apply(allCells, c -> (c,f ** toModule(R,cellLabel c)));
     tempCellComplex := relabelCellComplex(c,ht);
-    cellComplex(R,flatten values cells tempCellComplex) 
+    cellComplex(S,flatten values cells tempCellComplex) 
     )
 
 --Get list of cells 
@@ -441,9 +455,8 @@ net(Cell) := (cell) -> (
 
 net(CellComplex) := (cellComplex) -> (
     d := dim cellComplex;
-    nMaxCells := #(cells(d,cellComplex));
     nTotalCells := #(flatten values cells cellComplex);
-    "CellComplex of dimension " | d | " with " | nMaxCells | " maximal cells and " | nTotalCells | " total cells"
+    "CellComplex of dimension " | d | " with " | nTotalCells | " total cells"
     ); 
 
 ----------------------------

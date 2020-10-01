@@ -294,3 +294,17 @@ assert(isMinimal(Cnonmin) != true);
 Cmin = cellComplex(R,{e12,e23});
 assert(isMinimal(Cmin) == true);
 ///
+
+--RingMap**CellComplex check
+R = ZZ;
+M = transpose matrix {{0,0,0},{0,1,0},{0,0,1},{1,0,0},{1,1,0},{1,0,1}};
+P = convexHull M;
+C = cellComplex(R,P);
+S = ZZ[x];
+f = map(S,R,{});
+D = f**C;
+chainD = chainComplex D;
+assert(ring chainD === S);
+assert(HH_1(D)==0);
+assert(HH_2(D)==0);
+assert(HH_3(D)==0);

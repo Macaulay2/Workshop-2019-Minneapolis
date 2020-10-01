@@ -140,9 +140,18 @@ doc ///
             the new cell is a simplex, as such does not have the caveat of
             @TO newCell@. Otherwise it has the same behavior. This is
             particularly useful in constructing \Delta-complexes.
+	Example 
+	    v1 = newSimplexCell {};
+	    v2 = newSimplexCell {};
+	    e1 = newSimplexCell {v1,v2};
+	    e2 = newSimplexCell {(v1,1),(v2,-1)};
+	    C = cellComplex(ZZ, {e1,e2});
+	Text 
+	    One cannot use this command to create cells that are not simplices.
     SeeAlso
         cellComplex
         newCell
+	isSimplex
 ///
 
 doc ///
@@ -208,6 +217,16 @@ doc ///
     Outputs
     	: Thing 
 	    the label of the cell
+    Description 
+    	Example 
+	    R = QQ[x,y];
+	    v1 = newSimplexCell({},x^2);
+	    v2 = newSimplexCell({},x*y^2);
+	    v3 = newSimplexCell {};
+	    e = newSimplexCell {v1,v2};
+	    C = cellComplex(R,{e,v3});
+	    cellLabel v1
+	    cellLabel e
     SeeAlso
     	Cell
 ///
