@@ -195,8 +195,8 @@ doc ///
 	    This returns the base ring associated to a cell complex C, which is used to interpret labels. 
 	Example 
 	    R = QQ[x,y];
-	    vx = newSimplexCell {};
-	    vy = newSimplexCell {};
+	    vx = newSimplexCell({},x);
+	    vy = newSimplexCell({},y^2);
 	    e = newSimplexCell {vx,vy};
 	    C = cellComplex(R,{e});
 	    ring(C)
@@ -244,6 +244,15 @@ doc ///
     Outputs
         : ZZ
             the dimension of the complex
+    Description 
+    	Example 
+	    R = QQ[x,y,z];
+	    vx = newSimplexCell({},x);
+	    vy = newSimplexCell({},y);
+	    vz = newSimplexCell({},z);
+	    exy = newSimplexCell {vx,vy};
+	    C = cellComplex(R,{exy,vz});
+	    dim C
     SeeAlso
         (dim,Cell)
 ///
@@ -261,6 +270,16 @@ doc ///
     Outputs
         : ZZ
             the dimension of the cell
+    Description 
+    	Example 
+	    R = QQ[x,y,z];
+	    vx = newSimplexCell({},x);
+	    vy = newSimplexCell({},y);
+	    vz = newSimplexCell({},z);
+	    exy = newSimplexCell {vx,vy};
+	    C = cellComplex(R,{exy,vz});
+	    dim(vz)
+	    dim(exy)
     SeeAlso
         (dim,CellComplex)
 ///
@@ -279,6 +298,20 @@ doc ///
     Outputs 
     	: HashTable 
 	    the cells of C 
+    Description 
+    	Example 
+	    R = QQ[x,y,z];
+	    vx = newSimplexCell({},x);
+	    vy = newSimplexCell({},y);
+	    vz = newSimplexCell({},z);
+	    exy = newSimplexCell {vx,vy};
+	    C = cellComplex(R,{exy,vz});
+	    cells(C)
+	Example 
+	    R = QQ;
+	    P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
+	    C = cellComplex(R,P);
+	    cells C
     SeeAlso 
     	(cells,ZZ,CellComplex)
     	
@@ -299,6 +332,19 @@ doc ///
     Outputs
     	: List 
 	    the r-cells of C
+    Description 
+    	Example 
+	    R = QQ[x,y,z];
+	    vx = newSimplexCell({},x);
+	    vy = newSimplexCell({},y);
+	    vz = newSimplexCell({},z);
+	    exy = newSimplexCell {vx,vy};
+	    C = cellComplex(R,{exy,vz});
+	    cells(0,C)
+	    cells(1,C)
+	    cells(2,C)
+    SeeAlso 
+    	(cells,CellComplex)
 ///
 
 doc ///
