@@ -362,6 +362,22 @@ doc ///
     Description 
     	Text 
 	    Given a cell C, this command returns a list whose elements are two-element sequences. The first element of each tuple is a boundary cell of C and the second element is the orientation of that boundary cell relative to C. 
+	    This differs from boundaryCells in that it returns the boundary cells and their corresponding orientation, whereas boundaryCells returns only the boundary cells.
+	Example 
+	    R = QQ[x,y,z];
+	    vx = newSimplexCell({},x);
+	    vy = newSimplexCell({},y);
+	    vz = newSimplexCell({},z);
+	    exy = newSimplexCell {vx,vy};
+	    C = cellComplex(R,{exy,vz});
+	    boundary(exy)
+	    boundary(vz)	    	
+	Example 
+	    R = QQ;
+	    P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
+	    C = cellComplex(R,P);
+	    face = (cells(2,C))#0;
+	    boundary(face)
     SeeAlso
     	(boundaryCells,Cell)
 ///
@@ -380,6 +396,25 @@ doc ///
     Outputs 
     	: List
 	    the cells in the boundary of C 
+    Description 
+    	Text 
+	    Given a cell C, this command returns a list whose elements are the boundary cells of C. 
+	    This differs from boundary in that it returns returns only the boundary cells of C, whereas boundaryCells returns a list of two-element sequences of the boundary cells and their corresponding orientation.
+	Example 
+	    R = QQ[x,y,z];
+	    vx = newSimplexCell({},x);
+	    vy = newSimplexCell({},y);
+	    vz = newSimplexCell({},z);
+	    exy = newSimplexCell {vx,vy};
+	    C = cellComplex(R,{exy,vz});
+	    boundaryCells(exy)
+	    boundaryCells(vz)	    	
+	Example 
+	    R = QQ;
+	    P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
+	    C = cellComplex(R,P);
+	    face = (cells(2,C))#0;
+	    boundaryCells(face)
     SeeAlso 
     	(boundary,ZZ,CellComplex)
 ///
