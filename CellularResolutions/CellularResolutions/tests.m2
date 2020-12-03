@@ -296,6 +296,7 @@ assert(isMinimal(Cmin) == true);
 ///
 
 --RingMap**CellComplex check
+TEST ///
 R = ZZ;
 M = transpose matrix {{0,0,0},{0,1,0},{0,0,1},{1,0,0},{1,1,0},{1,0,1}};
 P = convexHull M;
@@ -308,3 +309,4 @@ assert(ring chainD === S);
 assert(HH_1(D)==0);
 assert(HH_2(D)==0);
 assert(HH_3(D)==0);
+///

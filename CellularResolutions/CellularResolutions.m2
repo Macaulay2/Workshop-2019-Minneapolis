@@ -87,7 +87,8 @@ maximalCells(List) := (lst) -> (
     maxcells := set lst;
     bdcells := sum (maxcells/bdfn);
     maxcells = maxcells - bdcells;
-    while any(bdcells, b -> instance(b,Cell)) do (
+    while #bdcells != 0 do (
+    --while any(bdcells, b -> instance(b,Cell)) do (
 	bdcells = sum (bdcells/bdfn);
 	maxcells = maxcells - bdcells;
 	);
