@@ -310,3 +310,13 @@ assert(HH_1(D)==0);
 assert(HH_2(D)==0);
 assert(HH_3(D)==0);
 ///
+
+TEST ///
+R = ZZ;
+v = newCell({},1);
+f = newCell({v},1,CellDimension=>2);
+C = cellComplex(R,{f});
+assert(HH_0(C)==0);
+assert(HH_1(C)==0);
+assert(HH_2(C)==ZZ^1);
+///

@@ -215,9 +215,9 @@ newCell(List,Thing) := opt -> (boundary,label) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
     then return newCell(inferOrientation boundary,label,CellDimension=>opt.CellDimension);
     if not isCycle boundary then error "Expected the boundary to be a cycle";
-    cd := if opt.CellDimension!=null then opt.CellDimension else 0;
+    cd := if opt.CellDimension=!=null then opt.CellDimension else 0;
     c := makeCell(boundary,label,cd);
-    if opt.CellDimension!=null and cellDimension c > cd then error "Incorrect CellDimesion optional parameter";
+    if opt.CellDimension=!=null and dim c > cd then error "Incorrect CellDimesion optional parameter";
     c
     )
 newCell(List) := opt -> cells -> newCell(cells,inferLabel cells,CellDimension=>opt.CellDimension);
@@ -334,6 +334,7 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
              then (0,i) => inducedMap(codomain,domainModulesTable#F)
              else for p in pairs boundaryTally F list(
                  (cell,deg) := p;
+                 if dim cell < dim F - 1 then continue;
                  (tCellsIndexed#cell,i) => deg_R*inducedMap(codomainModulesTable#cell,domainModulesTable#F));
 	i = i+1;
 	l
