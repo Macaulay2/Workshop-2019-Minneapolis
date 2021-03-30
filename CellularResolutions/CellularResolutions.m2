@@ -28,7 +28,10 @@ export {"CellComplex",
         "isMinimal",
 	"Reduced",
         "CellDimension",
-	"maximalCells"
+	"maximalCells",
+        "cellComplexSphere",
+        "cellComplexRPn",
+        "cellComplexTorus"
         }
 protect labelRing
 protect cellDimension
@@ -460,6 +463,50 @@ net(CellComplex) := (cellComplex) -> (
     nTotalCells := #(flatten values cells cellComplex);
     "CellComplex of dimension " | d | " with " | nTotalCells | " total cells"
     ); 
+
+
+------------------------
+-- Common cell complexes
+------------------------
+
+cellComplexSphere = method();
+cellComplexSphere(Ring,ZZ) := (R,n) -> (
+    if n<0 then error "cellComplexSphere expects a non-negative integer";
+    v := newSimplexCell {};
+    if n==1 then (
+        w := newSimplexCell {};
+        cellComplex(R,{v,w})
+        )
+    else(
+        c := newCell({(v,0)},CellDimension=>n);
+        cellComplex (R,{c})
+        )
+    )
+
+cellComplexRPn = method();
+cellComplexRPn(Ring,ZZ) := (R,n) -> (
+    if n<0 then error "cellComplexRPn expects a non-negative integer";
+    t := newSimplexCell {};
+    if n==0 then return cellComplex(R,{t});
+    for i from 1 to n do(
+        attachingDegree := if even i then 2 else 0;
+        t = newCell {(t,attachingDegree)};
+        );
+    cellComplex(R,{t})
+    )
+
+cellComplexTorus = method();
+cellComplexTorus(Ring,ZZ) := (R,n) -> (
+    if n<0 then error "cellComplexTorus expects a non-negative integer";
+    v := newSimplexCell {};
+    if n==0 then return cellComplex(R,{v});
+    cells := new MutableHashTable;
+    for s in subsets(n) do (
+        k := #s;
+        cells#s = newCell apply(subsets(s,k-1), s' -> (cells#s',0))
+        );
+    cellComplex(R,{cells#(toList (0..(n-1)))})
+    )
 
 ----------------------------
 
