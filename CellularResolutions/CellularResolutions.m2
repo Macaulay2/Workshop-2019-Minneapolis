@@ -28,7 +28,7 @@ export {"CellComplex",
         "isMinimal",
 	"Reduced",
         "CellDimension",
-	"maximalCells",
+	"maxCells",
         "cellComplexSphere",
         "cellComplexRPn",
         "cellComplexTorus"
@@ -54,10 +54,11 @@ cellsFromMaxCells := lst -> (
     )
 
 --Private constructor, creates the cache
-mkCellComplex := (labelRingVal,cellsVal) -> (
+mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
     new CellComplex from {
         symbol labelRing => labelRingVal,
         symbol cells => cellsVal,
+	symbol maxCells => maxCellsVal, 
         cache => new CacheTable
 	}
     )
@@ -66,8 +67,9 @@ mkCellComplex := (labelRingVal,cellsVal) -> (
 --TODO: create an option to make a void complex
 cellComplex = method()
 cellComplex(Ring,List) := (R,maxCells) -> (
-    mkCellComplex(R,cellsFromMaxCells maxCells)
+    mkCellComplex(R, (maxAndAllCells maxCells)#1, (maxAndAllCells maxCells)#0)
     )
+
 cellComplex(SimplicialComplex) := (C) -> (
     S := ring C;
     Cfaces := applyValues(new HashTable from faces C,flatten @@ entries);
@@ -84,7 +86,25 @@ cellComplex(SimplicialComplex) := (C) -> (
     cellComplex(S,values cells)
     )
 
-maximalCells = method()
+maxAndAllCells = method()
+maxAndAllCells(List) := (lst) -> (
+    bdfn := c -> set boundaryCells c;
+    maxcells := set lst;
+    bdcells := sum (maxcells/bdfn);
+    allcells := maxcells + bdcells;
+    maxcells = maxcells - bdcells;
+    while #bdcells != 0 do (
+	bdcells = sum (bdcells/bdfn);
+	allcells = allcells + bdcells;
+	maxcells = maxcells - bdcells;
+	);
+    (partition(dim,toList maxcells), partition(dim,toList allcells))
+    )
+
+maxCells = method()
+maxCells(CellComplex) := (cellComplex) -> cellComplex.maxCells
+
+-* maximalCells = method()
 maximalCells(List) := (lst) -> (
     bdfn := c -> set boundaryCells c;
     maxcells := set lst;
@@ -96,7 +116,7 @@ maximalCells(List) := (lst) -> (
 	maxcells = maxcells - bdcells;
 	);
     maxcells
-    )
+    ) *-
 
 --Define dimension for cell
 dim(Cell) := (cell) -> cell.cellDimension
