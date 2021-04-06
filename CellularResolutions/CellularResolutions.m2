@@ -108,6 +108,7 @@ maxCells = method()
 maxCells(CellComplex) := (cacheValue (symbol maxCells)) (cellComplex ->
     (
         lst := flatten values cells cellComplex;
+        if #lst == 0 then return new HashTable;
         bdfn := c -> set boundaryCells c;
         maxcells := set lst;
         bdcells := sum (maxcells/bdfn);
@@ -116,7 +117,7 @@ maxCells(CellComplex) := (cacheValue (symbol maxCells)) (cellComplex ->
             bdcells = sum (bdcells/bdfn);
 	    maxcells = maxcells - bdcells;
 	    );
-        maxcells
+        partition(dim,toList maxcells)
         ))
 
 -* maximalCells = method()
