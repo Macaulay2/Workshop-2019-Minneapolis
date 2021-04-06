@@ -58,8 +58,10 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
     new CellComplex from {
         symbol labelRing => labelRingVal,
         symbol cells => cellsVal,
-	symbol maxCells => maxCellsVal, 
-        cache => new CacheTable
+        cache => new CacheTable from (
+            if maxCellsVal === null
+            then {}
+            else {symbol maxCells => maxCellsVal})
 	}
     )
 
@@ -88,6 +90,7 @@ cellComplex(SimplicialComplex) := (C) -> (
 
 maxAndAllCells = method()
 maxAndAllCells(List) := (lst) -> (
+    if #lst == 0 then return (new HashTable,new HashTable);
     bdfn := c -> set boundaryCells c;
     maxcells := set lst;
     bdcells := sum (maxcells/bdfn);
@@ -102,7 +105,19 @@ maxAndAllCells(List) := (lst) -> (
     )
 
 maxCells = method()
-maxCells(CellComplex) := (cellComplex) -> cellComplex.maxCells
+maxCells(CellComplex) := (cacheValue (symbol maxCells)) (cellComplex ->
+    (
+        lst := flatten values cells cellComplex;
+        bdfn := c -> set boundaryCells c;
+        maxcells := set lst;
+        bdcells := sum (maxcells/bdfn);
+        maxcells = maxcells - bdcells;
+        while #bdcells != 0 do (
+            bdcells = sum (bdcells/bdfn);
+	    maxcells = maxcells - bdcells;
+	    );
+        maxcells
+        ))
 
 -* maximalCells = method()
 maximalCells(List) := (lst) -> (
@@ -320,7 +335,7 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
 -- skeleton = method();
 skeleton(ZZ,CellComplex) := (n,cellComplex) -> (
     c := new HashTable from select(pairs cellComplex.cells, (k,v) -> k<=n);
-    mkCellComplex(cellComplex.labelRing,c)
+    mkCellComplex(cellComplex.labelRing,c,null)
     )
 
 --take a hash table of RingElements/Matrices, and make a matrix, or 0
