@@ -544,6 +544,26 @@ cellComplexTorus(Ring,ZZ) := (R,n) -> (
     cellComplex(R,{cells#(toList (0..(n-1)))})
     )
 
+
+----------------------------
+-- Specific chain complexes
+----------------------------
+
+taylorComplex = method();
+taylorComplex(MonomialIdeal) := (I) -> (
+    gensI := I_*;
+    r := #gensI;
+    cells := new MutableHashTable;
+    for i to r-1 do cells#{i} = newSimplexCell({},gensI#i);
+    for k from 2 to r do (
+	for s in subsets(r,k) do (
+	    bd := for t in subsets(s,k-1) list cells#t;
+	    cells#s = newSimplexCell(bd, lcm(gensI_s));
+	    );
+	);
+    cellComplex(ring I, {cells#(splice {0..(r-1)})})
+    )
+
 ----------------------------
 
 ----------------------------
