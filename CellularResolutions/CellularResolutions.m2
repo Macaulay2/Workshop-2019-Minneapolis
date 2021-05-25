@@ -582,8 +582,7 @@ hullComplex(MonomialIdeal) := (I) -> (
     Pfaces = applyValues(Pfaces, v -> delete( , v));
     Pfaces = applyPairs(Pfaces, (d,lst) -> (Pdim-d,lst)); --flipping from codim to dim
     cells := new MutableHashTable;
-    for v in Pfaces#0 do cells#v = newCell({},gensI#(v#0));    
-    -- cells#0 = for v in Pfaces#0 list(newCell({}, gensI#(v#0)));
+    for v in Pfaces#0 do cells#v = newCell({},gensI#(v#0));
     for i from 1 to Pdim-1 do (
         for face in Pfaces#i do (
             bd := for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue);

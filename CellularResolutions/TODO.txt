@@ -11,9 +11,9 @@ Specific: (In approximate order of importance)
 1) Add homology function that can be applied directly to the cell complex (Done)
 2) Add tools for cohomology (Done)
 3) Add a database of common complexes (Done, still needs tests/doc)
-   a) Sphere 
-   b) RP^n
-   c) Torus
+   a) Sphere (Done)
+   b) RP^n (Done) 
+   c) Torus (Done
 4) Get a cell complex from a polytope/simplicial complex (Done)
 5) Be able to check at the cell complex level minimality/resolutionness (Minimality: done)
 6) Use options in homology/chainComplex to allow the user to choose reduced homology (done, needs more tests).
@@ -28,8 +28,8 @@ Specific: (In approximate order of importance)
 14) Function for cell poset (Done)
 15) Add polyhedral complex -> cell complex code (Done)
 16) Wedge/Connect Sum/cone/etc of cell complexes (future project)
-17) Add hullComplex
-18) Add taylorComplex 
+17) Add hullComplex (Done) 
+18) Add taylorComplex (Done)
 
 
 Issues:
@@ -38,3 +38,4 @@ Issues:
 3) The net output for a cell complex returns the number of top-dimensional cells, NOT the number of maximal cells. So this isn't quite correct if your complex isn't pure. (fixed)
 4) How do you document an optional input? (done)
 5) What is the attach function that doesn't exist? And did we want to do something with it?  (removed, done)
+6) What breaks if you give things the empty cell complex? 
