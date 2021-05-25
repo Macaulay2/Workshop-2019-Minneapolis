@@ -570,40 +570,27 @@ taylorComplex(MonomialIdeal) := (I) -> (
 hullComplex = method();
 hullComplex(MonomialIdeal) := (I) -> ( 
     gensI := I_*;
-    print(gensI);
     R := ring I;
     n := #(gens R);
     t := (n+1)! + 1;
     expvecs := flatten (gensI/exponents);
-    print(expvecs);
     verts := for a in expvecs list for i from 0 to (n-1) list t^(a#i);
-    print(verts);
     P := convexHull(transpose matrix verts, id_(ZZ^n));
     Pdim := dim P;
-    print(vertices P);
     Pfaces := new HashTable from select(pairs faces P, (k,v) -> (k <= Pdim and k > 0)); --weird inequalities bc codim
     Pfaces = applyValues(Pfaces, v -> apply(v,p -> if p#1 == {} then p#0)); -- selecting compact faces
     Pfaces = applyValues(Pfaces, v -> delete( , v));
     Pfaces = applyPairs(Pfaces, (d,lst) -> (Pdim-d,lst)); --flipping from codim to dim
-    print(Pfaces);
     cells := new MutableHashTable;
     for v in Pfaces#0 do cells#v = newCell({},gensI#(v#0));    
     -- cells#0 = for v in Pfaces#0 list(newCell({}, gensI#(v#0)));
     for i from 1 to Pdim-1 do (
-	print i;
         for face in Pfaces#i do (
-	    print face;
             bd := for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue);
             cells#face = newCell bd
             );
         );
-    cells 
-    -*cellComplex(R,flatten values cells)  
-    facelist := facesAsPolyhedra(1,P); -- 1 bc facesAsPolyhedra takes codim
-    compactfaces := select(facelist, isCompact);
-    for f in compactfaces do print(vertices f);
-    C := cellComplex(R, polyhedralComplex compactfaces);
-    C *-
+    cellComplex(R,flatten values cells)
     )
 
 ----------------------------
