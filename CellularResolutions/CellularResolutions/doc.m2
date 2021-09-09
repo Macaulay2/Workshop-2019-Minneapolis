@@ -70,6 +70,8 @@ doc ///
         newCell
         (newCell,List,Thing)
         (newCell,List)
+        CellDimension
+        [newCell,CellDimension]
     Headline
         creates a new cell
     Usage
@@ -97,6 +99,9 @@ doc ///
             If not given a label, and the labels on the boundary are monomials
             or monomial ideals, from the same ring, then the label is the lcm
             of the labels of the boundary
+        Text
+            If the dimension cannot be directly infered from the boundary,
+            CellDimension can be used to specify the true dimension
         Example
             R = QQ[x,y]
             a = newCell({},x);
@@ -783,7 +788,7 @@ doc ///
     Headline 
     	relabels a cell complex 
     Usage 
-    	relabelCellComplex(CellComplex,HashTable) 
+    	relabelCellComplex(C,H) 
     Inputs 
     	C : CellComplex 
 	H : HashTable 
@@ -812,11 +817,75 @@ doc ///
 	    for c in cells(1,relabeledC) list cellLabel(c)
     SeeAlso 
     	cellLabel
+        (symbol **,RingMap,CellComplex)
 ///
 
 doc /// 
     Key
 	(symbol **,RingMap,CellComplex)
     Headline 
-        pushes labels to another ring   
+        tensors labels via a ring map
+    Usage
+        f ** C
+    Inputs
+        f : RingMap
+        C : CellComplex
+    Outputs
+        : CellComplex
+         whose cells labels are given by tensoring by the ring map f
+    Description
+        Text
+            Given a ring map f and a cell complex C, then for each label, viewed as a module M, this function constructs a cell complex whose new labels are f ** M
+    SeeAlso
+        relabelCellComplex
+///
+
+doc ///
+    Key
+        cellComplexSphere
+        (cellComplexSphere,Ring,ZZ)
+    Headline
+        gives a sphere as a cell complex
+///
+
+doc ///
+    Key
+        cellComplexRPn
+        (cellComplexRPn,Ring,ZZ)
+    Headline
+        gives a $RP^n$ as a cell complex
+///
+
+doc ///
+    Key
+        cellComplexTorus
+        (cellComplexTorus,Ring,ZZ)
+    Headline
+        gives a torus as a cell complex
+///
+
+
+doc ///
+    Key
+        hullComplex
+        (hullComplex,MonomialIdeal)
+    Headline
+        gives the hull complex of a monomial ideal
+///
+
+
+doc ///
+    Key
+        taylorComplex
+        (taylorComplex,MonomialIdeal)
+    Headline
+        gives the taylor complex of a monomial ideal
+///
+
+doc ///
+    Key
+        maxCells
+        (maxCells,CellComplex)
+    Headline
+        gives the maximal cells of a cell complex
 ///
