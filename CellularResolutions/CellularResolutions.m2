@@ -500,7 +500,9 @@ net(Cell) := (cell) -> (
 net(CellComplex) := (cellComplex) -> (
     d := dim cellComplex;
     nTotalCells := #(flatten values cells cellComplex);
-    "CellComplex of dimension " | d | " with " | nTotalCells | " total cells"
+    if nTotalCells == 0
+    then "empty CellComplex"
+    else "CellComplex of dimension " | d | " with " | nTotalCells | " total cells"
     ); 
 
 
