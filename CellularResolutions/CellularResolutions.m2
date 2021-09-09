@@ -385,7 +385,8 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
 
 chainComplex(CellComplex) := {Reduced=>true} >> o -> (cellComplex) -> (
     if not cellComplex.cache.?chainComplex then (
-        cellComplex.cache.chainComplex = (chainComplex apply((dim cellComplex) + 1, r -> boundary(r,cellComplex)))[1]
+        cellComplex.cache.chainComplex =
+            (chainComplex apply(max((dim cellComplex) + 1,1), r -> boundary(r,cellComplex)))[1]
         );
     if not o.Reduced then (
 	Ccopy := chainComplex cellComplex.cache.chainComplex;

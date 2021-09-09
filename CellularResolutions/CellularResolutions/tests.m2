@@ -4,6 +4,7 @@ e = cellComplex(QQ,{});
 assert(dim e === -infinity);
 assert(#maxCells e == 0);
 assert(#maxCells skeleton(0,e) == 0);
+chainComplex e;
 ///
 
 
