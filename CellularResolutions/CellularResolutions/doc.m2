@@ -807,11 +807,11 @@ doc ///
 	    P = polyhedralComplex {P1,P2};
 	    C = cellComplex(R,P);
 	    verts = cells(0,C);
-	    v1 = verts#0;
-	    v2 = verts#1;
-	    v3 = verts#2;
-	    v4 = verts#3;
-	    T = new HashTable from {v1 => a^2*b, v2 => b*c^2, v3 => b^2, v4 => a*c};
+	    v0 = verts#0;
+	    v1 = verts#1;
+	    v2 = verts#2;
+	    v3 = verts#3;
+	    T = new HashTable from {v0 => a^2*b, v1 => b*c^2, v2 => b^2, v3 => a*c};
 	    relabeledC = relabelCellComplex(C,T);
 	    for c in cells(0,relabeledC) list cellLabel(c)
 	    for c in cells(1,relabeledC) list cellLabel(c)
@@ -836,6 +836,19 @@ doc ///
     Description
         Text
             Given a ring map f and a cell complex C, then for each label, viewed as a module M, this function constructs a cell complex whose new labels are f ** M
+    	Example 
+	    S = QQ[x,y,z];
+	    R = QQ[a,b,c];
+	    f = map(R,S,matrix{{a,b,c^2}});
+	    v1 = newCell({},x);
+	    v2 = newCell({},y);
+	    v3 = newCell({},z);
+	    e12 = newCell({v1,v2});
+	    e23 = newCell({v2,v3});
+	    C = cellComplex(S,{e12,e23});
+	    cells(1,C)/cellLabel
+	    D = f ** C;
+	    cells(1,D)/cellLabel
     SeeAlso
         relabelCellComplex
 ///

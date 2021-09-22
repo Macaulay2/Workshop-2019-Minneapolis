@@ -321,7 +321,8 @@ RingMap ** CellComplex := (f,c) -> (
     R := source f;
     S := target f;
     allCells := flatten values cells(c);
-    ht := hashTable apply(allCells, c -> (c,f ** toModule(R,cellLabel c)));
+    -- ht := hashTable apply(allCells, c -> (c,f ** toModule(R,cellLabel c)));
+    ht := hashTable apply(allCells, c -> (c,f(cellLabel c)));
     tempCellComplex := relabelCellComplex(c,ht);
     cellComplex(S,flatten values cells tempCellComplex) 
     )

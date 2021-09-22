@@ -99,20 +99,19 @@ assert(#cells(-1,D)==0);
 ///
 
 TEST ///
-R = QQ[w,x,y,z]
-C = simplicialComplex monomialIdeal(w*x,w*y);
-dim C
-D = cellComplex(C);
-D
-S = QQ[a];
-f = map(S,R,{a,a,a,a});
-D' = f ** D;
-D'
-assert(dim D'==2);
-assert(#cells(2,D')==1);
-assert(#cells(1,D')==4);
-assert(#cells(0,D')==4);
-assert(#cells(-1,D')==0);
+S = QQ[x,y,z];
+R = QQ[a,b,c];
+f = map(R,S,matrix{{a,b,c^2}});
+v1 = newCell({},x);
+v2 = newCell({},y);
+v3 = newCell({},z);
+e12 = newCell({v1,v2});
+e23 = newCell({v2,v3});
+C = cellComplex(S,{e12,e23});
+D = f ** C;
+assert(ring D == S);
+assert(#cells(1,D) == #cells(1,C));
+assert(set(cells(1,D)/cellLabel) === set {a*b, b*c^2});
 ///
 
 
