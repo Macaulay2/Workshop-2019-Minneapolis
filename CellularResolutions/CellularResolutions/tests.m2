@@ -109,7 +109,7 @@ e12 = newCell({v1,v2});
 e23 = newCell({v2,v3});
 C = cellComplex(S,{e12,e23});
 D = f ** C;
-assert(ring D == S);
+assert(ring D === R);
 assert(#cells(1,D) == #cells(1,C));
 assert(set(cells(1,D)/cellLabel) === set {a*b, b*c^2});
 ///

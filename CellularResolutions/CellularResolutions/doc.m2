@@ -232,6 +232,7 @@ doc ///
 	    C = cellComplex(R,{e,v3});
 	    cellLabel v1
 	    cellLabel e
+	    cellLabel v3
     SeeAlso
     	Cell
 ///
@@ -884,6 +885,27 @@ doc ///
         (hullComplex,MonomialIdeal)
     Headline
         gives the hull complex of a monomial ideal
+    Usage 
+    	hullComplex I
+    Inputs
+    	I : MonomialIdeal
+    Outputs 
+        : CellComplex
+	    the hull complex of $I$ as described in Bayer-Sturmfels' ``Cellular Resolutions of Monomial Modules''
+    Description
+    	Text
+	    Given a monomial ideal $I$, this function returns the hull complex of that ideal. The example given below can be found as Example 4.23 in Miller-Sturmfels' ``Combinatorial Commutative Algebra.'' 
+	    In this example, the resolution supported on the hull complex is minimal, but this is not always the case.
+	Example
+	    S = QQ[x,y,z];
+	    I = monomialIdeal (x^2*z, x*y*z, y^2*z, x^3*y^5, x^4*y^4, x^5*y^3);
+	    H = hullComplex I
+	    chainComplex H
+	    cells(1,H)/cellLabel
+	    cells(2,H)/cellLabel
+	    isMinimal H
+    SeeAlso 
+    	
 ///
 
 
@@ -892,7 +914,23 @@ doc ///
         taylorComplex
         (taylorComplex,MonomialIdeal)
     Headline
-        gives the taylor complex of a monomial ideal
+        gives the Taylor complex of a monomial ideal
+    Usage 
+    	taylorComplex I
+    Inputs
+    	I : MonomialIdeal
+    Outputs
+    	: CellComplex
+	    the Taylor complex of $I$
+    Description
+    	Text
+	    Given a monomial ideal $I$, this function returns the Taylor complex of that ideal. 
+	Example
+	    S = QQ[x,y,z];
+	    I = ideal (x^2, y^2, z^2);
+	    T = taylorComplex I
+	    C = chainComplex T
+	    C.dd
 ///
 
 doc ///
