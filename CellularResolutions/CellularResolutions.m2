@@ -515,7 +515,7 @@ cellComplexSphere = method();
 cellComplexSphere(Ring,ZZ) := (R,n) -> (
     if n<0 then error "cellComplexSphere expects a non-negative integer";
     v := newSimplexCell {};
-    if n==1 then (
+    if n==0 then (
         w := newSimplexCell {};
         cellComplex(R,{v,w})
         )

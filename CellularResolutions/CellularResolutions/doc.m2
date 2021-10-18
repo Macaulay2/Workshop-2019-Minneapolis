@@ -41,7 +41,7 @@ doc ///
         cellComplex
         (cellComplex,Ring,List)
     Headline
-        create an cell complex
+        create a cell complex
     Usage
         cellComplex(R,maxCells)
     Inputs
@@ -178,7 +178,7 @@ doc ///
 	    R = QQ[a..f];
 	    I = monomialIdeal(a*f, b*d, c*e);
 	    Delta = simplicialComplex I;
-	    C = cellComplex(Delta);
+	    C = cellComplex(Delta)
     SeeAlso 
     	cellComplex 
 ///
@@ -525,8 +525,21 @@ doc ///
     Outputs
         : Module
             the r-th homology module of C with coefficients in ring(C)
+    Description 
+    	Text 
+	    This computes the reduced homology of the cellular complex arising from the cell complex C.
+	Example
+	    R = QQ[x]
+            a = newSimplexCell({},x);
+            b1 = newCell {a,a};
+            b2 = newCell {a,a};
+            C = cellComplex(R,{b1,b2});
+	    homology(0,C)
+	    homology(1,C)
+	    prune oo
     SeeAlso
         (homology,CellComplex)
+	(cohomology,ZZ,CellComplex)
 ///
 
 doc /// 
@@ -750,6 +763,8 @@ doc ///
 	    faces P
 	    C = cellComplex(R,P);
 	    cells C
+    SeeAlso
+    	(cellComplex,Ring,PolyhedralComplex)
 ///
 
 doc /// 
@@ -778,6 +793,8 @@ doc ///
 	    F = polyhedralComplex {P1,P2,P3,P4};
 	    C = cellComplex(R,F);
 	    facePoset C
+    SeeAlso 
+    	(cellComplex,Ring,Polyhedron)
 ///
 
 doc /// 
@@ -860,6 +877,26 @@ doc ///
         (cellComplexSphere,Ring,ZZ)
     Headline
         gives a sphere as a cell complex
+    Usage
+    	cellComplexSphere(R,n)
+    Inputs
+    	R : Ring
+	    that specifies the base ring
+	n : ZZ	    
+    Outputs
+    	: CellComplex
+	    an n-dimensional sphere
+    Description
+    	Text
+            This function constructs an n-dimensional sphere in the typical way for a CW-complex: a single n-dimensional cell attached to a single 0-dimensional cell.
+	Example
+	    S = cellComplexSphere(QQ,3)
+	    cells(S)
+	    chainComplex S
+	    prune homology S
+    SeeAlso
+    	cellComplexRPn
+	cellComplexTorus
 ///
 
 doc ///
@@ -868,6 +905,27 @@ doc ///
         (cellComplexRPn,Ring,ZZ)
     Headline
         gives a $RP^n$ as a cell complex
+    Usage
+    	cellComplexRPn(R,n)
+    Inputs
+    	R : Ring 
+	    the coefficients for computing homology
+	n : ZZ
+    Outputs
+    	: CellComplex
+	    n-dimensional projective space as a cell complex
+    Description
+    	Text
+	    This function constructs n-dimensional projective space as a cell complex with the typical CW-structure: 
+	    a single cell of each dimension, where each r-cell is attached as a 2-sheeted covering to the (r-1)-cell.
+	Example
+	    QP5 = cellComplex(QQ,5)
+	    prune homology QP5
+	    ZP6 = cellComplex(ZZ,6)
+	    prune homology ZP6
+    SeeAlso
+    	cellComplexSphere
+	cellComplexTorus
 ///
 
 doc ///
@@ -876,6 +934,24 @@ doc ///
         (cellComplexTorus,Ring,ZZ)
     Headline
         gives a torus as a cell complex
+    Usage
+    	cellComplexTorus(R,n)
+    Inputs
+    	R : Ring
+	n : ZZ
+    Outputs
+    	: CellComplex
+	    the n-dimensional torus
+    Description
+    	Text
+	    This function returns the n-dimensional torus as a cell complex in the usual way: the product of n copies of S^1. 
+	Example
+	    T3 = cellComplexTorus(QQ,3)
+	    cells(T3)
+	    prune homology T3
+    SeeAlso
+    	CellComplexSphere
+	CellComplexRPn
 ///
 
 
@@ -905,7 +981,7 @@ doc ///
 	    cells(2,H)/cellLabel
 	    isMinimal H
     SeeAlso 
-    	
+    	(taylorComplex,MonomialIdeal)
 ///
 
 
@@ -924,13 +1000,15 @@ doc ///
 	    the Taylor complex of $I$
     Description
     	Text
-	    Given a monomial ideal $I$, this function returns the Taylor complex of that ideal. 
+	    Given a monomial ideal I, this function returns the Taylor complex of that ideal. 
 	Example
 	    S = QQ[x,y,z];
-	    I = ideal (x^2, y^2, z^2);
+	    I = monomialIdeal (x^2, y^2, z^2);
 	    T = taylorComplex I
 	    C = chainComplex T
 	    C.dd
+    SeeAlso 
+    	(hullComplex,MonomialIdeal)
 ///
 
 doc ///
@@ -939,4 +1017,24 @@ doc ///
         (maxCells,CellComplex)
     Headline
         gives the maximal cells of a cell complex
+    Usage 
+    	maxCells C
+    Inputs 
+    	C : CellComplex
+    Outputs 
+    	: HashTable
+	    whose keys are the dimensions of the maximal cells of C and whose respective values are a list of the maximal cells of that dimension
+    Description
+    	Text
+	    Given a cell complex C, this function returns its maximal cells with respect to containment.
+	Example
+	    S = QQ[x,y,z];
+	    v1 = newCell({},x);
+	    v2 = newCell({},y);
+	    v3 = newCell({},z);
+	    e = newCell({v1,v2});
+	    C = cellComplex(S,{e,v3});
+	    maxCells C
+    SeeAlso
+    	cells(CellComplex)
 ///
