@@ -556,6 +556,16 @@ doc ///
     Outputs 
     	: Module 
 	    the r-th cohomology module of C
+    Description 
+    	Example 
+	    R = QQ[x]
+            a = newSimplexCell({},x);
+            b1 = newCell {a,a};
+            b2 = newCell {a,a};
+            C = cellComplex(R,{b1,b2});
+	    cohomology(-1,C)
+	    cohomology(0,C)
+	    cohomology(1,C)
     SeeAlso
     	(homology,CellComplex)
 	(homology,ZZ,CellComplex)
@@ -919,9 +929,9 @@ doc ///
 	    This function constructs n-dimensional projective space as a cell complex with the typical CW-structure: 
 	    a single cell of each dimension, where each r-cell is attached as a 2-sheeted covering to the (r-1)-cell.
 	Example
-	    QP5 = cellComplex(QQ,5)
+	    QP5 = cellComplexRPn(QQ,5)
 	    prune homology QP5
-	    ZP6 = cellComplex(ZZ,6)
+	    ZP6 = cellComplexRPn(ZZ,6)
 	    prune homology ZP6
     SeeAlso
     	cellComplexSphere
@@ -950,8 +960,8 @@ doc ///
 	    cells(T3)
 	    prune homology T3
     SeeAlso
-    	CellComplexSphere
-	CellComplexRPn
+    	cellComplexSphere
+	cellComplexRPn
 ///
 
 
@@ -1036,5 +1046,5 @@ doc ///
 	    C = cellComplex(S,{e,v3});
 	    maxCells C
     SeeAlso
-    	cells(CellComplex)
+    	(cells,CellComplex)
 ///
