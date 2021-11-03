@@ -323,3 +323,11 @@ assert(HH_0(C)==0);
 assert(HH_1(C)==0);
 assert(HH_2(C)==ZZ^1);
 ///
+
+--Sphere test 
+TEST ///
+C = cellComplexSphere(QQ,3);
+assert(dim C==3);
+for i from {-1,0,1,2,4,20} do assert(HH_i(C)==0);
+assert(HH_3(C)== QQ^1);
+///

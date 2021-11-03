@@ -38,4 +38,54 @@ Issues:
 3) The net output for a cell complex returns the number of top-dimensional cells, NOT the number of maximal cells. So this isn't quite correct if your complex isn't pure. (fixed)
 4) How do you document an optional input? (done)
 5) What is the attach function that doesn't exist? And did we want to do something with it?  (removed, done)
-6) What breaks if you give things the empty cell complex? 
+6) What breaks if you give things the empty cell complex?
+
+TESTS
+x cellComplex(Ring,List)
+- cellComplex(SimplicialComplex)
+- cellsFromMaxCells
+- mkCellComplex (internal)
+- maxAndAllCells (internal?)
+- maxCells (now idk if we use this?)
+- dim(Cell)
+- dim(CellComplex)
+- ring(CellComplex)
+- cellLabel(Cell)
+- makeCell (internal)
+- boundary(Cell)
+- boundaryCells
+- isCycle
+- inferOrientation
+- toModule
+- inferLabel
+- newCell(List,Thing)
+- newCell(List)
+- isSimplexBoundary
+- isSimplex
+- newSimplexCell(List,Thing)
+- newSimplexCell(List)
+- relabelCellComplex ((inferLabels true))
+- relabelCellComplex ((inferLabels false))
+- RingMap ** CellComplex
+- cells(CellComplex)
+- cells(ZZ,CellComplex)
+- skeleton(ZZ,CellComplex)
+- boundary(ZZ,CellComplex)
+- chainComplex(CellComplex) ((Reduced true))
+- chainComplex(CellComplex) ((Reduced false))
+- homology(ZZ,CellComplex)
+- homology(CellComplex)
+- cohomology(ZZ,CellComplex)
+- cellComplex(Ring,Polyhedron)
+- cellComplex(Ring,PolyhedralComplex)
+- facePoset(CellComplex)
+- isFree
+- isCellMinimal
+- isMinimal
+- net(Cell)
+- net(CellComplex) (((literally how do you test this????)))
+- cellComplexSphere
+- cellComplexRPn
+- cellComplexTorus
+- taylorComplex
+- hullComplex 
