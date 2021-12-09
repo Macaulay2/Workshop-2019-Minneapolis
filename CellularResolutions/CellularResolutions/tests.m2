@@ -108,10 +108,11 @@ v3 = newCell({},z);
 e12 = newCell({v1,v2});
 e23 = newCell({v2,v3});
 C = cellComplex(S,{e12,e23});
+assert(ring C === S);
 D = f ** C;
 assert(ring D === R);
 assert(#cells(1,D) == #cells(1,C));
-assert(set(cells(1,D)/cellLabel) === set {a*b, b*c^2});
+assert(set (cells(1,D)/cellLabel) === set {a*b, b*c^2});
 ///
 
 
@@ -127,8 +128,8 @@ lxz = newSimplexCell({vx,vz});
 fxyz = newSimplexCell({lxy,lyz,lxz});
 assert(cellLabel fxyz === x*y*z);
 D = cellComplex(R,{fxyz});
-C = (chainComplex D)[-1];
-assert(HH_0(C)==cokernel matrix {{x,y,z}});
+C = (chainComplex D);
+assert(HH_(-1)(C)==cokernel matrix {{x,y,z}});
 assert(C.dd^2==0);
 ///
 
@@ -205,9 +206,11 @@ assert(HH_2(C)==0);
 assert(HH_3(C)==0);
 assert((chainComplex C).dd^2==0);
 C1 = skeleton(1,C);
+assert(dim C1 == 1);
 assert(rank HH_1 C1 == 5);
 assert(rank HH_2 C1 == 0);
 C2 = skeleton(2,C);
+assert(dim C2 == 2);
 assert(HH_1 C2 == 0);
 assert(rank HH_2 C2 == 1);
 ///
@@ -276,7 +279,7 @@ C = cellComplex(R,{f}); -- C is a square
 assert(dim C == 2);
 P = facePoset C;
 assert(compare(P,v1,e12));
-assert(compare(P,v1,e23) == false);
+assert(not compare(P,v1,e23));
 assert(compare(P,P_*#0,f));
 assert(isGraded P);
 assert(maximalElements P === {f});
@@ -293,9 +296,9 @@ e13 = newCell({v1,v3});
 e23 = newCell({v2,v3});
 f123 = newCell({e12,e13,e23});
 Cnonmin = cellComplex(R,{f123});
-assert(isMinimal(Cnonmin) != true);
+assert(not isMinimal(Cnonmin));
 Cmin = cellComplex(R,{e12,e23});
-assert(isMinimal(Cmin) == true);
+assert(isMinimal(Cmin));
 ///
 
 --RingMap**CellComplex check
@@ -328,6 +331,17 @@ assert(HH_2(C)==ZZ^1);
 TEST ///
 C = cellComplexSphere(QQ,3);
 assert(dim C==3);
-for i from {-1,0,1,2,4,20} do assert(HH_i(C)==0);
+for i in {1,2,4} do assert(# cells(i,C) == 0);
+for i in {0,3} do assert(# cells(i,C) == 1);
+for i in {-1,0,1,2,4,20} do assert(HH_i(C)==0);
 assert(HH_3(C)== QQ^1);
 ///
+
+--RPn test 
+TEST /// 
+C = cellComplexRPn(ZZ,4);
+assert(dim C==4);
+for i in (0..4) do assert(# cells(i,C) == 1);
+for i in {-1,5} do assert(# cells(i,C) == 0);
+///
+
