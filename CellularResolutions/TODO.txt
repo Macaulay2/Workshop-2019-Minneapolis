@@ -46,8 +46,7 @@ x cellComplex(Ring,List)
 n cellsFromMaxCells
 n mkCellComplex (internal)
 n maxAndAllCells (internal?)
-- maxCells (now idk if we use this?)
-  -- idt this should be exported...
+- maxCells
 x dim(Cell)
 x dim(CellComplex)
 x ring(CellComplex)
@@ -55,13 +54,13 @@ x cellLabel(Cell)
 n makeCell (internal)
 - boundary(Cell)
 - boundaryCells
-- isCycle
-- inferOrientation
-- toModule
-- inferLabel
+n isCycle
+n inferOrientation
+n toModule
+n inferLabel
 - newCell(List,Thing)
 - newCell(List)
-- isSimplexBoundary
+n isSimplexBoundary
 - isSimplex
 x newSimplexCell(List,Thing)
 x newSimplexCell(List)
@@ -84,19 +83,14 @@ x homology(CellComplex)
 x cellComplex(Ring,Polyhedron)
 x cellComplex(Ring,PolyhedralComplex)
 - facePoset(CellComplex)
-  -- == false is in one of these tests, is that bad....?
-  -- should it be assert (! fjdksdl)?
-  -- do "not X"
 - isFree
-- isCellMinimal
-- isMinimal
-  -- same question as with facePoset
+n isCellMinimal
+x isMinimal
 - net(Cell)
 - net(CellComplex) (((literally how do you test this????)))
   -- you probably just don't
 x cellComplexSphere
-- cellComplexRPn
-  -- check number of cells, dimension, homology
+x cellComplexRPn
 - cellComplexTorus
 - taylorComplex
 - hullComplex

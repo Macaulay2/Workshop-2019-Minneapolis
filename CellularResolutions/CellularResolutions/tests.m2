@@ -39,8 +39,12 @@ del1 = boundary(1,C);
 del2 = boundary(2,C);
 del100 = boundary(100,C);
 assert(del0 == map(QQ^1,QQ^2, {{1,1}}));
---This doesn't work due to issues about the ordering of the cells
---assert(del1 == map(QQ^2,QQ^2, {{1,1},{-1,-1}}));
+assert(rank source del1 == 2);
+assert(rank target del1 == 2);
+assert(rank del1 == 1);
+assert(rank source del2 == 1);
+assert(rank target del2 == 2);
+assert(rank del2 == 1);
 assert(del100 == map(QQ^0,QQ^0,{}));
 CchainComplex = chainComplex C;
 assert(HH_0(CchainComplex)==0);
@@ -56,8 +60,6 @@ v = newCell {};
 l = newCell {v,v};
 f = newCell {(l,1),(l,1)};
 C = cellComplex(ZZ,{f});
-f
-C
 assert(dim C===2);
 prune HH chainComplex C
 assert(HH_0 C == 0);
@@ -343,5 +345,7 @@ C = cellComplexRPn(ZZ,4);
 assert(dim C==4);
 for i in (0..4) do assert(# cells(i,C) == 1);
 for i in {-1,5} do assert(# cells(i,C) == 0);
+for i in {-1,0,2,4} do assert(HH_i C == 0);
+for i in {1,3} do assert(prune HH_i C == cokernel matrix {{2}});
 ///
 

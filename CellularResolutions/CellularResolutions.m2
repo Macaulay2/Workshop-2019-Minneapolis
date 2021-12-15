@@ -1,10 +1,10 @@
 -- -*- coding: utf-8 -*-
 newPackage(
     "CellularResolutions",
-    Version => "0.1",
+    Version => "0.9",
     Date => "July 22, 2019",
     Authors => {
-        {Name => "Jay Yang", Email => "jkyang@umn.edu"},
+        {Name => "Jay Yang", Email => "yangj306@mcmaster.ca"},
         {Name => "Aleksandra Sobieska", Email => "asobieska@math.wisc.edu"}
         },
     Headline => "A package for cellular resolutions of monomial ideals",
@@ -121,20 +121,6 @@ maxCells(CellComplex) := (cacheValue (symbol maxCells)) (cellComplex ->
 	    );
         partition(dim,toList maxcells)
         ))
-
--* maximalCells = method()
-maximalCells(List) := (lst) -> (
-    bdfn := c -> set boundaryCells c;
-    maxcells := set lst;
-    bdcells := sum (maxcells/bdfn);
-    maxcells = maxcells - bdcells;
-    while #bdcells != 0 do (
-    --while any(bdcells, b -> instance(b,Cell)) do (
-	bdcells = sum (bdcells/bdfn);
-	maxcells = maxcells - bdcells;
-	);
-    maxcells
-    ) *-
 
 --Define dimension for cell
 dim(Cell) := (cell) -> cell.cellDimension
