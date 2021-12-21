@@ -8,7 +8,12 @@ doc ///
         A package for cellular resolutions of monomial ideals
     Description
         Text
-            Cellular Resolutions
+            This package aims to make working with cellular resolutions of
+            monomial ideals possible. The package additionally provides basic
+            functions to work with cell complexes, although the focus is on
+            those constructs needed to construct cellular resolutions. For
+            some direct ways to construct common cellular resolutions see
+            @TO taylorComplex@ and @TO hullComplex@.
 ///
 
 doc ///
@@ -22,6 +27,10 @@ doc ///
             CW-complex, i.e. a collection of cells in various dimensions along
             with their boundary expressed as a sequence of cells along with an
             orientation such that the boundary is a cycle.
+    Caveat
+        Not every object represented by a @CODE "CellComplex"@ object
+        corresponds to a topological cell complex. In general there is no
+        way to check that such a topological realization exists.
 ///
 
 doc ///
@@ -31,9 +40,11 @@ doc ///
         the class of all cells in cell complexes
     Description
         Text
-            This class represents a single cell in a cell complex.
+            This class represents a single cell in a cell complex. A cell has
+            a boundary, a dimension, and a label.
     SeeAlso
         CellComplex
+        cellLabel
 ///
 
 doc ///
@@ -405,7 +416,9 @@ doc ///
     Description 
     	Text 
 	    Given a cell C, this command returns a list whose elements are the boundary cells of C. 
-	    This differs from @TO boundary@ in that it returns returns only the boundary cells of C, whereas boundaryCells returns a list of two-element sequences of the boundary cells and their corresponding orientation.
+	    This differs from @TO boundary@ in that it returns returns only the boundary cells of C,
+            whereas boundaryCells returns a list of two-element sequences of the boundary cells and
+            their corresponding orientation.
 	Example 
 	    R = QQ[x,y,z];
 	    vx = newSimplexCell({},x);
@@ -739,7 +752,8 @@ doc ///
 	    true if all modules associated to the cell labels are free 
     Description 
     	Text 
-	    This command checks if the modules associated to the labels in the cell complex are all free, which is necessary to create the cellular resolution. 
+	    This command checks if the modules associated to the labels in the cell complex are all free,
+            which is necessary for the complex to give a free resolution.
 	Example 
 	    R = QQ[x,y,z];
 	    v1 = newCell({},ideal(x,y));
@@ -766,7 +780,9 @@ doc ///
 	    whose cells are the faces of the given polyhedron P
     Description 
     	Text 
-	    Given a polyhedron, this command returns the cell complex whose cells correspond to the faces of the polyhedron. The faces have the default label 1. 
+	    Given a polyhedron, this command returns the cell complex whose
+            cells correspond to the faces of the polyhedron. The faces have
+            the default label 1.
 	Example 
 	    R = QQ;
 	    P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
@@ -793,7 +809,9 @@ doc ///
 	    whose cells are the faces of the given polyhedral complex 
     Description 
     	Text 
-	    Given a polyhedral complex, this commend returns the cell complex whose cells correspond to the faces of the polyhedral complex. The faces have the default label 1.
+	    Given a polyhedral complex, this commend returns the
+            cell complex whose cells correspond to the faces of the polyhedral
+            complex. The faces have the default label 1.
 	Example 
 	    R = QQ[x];
 	    P1 = convexHull matrix {{2,2,0},{1,-1,0}};
