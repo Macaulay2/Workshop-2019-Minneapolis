@@ -41,8 +41,10 @@ protect cellDimension
 protect CellDimension
 
 CellComplex = new Type of HashTable
+CellComplex.synonym = "cell complex"
 --Note, the mutable hash table means that equality works "Correctly"
 Cell = new Type of MutableHashTable
+Cell.synonym = "cell"
 
 --returns a hashtable of lists of cells indexed by dimension
 cellsFromMaxCells := lst -> (
