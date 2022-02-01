@@ -74,7 +74,8 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
 --TODO: create an option to make a void complex
 cellComplex = method()
 cellComplex(Ring,List) := (R,maxCells) -> (
-    mkCellComplex(R, (maxAndAllCells maxCells)#1, (maxAndAllCells maxCells)#0)
+    (realMaxCells,allCells) := maxAndAllCells maxCells;
+    mkCellComplex(R, allCells, realMaxCells)
     )
 
 cellComplex(SimplicialComplex) := (C) -> (
