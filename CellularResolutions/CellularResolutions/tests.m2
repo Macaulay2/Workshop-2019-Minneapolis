@@ -349,3 +349,11 @@ for i in {-1,0,2,4} do assert(HH_i C == 0);
 for i in {1,3} do assert(prune HH_i C == cokernel matrix {{2}});
 ///
 
+-- Scarf complex Test
+TEST ///
+R = QQ[w,x,y,z];
+I = monomialIdeal {w*x,x*y,y*z,w*z}
+C = scarfComplex I
+assert(dim C == 1);
+assert(prune HH_1 C != 0);
+///

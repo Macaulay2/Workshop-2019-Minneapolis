@@ -33,6 +33,7 @@ export {"CellComplex",
         "cellComplexRPn",
         "cellComplexTorus",
 	"taylorComplex",
+        "scarfComplex",
 	"hullComplex"
         }
 protect labelRing
@@ -554,7 +555,27 @@ taylorComplex(MonomialIdeal) := (I) -> (
 	    cells#s = newSimplexCell(bd, lcm(gensI_s));
 	    );
 	);
-    cellComplex(ring I, {cells#(splice {0..(r-1)})})
+    cellComplex(ring I, {cells#(toList (0..(r-1)))})
+    )
+
+scarfComplex = method()
+scarfComplex(MonomialIdeal) := (I) -> (
+    gensI := I_*;
+    r := #gensI;
+    if r == 0 then error "scarftComplex expects a non-zero monomialIdeal";
+    cells := new MutableHashTable;
+    for i to r-1 do cells#{i} = newSimplexCell({},gensI#i);
+    for k from 2 to r do (
+	for s in subsets(r,k) do (
+	    bd := for t in subsets(s,k-1) when cells#?t list cells#t;
+            if #bd == k then (
+                m := lcm(gensI_s);
+                print m;
+                if all(bd, c -> cellLabel c != m) then cells#s = newSimplexCell(bd, m);
+	        );
+	    );
+        );
+    cellComplex(ring I, values cells)
     )
 
 hullComplex = method();
