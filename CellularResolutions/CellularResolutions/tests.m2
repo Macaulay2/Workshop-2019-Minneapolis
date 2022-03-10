@@ -357,3 +357,20 @@ C = scarfComplex I
 assert(dim C == 1);
 assert(prune HH_1 C != 0);
 ///
+
+TEST ///
+S = QQ[x,y,z,w];
+v1 = newCell({},y*w);
+v2 = newCell({},x*y*z);
+v3 = newCell({},x^2*y);
+v4 = newCell({},z^4*w);
+e12 = newCell({v1,v2});
+e13 = newCell({v1,v3});
+e23 = newCell({v2,v3});
+e14 = newCell({v1,v4});
+f123 = newCell({e12,e13,e23});
+Delta = cellComplex(S, {f123,e14});
+C = chainComplex Delta;
+assert (dim Delta == 2);
+assert (length C == 3);
+///

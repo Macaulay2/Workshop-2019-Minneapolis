@@ -333,15 +333,17 @@ skeleton(ZZ,CellComplex) := (n,cellComplex) -> (
     )
 
 --take a hash table of RingElements/Matrices, and make a matrix, or 0
-sparseBlockMatrix := (ht) -> (
+sparseBlockMap := (codomain,domain,ht) -> (
     ks := keys ht;
-    if ks === {} then return 0;
+    if ks == {} then return map(codomain,domain,0);
     rows := max (ks/first) + 1;
     columns := max (ks/(p->p#1)) + 1;
     maybeHt := p -> (
         if ht#?p then ht#p else 0
         );
-    matrix apply(rows,i -> apply(columns, j -> maybeHt(i,j))))
+    assert(rows <= #components codomain);
+    assert(columns <= #components domain);
+    map(codomain,domain,matrix apply(#components codomain,i -> apply(#components domain, j -> maybeHt(i,j)))))
 
 --Create chain complex from cell complex 
 boundary(ZZ,CellComplex) := (r,cellComplex) -> (
@@ -357,8 +359,8 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
         new HashTable from domainModules;
     codomainModulesTable :=
         new HashTable from codomainModules;
-    domain := fold((a,b) -> a ++ b, R^0, apply(domainModules,last));
-    codomain := if t==-1 then R^1 else fold((a,b) -> a ++ b, R^0, apply(codomainModules,last));
+    domain := if domainModules == {} then R^0 else directSum(apply(domainModules,last));
+    codomain := if t==-1 then R^1 else if codomainModules == {} then R^0 else directSum(apply(codomainModules,last));
     tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
     i := 0;
     L := flatten for F in rCells list (
@@ -371,7 +373,7 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
 	i = i+1;
 	l
 	);
-    map(codomain,domain,sparseBlockMatrix new HashTable from L)
+    sparseBlockMap(codomain,domain,new HashTable from L)
     );
 
 chainComplex(CellComplex) := {Reduced=>true} >> o -> (cellComplex) -> (
