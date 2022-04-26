@@ -64,6 +64,7 @@ assert(dim C===2);
 prune HH chainComplex C
 assert(HH_0 C == 0);
 assert(homology(0,chainComplex(C,Reduced=>false))==ZZ^1);
+assert(homology(1,chainComplex(C,Reduced=>false))==ZZ^1/(2*ZZ^1));
 assert(HH_1 chainComplex C == cokernel matrix {{2}})
 assert(HH^2 C == cokernel matrix {{2}});
 assert(HH^1 C == 0);

@@ -382,8 +382,8 @@ chainComplex(CellComplex) := {Reduced=>true} >> o -> (cellComplex) -> (
             (chainComplex apply(max((dim cellComplex) + 1,1), r -> boundary(r,cellComplex)))[1]
         );
     if not o.Reduced then (
-	Ccopy := chainComplex cellComplex.cache.chainComplex;
-	Ccopy_(-1) = 0*Ccopy_(-1);
+	Ccopy := chainComplex apply(max cellComplex.cache.chainComplex,
+                                    i -> cellComplex.cache.chainComplex.dd_(i+1));
 	Ccopy
 	)
     else cellComplex.cache.chainComplex
