@@ -366,7 +366,8 @@ doc ///
 
 doc ///
     Key 
-    	(boundary,Cell)
+    	boundary
+	(boundary,Cell)
     Headline 
     	returns the boundary cells along with relative orientations
     Usage 
@@ -455,7 +456,7 @@ doc ///
 	    the boundary map from r-faces to (r-1)-faces of C
     SeeAlso 
         (chainComplex,CellComplex)
-        (boundary,SimplicialComplex)
+        -- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package
         (chainComplex,SimplicialComplex) 
 ///
 
@@ -491,7 +492,7 @@ doc ///
 	    chainComplex(C,Reduced=>false)
     SeeAlso
         (boundary,ZZ,CellComplex)
-	(boundary,SimplicialComplex)
+	-- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package
         (chainComplex,SimplicialComplex)
 ///
 

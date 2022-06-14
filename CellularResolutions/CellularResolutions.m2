@@ -34,9 +34,11 @@ export {"CellComplex",
         "cellComplexTorus",
 	"taylorComplex",
         "scarfComplex",
-	"hullComplex"
+	"hullComplex",
+	"boundary"
         }
 protect labelRing
+protect label
 protect cellDimension
 protect CellDimension
 
@@ -70,7 +72,8 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
 	}
     )
 
---Adds a single -1 cell by default
+--Adds a single -1 cell by default 
+--does NOT in fact do the above
 --TODO: create an option to make a void complex
 cellComplex = method()
 cellComplex(Ring,List) := (R,maxCells) -> (
@@ -161,6 +164,7 @@ chainToVirtualTally := (lst) -> (
     else sum(lst, (cell,deg) -> new VirtualTally from {cell => deg})
     )
 
+boundary = method()
 boundary(Cell) := (cell) -> cell.boundary
 boundaryCells = method()
 boundaryCells(Cell) := (cell) -> apply(boundary(cell), c -> first c)
@@ -327,7 +331,7 @@ cells(ZZ,CellComplex) := (r,cellComplex) -> (
     )
 
 -- skeleton = method();
-skeleton(ZZ,CellComplex) := (n,cellComplex) -> (
+skeleton(ZZ,CellComplex) := CellComplex => (n,cellComplex) -> (
     c := new HashTable from select(pairs cellComplex.cells, (k,v) -> k<=n);
     mkCellComplex(cellComplex.labelRing,c,null)
     )
