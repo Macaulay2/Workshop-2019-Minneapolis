@@ -83,7 +83,7 @@ cellComplex(Ring,List) := (R,maxCells) -> (
 
 cellComplex(SimplicialComplex) := (C) -> (
     S := ring C;
-    Cfaces := applyValues(new HashTable from faces C,flatten @@ entries);
+    Cfaces := new HashTable from faces C;
     --cells indexes Cells by monomials corresponding to faces of the simplicial complex
     cells := new MutableHashTable from {};
     for i from 0 to dim C do (
@@ -180,7 +180,7 @@ isCycle(List) := (lst) ->
                 deg := l#1;
                 if deg>0
                 then sum(deg,i -> boundaryTally c)
-                else - sum(deg,i -> boundaryTally c)))) ? 0) == symbol ==
+                else - sum( - deg,i -> boundaryTally c)))) ? 0) == symbol ==
 
 
 --Figure out an orientation automatically
@@ -410,14 +410,6 @@ cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
 ----------
 ---Here there be polyhedra 
 ----------
-
-faces(Polyhedron) := opts -> (P) -> Polyhedra$faces P
-faces(ZZ,Polyhedron) := opts -> (r,P) -> Polyhedra$faces(r,P)
-vertices(Polyhedron) := (P) -> Polyhedra$vertices P
-
-faces(PolyhedralComplex) := opts -> (PC) -> Polyhedra$faces PC 
-faces(ZZ,PolyhedralComplex) := opts -> (r,PC) -> Polyhedra$faces(r,PC) 
-vertices(PolyhedralComplex) := (PC) -> Polyhedra$vertices PC
 
 cellComplex(Ring,Polyhedron) := (R,P) -> (
     if not isCompact P then error "The given polyhedron is not compact.";
