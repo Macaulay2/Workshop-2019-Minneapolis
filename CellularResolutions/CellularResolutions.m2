@@ -172,15 +172,24 @@ boundaryCells(Cell) := (cell) -> apply(boundary(cell), c -> first c)
 boundaryTally := (cell) -> chainToVirtualTally cell.boundary
 
 
---Check if a chain, represented by a list is a boundary
-isCycle = method()
-isCycle(List) := (lst) ->
-    ((sum(lst,l -> (
+internalCycleCheck := (lst) -> ((sum(lst,l -> (
                 c := l#0;
                 deg := l#1;
                 if deg>0
                 then sum(deg,i -> boundaryTally c)
                 else - sum( - deg,i -> boundaryTally c)))) ? 0) == symbol ==
+
+--Check if a chain, represented by a list is a boundary
+isCycle = method()
+isCycle(List) := {Reduced=>true} >> o -> (lst) ->
+    (if o.Reduced
+    then (
+        p := partition(x -> dim (x#0) == 0, lst);
+        zeroDimCells := if p#?true then p#true else {};
+        otherCells := if p#?false then p#false else {};
+        internalCycleCheck otherCells and sum(zeroDimCells,last) == 0
+        )
+    else internalCycleCheck lst)
 
 
 --Figure out an orientation automatically

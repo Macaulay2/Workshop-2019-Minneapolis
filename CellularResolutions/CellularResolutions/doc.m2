@@ -673,9 +673,9 @@ doc ///
 	    lxy = newSimplexCell({vx,vy});
 	    lyz = newSimplexCell({vy,vz});
 	    lxz = newSimplexCell({vx,vz});
-	    isCycle {(lxy,1)}
-	    isCycle {{lxy,1},{lyz,1},{lxz,-1}}
-	    isCycle {{lxy,1},{lyz,1},{lxz,1}}
+	    assert(isCycle {(lxy,1)} == false);
+	    assert(isCycle {{lxy,1},{lyz,1},{lxz,-1}} == true);
+	    assert(isCycle {{lxy,1},{lyz,1},{lxz,1}} == false);
 ///
 
 doc /// 

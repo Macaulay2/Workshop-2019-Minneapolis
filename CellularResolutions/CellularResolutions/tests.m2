@@ -375,3 +375,22 @@ C = chainComplex Delta;
 assert (dim Delta == 2);
 assert (length C == 3);
 ///
+
+
+TEST ///
+R = QQ[x,y,z];
+vx = newSimplexCell({},x);
+vy = newSimplexCell({},y);
+vz = newSimplexCell({},z);
+lxy = newSimplexCell({vx,vy});
+lyz = newSimplexCell({vy,vz});
+lxz = newSimplexCell({vx,vz});
+assert(isCycle {(lxy,1)} == false);
+assert(isCycle {{lxy,1},{lyz,1},{lxz,-1}} == true);
+assert(isCycle {{lxy,1},{lyz,1},{lxz,1}} == false);
+assert(isCycle {} == true);
+assert(isCycle {(vx,1)} == false);
+assert(isCycle {(vx,1),(vy,-1)} == true);
+assert(isCycle {(vx,0)} == true);
+
+///
