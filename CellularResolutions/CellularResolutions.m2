@@ -4,7 +4,7 @@ newPackage(
     Version => "0.9",
     Date => "July 22, 2019",
     Authors => {
-        {Name => "Jay Yang", Email => "yangj306@mcmaster.ca"},
+        {Name => "Jay Yang", Email => "jayy@wustl.edu"},
         {Name => "Aleksandra Sobieska", Email => "asobieska@math.wisc.edu"}
         },
     Headline => "A package for cellular resolutions of monomial ideals",
