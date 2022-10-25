@@ -574,16 +574,32 @@ scarfComplex(MonomialIdeal) := (I) -> (
     r := #gensI;
     if r == 0 then error "scarftComplex expects a non-zero monomialIdeal";
     cells := new MutableHashTable;
-    for i to r-1 do cells#{i} = newSimplexCell({},gensI#i);
+    dupLabels := new MutableHashTable;
+    for i to r-1 do cells#(gensI#i) = newSimplexCell({},gensI#i);
     for k from 2 to r do (
+        hasCells := false;
 	for s in subsets(r,k) do (
-	    bd := for t in subsets(s,k-1) when cells#?t list cells#t;
-            if #bd == k then (
-                m := lcm(gensI_s);
-                print m;
-                if all(bd, c -> cellLabel c != m) then cells#s = newSimplexCell(bd, m);
-	        );
-	    );
+            --boundary cell via the labels
+	    bdLabels := for t in subsets(s,k-1) list lcm(gensI_t);
+            incompleteBoundary := false;
+            bd := for label in bdLabels list (
+                if cells#?label then cells#label else (incompleteBoundary = true; break;));
+            if incompleteBoundary then continue;
+            --compute the label of the cell
+            m := lcm(gensI_s);
+            --figure out if we have a duplicate label, if we do remove any cells with
+            --the same label, otherwise add the cell
+            if not dupLabels#?m
+            then if cells#?m
+                 then (
+                     dupLabels#m = true;
+                     remove(cells,m))
+                 else (
+                     hasCells = true;
+                     cells#m = newSimplexCell(bd, m));
+            );
+        --if there are no cells at dimension k, there won't be any of higher dimension
+        if not hasCells then break;
         );
     cellComplex(ring I, values cells)
     )

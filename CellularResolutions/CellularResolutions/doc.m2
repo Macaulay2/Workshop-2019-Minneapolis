@@ -1042,6 +1042,38 @@ doc ///
 
 doc ///
     Key
+        scarfComplex
+        (scarfComplex,MonomialIdeal)
+    Headline
+        gives the hull complex of a monomial ideal
+    Usage
+        scarfComplex I
+    Inputs
+        I : MonomialIdeal
+    Outputs
+        : CellComplex
+            the scarf complex of $I$
+    Description
+        Text
+	    Given a monomial ideal $I$, this function returns the scarf complex of that ideal.
+            This complex, if it is a resolution is always minimal, but it need not be a resolution
+            in general
+	Example
+	    S = QQ[x,y,z];
+	    I = monomialIdeal (x^2*z, x*y*z, y^2*z, x^3*y^5, x^4*y^4, x^5*y^3);
+	    C = scarfComplex I
+	    chainComplex C
+	    cells(1,C)/cellLabel
+	    cells(2,C)/cellLabel
+	    isMinimal C
+    SeeAlso
+        (taylorComplex,MonomialIdeal)
+        (hullComplex,MonomialIdeal)
+///
+
+
+doc ///
+    Key
         maxCells
         (maxCells,CellComplex)
     Headline
