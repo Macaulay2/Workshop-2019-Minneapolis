@@ -35,12 +35,14 @@ export {"CellComplex",
 	"taylorComplex",
         "scarfComplex",
 	"hullComplex",
-	"boundary"
+	"boundary",
+        "LabelFunction"
         }
 protect labelRing
 protect label
 protect cellDimension
 protect CellDimension
+protect LabelFunction
 
 CellComplex = new Type of HashTable
 CellComplex.synonym = "cell complex"
@@ -75,13 +77,13 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
 --Adds a single -1 cell by default 
 --does NOT in fact do the above
 --TODO: create an option to make a void complex
-cellComplex = method()
-cellComplex(Ring,List) := (R,maxCells) -> (
+cellComplex = method(Options=>{LabelFunction => null})
+cellComplex(Ring,List) := o -> (R,maxCells) -> (
     (realMaxCells,allCells) := maxAndAllCells maxCells;
     mkCellComplex(R, allCells, realMaxCells)
     )
 
-cellComplex(SimplicialComplex) := (C) -> (
+cellComplex(SimplicialComplex) := o -> (C) -> (
     S := ring C;
     Cfaces := new HashTable from faces C;
     --cells indexes Cells by monomials corresponding to faces of the simplicial complex
@@ -420,32 +422,49 @@ cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
 ---Here there be polyhedra 
 ----------
 
-cellComplex(Ring,Polyhedron) := (R,P) -> (
+cellComplex(Ring,Polyhedron) :=  o -> (R,P) -> (
     if not isCompact P then error "The given polyhedron is not compact.";
     Pdim := dim P;
     Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i,apply(lst,first)));
+    print Pfaces;
+    verts := vertices P;
+    vertexCells := apply(numColumns verts,
+                         if o.LabelFunction =!= null
+                         then (n -> newCell({},o.LabelFunction (verts_n)))
+                         else (n -> newCell({})));
     cells := new MutableHashTable;
     for i from 0 to Pdim do (
         for face in Pfaces#i do (
             bd := if i!=0
                   then for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue)
                   else {};
-            cells#face = newCell bd
+            cells#face =
+                if i==0
+                then vertexCells#(face#0)
+                else newCell bd;
             );
         );
     cellComplex(R,flatten values cells)
     );
 
-cellComplex(Ring,PolyhedralComplex) := (R,P) -> (
+cellComplex(Ring,PolyhedralComplex) := o -> (R,P) -> (
     Pdim := dim P;
     Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i-1,apply(lst,first)));
+    verts := vertices P;
+    vertexCells := apply(numColumns verts,
+                         if o.LabelFunction =!= null
+                         then (n -> newCell({},o.LabelFunction (verts_n)))
+                         else (n -> newCell({})));
     cells := new MutableHashTable;
     for i from 0 to Pdim do (
         for face in Pfaces#i do (
 	    bd := if i!=0
                   then for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue)
                   else {};
-            cells#face = newCell bd
+            cells#face =
+                if i==0
+                then vertexCells#(face#0)
+                else newCell bd;
             );
         );
     cellComplex(R,flatten values cells)
