@@ -248,7 +248,22 @@ assert(# cells(3,C)==1);
 assert(# cells(4,C)==0);
 ///
 
---Polyhedral complex
+--Polytope test 4 (LabelFunction) test
+TEST ///
+R = ZZ[x,y,z];
+M = transpose matrix {{0,0,0},{0,1,0},{0,0,1},{1,0,0},{1,1,0},{1,0,1}};
+P = convexHull M;
+C = cellComplex(R,P,LabelFunction=>(v -> x^(lift(v_0,ZZ))*y^(lift(v_1,ZZ))*z^(lift(v_2,ZZ))));
+assert(dim C==3);
+assert(# cells(0,C)==6);
+assert(# cells(1,C)==9);
+assert(# cells(2,C)==5);
+assert(# cells(3,C)==1);
+assert(# cells(4,C)==0);
+assert(sort apply(cells(0,C),cellLabel) == sort {x*z,x*y,x,z,y,1});
+///
+
+--Polyhedral complex test 1
 TEST /// 
 R = QQ[x];
 P1 = convexHull matrix {{2,2,0},{1,-1,0}};
@@ -265,6 +280,24 @@ for i to 2 do assert(HH_i C==0);
 C1 = skeleton(1,C);
 assert(rank HH_1 C1 == 4);
 ///
+
+
+--Polyhedral complex test 2
+TEST ///
+R = frac(ZZ[x,y]);
+P1 = convexHull matrix {{2,2,0},{1,-1,0}};
+P2 = convexHull matrix {{2,-2,0},{1,1,0}};
+P3 = convexHull matrix {{-2,-2,0},{1,-1,0}};
+P4 = convexHull matrix {{-2,2,0},{-1,-1,0}};
+F = polyhedralComplex {P1,P2,P3,P4};
+C = cellComplex(R,F,LabelFunction=>(v -> x^(lift(v_0,ZZ))*y^(lift(v_1,ZZ))));
+assert(# cells(0,C)==5);
+assert(# cells(1,C)==8);
+assert(# cells(2,C)==4);
+assert(# cells(3,C)==0);
+assert(sort apply(cells(0,C),cellLabel) == sort {x^2*y,x^2/y,1,y/x^2,1/(x^2*y)});
+///
+
 
 --Face poset 
 TEST ///
@@ -323,7 +356,7 @@ assert(HH_3(D)==0);
 TEST ///
 R = ZZ;
 v = newCell({},1);
-f = newCell({v},1,CellDimension=>2);
+f = newCell({(v,0)},1,CellDimension=>2);
 C = cellComplex(R,{f});
 assert(HH_0(C)==0);
 assert(HH_1(C)==0);
