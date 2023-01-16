@@ -1,0 +1,55 @@
+# Minor Issues #
+- Cell
+  - No example
+- CellComplex
+  - No Example
+- boundary
+  - Put some text between the two examples or combined them
+- boundaryCell
+  - Put some text between the two examples or combined them
+- cellComplex
+  - needs more detail
+- cellLabel
+  - needs a description
+- cells
+  - needs a description
+- boundary(ZZ,CellComplex)
+  - no description�
+I
+- cell(ZZ,CellComplex)
+  - needs a description
+- chainComplex(CellComplex)
+  - Make sure all optional parameters are covered
+- dim(Cell)
+  - no description
+- dim(CellComplex)
+  - no description
+- facePoset(CellComplex)
+  - needs more detail
+- HH CellComplex
+  - needs more detail, discuss the labels
+- HH^ZZ CellComplex
+  - needs a description
+- HH_ZZ CellComplex
+  - needs more detail, discuss the labels
+  - maybe merge with HH node
+- LabelFunction
+  - missing documentation
+
+# Short but probably not an issue
+- cellComplexRPn
+- cellComplexSphere
+- cellComplexTorus
+- isCycle
+- isFree
+- isMinimal
+- isSimplex
+- maxCells
+- newSimplexCell
+- taylorComplex
+- cellComplex(Ring,PolyhedralComplex)
+- cellComplex(Ring,Polyhedron)
+- cellComplex(SimplicialComplex)
+- ring(CellComplex)
+- RingMap ** CellComplex
+
