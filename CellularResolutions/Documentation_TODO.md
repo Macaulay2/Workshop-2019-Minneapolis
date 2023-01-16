@@ -14,8 +14,7 @@
 - cells
   - needs a description
 - boundary(ZZ,CellComplex)
-  - no description�
-I
+  - no description
 - cell(ZZ,CellComplex)
   - needs a description
 - chainComplex(CellComplex)
