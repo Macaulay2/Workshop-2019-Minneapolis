@@ -261,7 +261,10 @@ doc ///
     Outputs
         : ZZ
             the dimension of the complex
-    Description 
+    Description
+        Text
+            Given a cell complex C, dim returns its dimension.
+            The dimension is equal to the largest dimension of a cell in C.
     	Example 
 	    R = QQ[x,y,z];
 	    vx = newSimplexCell({},x);
@@ -287,7 +290,13 @@ doc ///
     Outputs
         : ZZ
             the dimension of the cell
-    Description 
+    Description
+        Text
+            Given a cell C, dim returns its dimension.
+            In general the dimension of the cell is infered from the
+            dimension of its boundary however, this can be overridden
+            if the cell is created using @TO newCell@ with the @TO CellDimension@
+            option.
     	Example 
 	    R = QQ[x,y,z];
 	    vx = newSimplexCell({},x);
@@ -315,8 +324,11 @@ doc ///
     Outputs 
     	: HashTable 
 	    the cells of C 
-    Description 
-    	Example 
+    Description
+        Text
+            Given a cell complex, this function will return all the cells in that cell complex,
+            index by dimension. The order of the cells in each dimension is arbitrary.
+        Example
 	    R = QQ[x,y,z];
 	    vx = newSimplexCell({},x);
 	    vy = newSimplexCell({},y);
@@ -324,12 +336,12 @@ doc ///
 	    exy = newSimplexCell {vx,vy};
 	    C = cellComplex(R,{exy,vz});
 	    cells(C)
-	Example 
+	Example
 	    R = QQ;
 	    P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
 	    C = cellComplex(R,P);
 	    cells C
-    SeeAlso 
+    SeeAlso
     	(cells,ZZ,CellComplex)
     	
 ///
@@ -349,7 +361,10 @@ doc ///
     Outputs
     	: List 
 	    the r-cells of C
-    Description 
+    Description
+        Text
+            Given a dimension r and a cell complex C, cells returns a list of all the cells
+            of dimension r in C. The order of the returned cells is arbitrary.
     	Example 
 	    R = QQ[x,y,z];
 	    vx = newSimplexCell({},x);
@@ -377,10 +392,13 @@ doc ///
     Outputs 
     	: List 
 	    two-element sequences where the first element is the boundary cell and the second element is the orientation of the boundary cell relative to C    
-    Description 
-    	Text 
-	    Given a cell C, this command returns a list whose elements are two-element sequences. The first element of each tuple is a boundary cell of C and the second element is the orientation of that boundary cell relative to C. 
-	    This differs from @TO boundaryCells@ in that it returns the boundary cells and their corresponding orientation, whereas boundaryCells returns only the boundary cells.
+    Description
+        Text
+	    Given a cell C, this command returns a list whose elements are two-element sequences.
+            The first element of each tuple is a boundary cell of C and the second element
+            is the attaching degree of that boundary cell relative to C.
+	    This differs from @TO boundaryCells@ in that it returns the boundary cells and
+            their corresponding attaching degree, whereas boundaryCells returns only the boundary cells.
 	Example 
 	    R = QQ[x,y,z];
 	    vx = newSimplexCell({},x);
@@ -454,6 +472,10 @@ doc ///
     Outputs 
     	: Matrix 
 	    the boundary map from r-faces to (r-1)-faces of C
+    Description
+        Text
+            This function returns the map in the chain complex from the r-th homological degree
+            to the (r-1)-th homological degree.
     SeeAlso 
         (chainComplex,CellComplex)
         -- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package

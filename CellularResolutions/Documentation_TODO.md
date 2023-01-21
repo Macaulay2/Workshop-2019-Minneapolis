@@ -12,11 +12,9 @@
 - cellLabel
   - needs a description
 - cells
-  - needs a description
+  - needs text between the examples
 - boundary(ZZ,CellComplex)
-  - no description
-- cell(ZZ,CellComplex)
-  - needs a description
+  - needs an example
 - chainComplex(CellComplex)
   - Make sure all optional parameters are covered
 - dim(Cell)
@@ -49,6 +47,7 @@
 - cellComplex(Ring,PolyhedralComplex)
 - cellComplex(Ring,Polyhedron)
 - cellComplex(SimplicialComplex)
+- cell(ZZ,CellComplex)
 - ring(CellComplex)
 - RingMap ** CellComplex
 
