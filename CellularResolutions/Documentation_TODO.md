@@ -17,10 +17,6 @@
   - needs an example
 - chainComplex(CellComplex)
   - Make sure all optional parameters are covered
-- dim(Cell)
-  - no description
-- dim(CellComplex)
-  - no description
 - facePoset(CellComplex)
   - needs more detail
 - HH CellComplex
@@ -50,4 +46,5 @@
 - cell(ZZ,CellComplex)
 - ring(CellComplex)
 - RingMap ** CellComplex
-
+- dim(Cell)
+- dim(CellComplex)
