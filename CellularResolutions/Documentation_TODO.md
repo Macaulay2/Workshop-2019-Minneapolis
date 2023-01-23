@@ -1,4 +1,5 @@
 # Minor Issues #
+- Document better what labels need or don't need to be for various functions to work
 - Cell
   - No example
 - CellComplex
@@ -8,17 +9,13 @@
 - boundaryCell
   - Put some text between the two examples or combined them
 - cellComplex
-  - needs more detail
-- cellLabel
-  - needs a description
+  - either split the cellComplex key from cellComplex(Ring,List) or combined all of them?
 - cells
   - needs text between the examples
 - boundary(ZZ,CellComplex)
-  - needs an example
+  - better example?
 - chainComplex(CellComplex)
   - Make sure all optional parameters are covered
-- facePoset(CellComplex)
-  - needs more detail
 - HH CellComplex
   - needs more detail, discuss the labels
 - HH^ZZ CellComplex
@@ -48,3 +45,4 @@
 - RingMap ** CellComplex
 - dim(Cell)
 - dim(CellComplex)
+- facePoset(CellComplex)

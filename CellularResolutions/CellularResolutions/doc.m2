@@ -65,7 +65,12 @@ doc ///
             a cell complex
     Description
         Text
-            This function constructs a cell complex from a list of cells
+            The method cellComplex takes a ring R and a list of maximal cells and constructs the
+            corresponding cell complex. While the intent is for the supplied cells to be maximal,
+            including non-maximal cells is not forbiden and will generate valid cell complexes.
+        Text
+            The ring R is the ring over which the labels are interpreted. This function does not
+            directly check that the labels are in the correct ring.
         Example
             c = newCell {}
             C = cellComplex(QQ,{c});
@@ -233,8 +238,13 @@ doc ///
     Outputs
     	: Thing 
 	    the label of the cell
-    Description 
-    	Example 
+    Description
+        Text
+            The label is provided at the creation of the cell and cannot be modified, neither
+            this function nor any of the cell creation functions attempt to interpret the label
+            and while the labels generally should be monomials, this package makes no attempt
+            to enforce such a requirement.
+        Example
 	    R = QQ[x,y];
 	    v1 = newSimplexCell({},x^2);
 	    v2 = newSimplexCell({},x*y^2);
@@ -246,6 +256,8 @@ doc ///
 	    cellLabel v3
     SeeAlso
     	Cell
+        newSimplexCell
+        newCell
 ///
 
 doc ///
@@ -476,6 +488,14 @@ doc ///
         Text
             This function returns the map in the chain complex from the r-th homological degree
             to the (r-1)-th homological degree.
+        Example
+            R = QQ[x,y,z];
+            vx = newSimplexCell({},x);
+            vy = newSimplexCell({},y);
+            vz = newSimplexCell({},z);
+            exy = newSimplexCell {vx,vy};
+            C = cellComplex(R,{exy,vz});
+            boundary_1 C
     SeeAlso 
         (chainComplex,CellComplex)
         -- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package
@@ -995,7 +1015,8 @@ doc ///
 	    the n-dimensional torus
     Description
     	Text
-	    This function returns the n-dimensional torus as a cell complex in the usual way: the product of n copies of S^1. 
+	    This function returns the n-dimensional torus as a cell complex in the usual way:
+            the product of n copies of S^1.
 	Example
 	    T3 = cellComplexTorus(QQ,3)
 	    cells(T3)
@@ -1021,8 +1042,11 @@ doc ///
 	    the hull complex of $I$ as described in Bayer-Sturmfels' ``Cellular Resolutions of Monomial Modules''
     Description
     	Text
-	    Given a monomial ideal $I$, this function returns the hull complex of that ideal. The example given below can be found as Example 4.23 in Miller-Sturmfels' ``Combinatorial Commutative Algebra.'' 
-	    In this example, the resolution supported on the hull complex is minimal, but this is not always the case.
+            Given a monomial ideal $I$, this function returns the hull complex of that ideal.
+            The example given below can be found as Example 4.23 in Miller-Sturmfels'
+            ``Combinatorial Commutative Algebra.''
+            In this example, the resolution supported on the hull complex is minimal,
+            but this is not always the case.
 	Example
 	    S = QQ[x,y,z];
 	    I = monomialIdeal (x^2*z, x*y*z, y^2*z, x^3*y^5, x^4*y^4, x^5*y^3);
@@ -1051,7 +1075,9 @@ doc ///
 	    the Taylor complex of $I$
     Description
     	Text
-	    Given a monomial ideal I, this function returns the Taylor complex of that ideal. 
+            Given a monomial ideal I, this function returns the Taylor complex of that ideal.
+            Recall that the Taylor complex is a simplex with verticies labeled by the generators
+            of the ideal.
 	Example
 	    S = QQ[x,y,z];
 	    I = monomialIdeal (x^2, y^2, z^2);
@@ -1078,7 +1104,8 @@ doc ///
     Description
         Text
 	    Given a monomial ideal $I$, this function returns the scarf complex of that ideal.
-            This complex, if it is a resolution is always minimal, but it need not be a resolution
+            This complex, which is a subcomplex of the Taylor complex,
+            if it is a resolution is always minimal, but it need not be a resolution
             in general
 	Example
 	    S = QQ[x,y,z];
