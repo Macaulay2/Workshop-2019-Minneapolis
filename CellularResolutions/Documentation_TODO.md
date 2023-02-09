@@ -16,13 +16,9 @@
   - better example?
 - chainComplex(CellComplex)
   - Make sure all optional parameters are covered
-- HH CellComplex
-  - needs more detail, discuss the labels
+  - discuss how the labels work
 - HH^ZZ CellComplex
-  - needs a description
-- HH_ZZ CellComplex
-  - needs more detail, discuss the labels
-  - maybe merge with HH node
+  - needs a better description
 - LabelFunction
   - missing documentation
 

@@ -419,8 +419,8 @@ doc ///
 	    exy = newSimplexCell {vx,vy};
 	    C = cellComplex(R,{exy,vz});
 	    boundary(exy)
-	    boundary(vz)	    	
-	Example 
+	    boundary(vz)
+        Example
 	    R = QQ;
 	    P = convexHull matrix {{1,1,-1,-1},{1,-1,1,-1}};
 	    C = cellComplex(R,P);
@@ -450,7 +450,7 @@ doc ///
 	    This differs from @TO boundary@ in that it returns returns only the boundary cells of C,
             whereas boundaryCells returns a list of two-element sequences of the boundary cells and
             their corresponding orientation.
-	Example 
+	Example
 	    R = QQ[x,y,z];
 	    vx = newSimplexCell({},x);
 	    vy = newSimplexCell({},y);
@@ -523,7 +523,7 @@ doc ///
             taking into account the labels on the cells. 
 	    The ambient ring is the base ring of the cell complex. 
 	    By default, the option "Reduced" is set to true, so 
-	    the resulting ChainComplex has a rank 1 free module in homological degree -1 for the empty cell. 
+	    the resulting ChainComplex has a rank 1 free module in homological degree -1.
         Example
             R = QQ[x]
             a = newSimplexCell({},x);
@@ -536,6 +536,9 @@ doc ///
         (boundary,ZZ,CellComplex)
 	-- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package
         (chainComplex,SimplicialComplex)
+        (homology,CellComplex)
+        (homology,ZZ,CellComplex)
+        (cohomology,ZZ,CellComplex)
 ///
 
 doc ///
@@ -553,7 +556,21 @@ doc ///
             the graded module, the homology of C with coefficients in ring(C)
     Description 
     	Text 
-	    This computes the reduced homology of the cellular complex arising from the cell complex C.
+	    This computes the reduced homology of the cellular complex arising from the labeled cell complex C.
+        Text
+            If the labels are all 1, then this will be the standard homology of the cell complex over
+            the label ring, as in the following example
+	Example
+	    R = QQ[x]
+            a = newSimplexCell({},1);
+            b1 = newCell {a,a};
+            b2 = newCell {a,a};
+            C = cellComplex(R,{b1,b2});
+	    HH C
+	    prune oo
+        Text
+            However if the cells instead labeled with monomials (or monomial ideals) from the ring
+            the homology of the corresponding complex of R modules is given.
 	Example
 	    R = QQ[x]
             a = newSimplexCell({},x);
@@ -564,6 +581,7 @@ doc ///
 	    prune oo
     SeeAlso
         (homology,ZZ,CellComplex)
+        (chainComplex,CellComplex)
 ///
 
 doc ///
@@ -584,18 +602,34 @@ doc ///
     Description 
     	Text 
 	    This computes the reduced homology of the cellular complex arising from the cell complex C.
+            For more details on the labels, see @TO (homology,CellComplex)@. As an example, we can 
+            compute the 0-th and 1st homology of a wedge of two circles, 
 	Example
-	    R = QQ[x]
-            a = newSimplexCell({},x);
+	    R = QQ
+            a = newSimplexCell({},1);
             b1 = newCell {a,a};
             b2 = newCell {a,a};
             C = cellComplex(R,{b1,b2});
 	    homology(0,C)
 	    homology(1,C)
 	    prune oo
+        Text
+            We can make this example slightly more interesting by changing the label ring and
+            adding a non-unit label. Note in particular that this has a non-zero 0-th homology
+        Example
+	    R = QQ[x]
+            a = newSimplexCell({},x);
+            b1 = newCell {a,a};
+            b2 = newCell {a,a};
+            C = cellComplex(R,{b1,b2});
+	    homology(0,C)
+            prune oo
+	    homology(1,C)
+	    prune oo
     SeeAlso
         (homology,CellComplex)
 	(cohomology,ZZ,CellComplex)
+        (chainComplex,CellComplex)
 ///
 
 doc /// 
@@ -612,7 +646,9 @@ doc ///
     Outputs 
     	: Module 
 	    the r-th cohomology module of C
-    Description 
+    Description
+        Text
+            This computes the cohomology
     	Example 
 	    R = QQ[x]
             a = newSimplexCell({},x);
@@ -625,6 +661,7 @@ doc ///
     SeeAlso
     	(homology,CellComplex)
 	(homology,ZZ,CellComplex)
+        (chainComplex,CellComplex)
 ///
 
 doc ///
@@ -887,8 +924,11 @@ doc ///
 	    whose cells are relabeled by the values in the hashtable H 
     Description 
     	Text 
-	    Given a cell complex C and a hashtable, whose key-value pairs are a cell from C and a new label for that cell, this command relabels C accordingly. 
-	    Labels for cells not provided in the hashtable are inferred to be the lcm of the labels of their boundary cells, unless the option InferLabels is turned off. 
+	    Given a cell complex C and a hashtable, whose key-value pairs
+            are a cell from C and a new label for that cell, this command
+            relabels C accordingly. Labels for cells not provided in the
+            hashtable are inferred to be the lcm of the labels of their
+            boundary cells, unless the option InferLabels is set to false.
 	Example 
 	    R = QQ[a,b,c];
 	    P1 = convexHull matrix {{0,1,0},{0,0,1}};
