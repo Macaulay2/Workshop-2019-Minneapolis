@@ -134,6 +134,7 @@ D = cellComplex(R,{fxyz});
 C = (chainComplex D);
 assert(HH_(-1)(C)==cokernel matrix {{x,y,z}});
 assert(C.dd^2==0);
+assert(degrees C_0 == {{1}, {1}, {1}});
 ///
 
 --Monomial ideal labels

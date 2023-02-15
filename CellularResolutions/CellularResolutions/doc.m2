@@ -507,6 +507,8 @@ doc ///
         (chainComplex,CellComplex)
 	Reduced
 	[(chainComplex,CellComplex),Reduced]
+        Prune
+        [(chainComplex,CellComplex),Prune]
     Headline
         compute the cellular chain complex for a cell complex
     Usage
@@ -532,6 +534,19 @@ doc ///
             C = cellComplex(R,{b1,b2});
             chainComplex C
 	    chainComplex(C,Reduced=>false)
+        Text
+            The option "Prune", also defaulted to true, controls whether the modules in the complex
+            are pruned before being returned. With the "Prune" option set to the default of true,
+            the resulting complex is visually nicer. However, unless the labeling ring is
+            fine graded, some of the structure will be lost.
+        Example
+            R = QQ[x,y]
+            a = newSimplexCell({},x);
+            b = newSimplexCell({},y);
+            e = newCell {a,b};
+            C = cellComplex(R,{e});
+            chainComplex C
+            chainComplex(C,Prune=>false)
     SeeAlso
         (boundary,ZZ,CellComplex)
 	-- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package

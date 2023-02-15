@@ -43,6 +43,8 @@ protect label
 protect cellDimension
 protect CellDimension
 protect LabelFunction
+protect Reduced
+protect Prune
 
 CellComplex = new Type of HashTable
 CellComplex.synonym = "cell complex"
@@ -391,17 +393,21 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
     sparseBlockMap(codomain,domain,new HashTable from L)
     );
 
-chainComplex(CellComplex) := {Reduced=>true} >> o -> (cellComplex) -> (
+chainComplex(CellComplex) := {Reduced=>true, Prune=>true} >> o -> (cellComplex) -> (
     if not cellComplex.cache.?chainComplex then (
         cellComplex.cache.chainComplex =
             (chainComplex apply(max((dim cellComplex) + 1,1), r -> boundary(r,cellComplex)))[1]
         );
-    if not o.Reduced then (
+    ret := if not o.Reduced then (
 	Ccopy := chainComplex apply(max cellComplex.cache.chainComplex,
                                     i -> cellComplex.cache.chainComplex.dd_(i+1));
 	Ccopy
 	)
-    else cellComplex.cache.chainComplex
+        else cellComplex.cache.chainComplex;
+    if o.Prune then (
+        prune ret --how expensive is prune? should it be cached?
+        )
+    else ret
     );
 
 --Get homology directly from cell complex

@@ -18,4 +18,4 @@
 
 # Code #
 
-- [] Prune option?
+- [x] Prune option?
