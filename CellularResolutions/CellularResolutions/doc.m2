@@ -488,14 +488,21 @@ doc ///
         Text
             This function returns the map in the chain complex from the r-th homological degree
             to the (r-1)-th homological degree.
+        Text
+            For example, below we construct the taylor complex for the monomial ideal $\langle x,y,z\rangle$
         Example
             R = QQ[x,y,z];
             vx = newSimplexCell({},x);
             vy = newSimplexCell({},y);
             vz = newSimplexCell({},z);
             exy = newSimplexCell {vx,vy};
-            C = cellComplex(R,{exy,vz});
-            boundary_1 C
+            exz = newSimplexCell {vx,vz};
+            eyz = newSimplexCell {vy,vz};
+            f = newSimplexCell {exy,exz,eyz};
+            C = cellComplex(R,{f});
+            d1 = boundary_1 C
+            d2 = boundary_2 C
+            assert(d1*d2==0)
     SeeAlso 
         (chainComplex,CellComplex)
         -- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package
@@ -616,7 +623,7 @@ doc ///
             the r-th homology module of C with coefficients in ring(C)
     Description 
     	Text 
-	    This computes the reduced homology of the cellular complex arising from the cell complex C.
+	    This computes the reduced homology in degree r of the cellular complex arising from the cell complex C.
             For more details on the labels, see @TO (homology,CellComplex)@. As an example, we can 
             compute the 0-th and 1st homology of a wedge of two circles, 
 	Example
@@ -663,7 +670,10 @@ doc ///
 	    the r-th cohomology module of C
     Description
         Text
-            This computes the cohomology
+            This computes the reduced cohomology in degree r of the labeled cell complex.
+            In particular, it constructs the co-chain complex by dualizing by
+            the label ring, and takes the homology of that chain complex. As an example
+            we can compute the cohomology of the wedge of two circles
     	Example 
 	    R = QQ[x]
             a = newSimplexCell({},x);
@@ -673,6 +683,15 @@ doc ///
 	    cohomology(-1,C)
 	    cohomology(0,C)
 	    cohomology(1,C)
+        Text
+            Or in a more interesting case, we have the cohomology over the integers of
+            $RP^3$
+        Example
+            C = cellComplexRPn(ZZ,3);
+            cohomology(0,C)
+            cohomology(1,C)
+            cohomology(2,C)
+            cohomology(3,C)
     SeeAlso
     	(homology,CellComplex)
 	(homology,ZZ,CellComplex)

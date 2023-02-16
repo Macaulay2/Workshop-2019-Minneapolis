@@ -12,15 +12,15 @@
   - either split the cellComplex key from cellComplex(Ring,List) or combined all of them?
 - cells
   - needs text between the examples
-- boundary(ZZ,CellComplex)
-  - better example?
 - chainComplex(CellComplex)
   - Make sure all optional parameters are covered
   - discuss how the labels work
-- HH^ZZ CellComplex
-  - needs a better description
 - LabelFunction
   - missing documentation
+- net(Cell)
+  - missing documentation?
+- net(CellComplex)
+  - missing documentation?
 
 # Short but probably not an issue
 - cellComplexRPn
