@@ -76,16 +76,13 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
 	}
     )
 
---Adds a single -1 cell by default 
---does NOT in fact do the above
---TODO: create an option to make a void complex
 cellComplex = method(Options=>true)
-cellComplex(Ring,List) := o -> (R,maxCells) -> (
+cellComplex(Ring,List) := (R,maxCells) -> (
     (realMaxCells,allCells) := maxAndAllCells maxCells;
     mkCellComplex(R, allCells, realMaxCells)
     )
 
-cellComplex(SimplicialComplex) := o -> (C) -> (
+cellComplex(SimplicialComplex) := (C) -> (
     S := ring C;
     Cfaces := new HashTable from faces C;
     --cells indexes Cells by monomials corresponding to faces of the simplicial complex
