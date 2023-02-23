@@ -79,7 +79,7 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
 --Adds a single -1 cell by default 
 --does NOT in fact do the above
 --TODO: create an option to make a void complex
-cellComplex = method(Options=>{LabelFunction => null})
+cellComplex = method(Options=>true)
 cellComplex(Ring,List) := o -> (R,maxCells) -> (
     (realMaxCells,allCells) := maxAndAllCells maxCells;
     mkCellComplex(R, allCells, realMaxCells)
@@ -428,7 +428,7 @@ cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
 ---Here there be polyhedra 
 ----------
 
-cellComplex(Ring,Polyhedron) :=  o -> (R,P) -> (
+cellComplex(Ring,Polyhedron) := {LabelFunction => null} >> o -> (R,P) -> (
     if not isCompact P then error "The given polyhedron is not compact.";
     Pdim := dim P;
     Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i,apply(lst,first)));
@@ -453,7 +453,7 @@ cellComplex(Ring,Polyhedron) :=  o -> (R,P) -> (
     cellComplex(R,flatten values cells)
     );
 
-cellComplex(Ring,PolyhedralComplex) := o -> (R,P) -> (
+cellComplex(Ring,PolyhedralComplex) := {LabelFunction => null} >> o -> (R,P) -> (
     Pdim := dim P;
     Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i-1,apply(lst,first)));
     verts := vertices P;

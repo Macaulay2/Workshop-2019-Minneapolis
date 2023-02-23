@@ -15,8 +15,6 @@
 - chainComplex(CellComplex)
   - Make sure all optional parameters are covered
   - discuss how the labels work
-- LabelFunction
-  - missing documentation
 - net(Cell)
   - missing documentation?
 - net(CellComplex)

@@ -878,9 +878,19 @@ doc ///
 	    isFree C2
 /// 
 
+doc ///
+    Key
+        LabelFunction
+    Description
+        Text
+            This optional parameter allows one to supply a function to give labels to the verticies
+            of a cell complex coming from a Polyhedron or PolyhedralComplex
+///
+
 doc /// 
     Key 
     	(cellComplex,Ring,Polyhedron)
+        [(cellComplex,Ring,Polyhedron),LabelFunction]
     Headline 
     	creates cell complex from given polyhedron 
     Usage 
@@ -909,7 +919,8 @@ doc ///
 
 doc /// 
     Key 
-    	(cellComplex,Ring,PolyhedralComplex) 
+    	(cellComplex,Ring,PolyhedralComplex)
+        [(cellComplex,Ring,PolyhedralComplex),LabelFunction]
     Headline 
     	creates cell complex from given polyhedral complex 
     Usage 
@@ -935,7 +946,10 @@ doc ///
 	    F = polyhedralComplex {P1,P2,P3,P4};
 	    C = cellComplex(R,F);
 	    facePoset C
-    SeeAlso 
+        Text
+            The labels on the verticies can be controlled via the optional parameter LabelFunction
+            This parameter expects a function that takes a ...
+    SeeAlso
     	(cellComplex,Ring,Polyhedron)
 ///
 
