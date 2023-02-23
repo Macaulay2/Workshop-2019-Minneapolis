@@ -77,12 +77,12 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
     )
 
 cellComplex = method(Options=>true)
-cellComplex(Ring,List) := (R,maxCells) -> (
+cellComplex(Ring,List) := {} >> o -> (R,maxCells) -> (
     (realMaxCells,allCells) := maxAndAllCells maxCells;
     mkCellComplex(R, allCells, realMaxCells)
     )
 
-cellComplex(SimplicialComplex) := (C) -> (
+cellComplex(SimplicialComplex) := {} >> o -> (C) -> (
     S := ring C;
     Cfaces := new HashTable from faces C;
     --cells indexes Cells by monomials corresponding to faces of the simplicial complex
@@ -429,7 +429,6 @@ cellComplex(Ring,Polyhedron) := {LabelFunction => null} >> o -> (R,P) -> (
     if not isCompact P then error "The given polyhedron is not compact.";
     Pdim := dim P;
     Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i,apply(lst,first)));
-    print Pfaces;
     verts := vertices P;
     vertexCells := apply(numColumns verts,
                          if o.LabelFunction =!= null
