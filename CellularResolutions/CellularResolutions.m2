@@ -76,7 +76,7 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
 	}
     )
 
-cellComplex = method(Options=>true)
+cellComplex = method(Options=>true, TypicalValue=>CellComplex)
 cellComplex(Ring,List) := {} >> o -> (R,maxCells) -> (
     (realMaxCells,allCells) := maxAndAllCells maxCells;
     mkCellComplex(R, allCells, realMaxCells)
@@ -181,7 +181,7 @@ internalCycleCheck := (lst) -> ((sum(lst,l -> (
                 else - sum( - deg,i -> boundaryTally c)))) ? 0) == symbol ==
 
 --Check if a chain, represented by a list is a boundary
-isCycle = method()
+isCycle = method(TypicalValue=>Boolean)
 isCycle(List) := {Reduced=>true} >> o -> (lst) ->
     (if o.Reduced
     then (
@@ -255,7 +255,7 @@ inferLabel := boundary -> (
     )
 
 --Attach a cell
-newCell = method(Options => {CellDimension=>null})
+newCell = method(Options => {CellDimension=>null}, TypicalValue=>Cell)
 newCell(List,Thing) := opt -> (boundary,label) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
     then return newCell(inferOrientation boundary,label,CellDimension=>opt.CellDimension);
@@ -279,11 +279,11 @@ isSimplexBoundary := (lst) -> (
     (isCycle lst)
     )
 
-isSimplex = method();
+isSimplex = method(TypicalValue=>Boolean);
 isSimplex(Cell) := cell ->
      isSimplexBoundary boundary cell
 
-newSimplexCell = method();
+newSimplexCell = method(TypicalValue=>Cell);
 newSimplexCell(List) := (boundary) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
     then return newSimplexCell inferOrientation boundary;
@@ -298,7 +298,7 @@ newSimplexCell(List,Thing) := (boundary,label) -> (
     )
 
 --Relabel function 
-relabelCellComplex = method(Options=>{InferLabels=>true});
+relabelCellComplex = method(Options=>{InferLabels=>true},TypicalValue=>CellComplex);
 relabelCellComplex(CellComplex,HashTable) := o -> (C,T) -> (
     dimC := dim C;
     R := ring C;
@@ -529,7 +529,7 @@ net(CellComplex) := (cellComplex) -> (
 -- Common cell complexes
 ------------------------
 
-cellComplexSphere = method();
+cellComplexSphere = method(TypicalValue=>CellComplex);
 cellComplexSphere(Ring,ZZ) := (R,n) -> (
     if n<0 then error "cellComplexSphere expects a non-negative integer";
     v := newSimplexCell {};
@@ -543,7 +543,7 @@ cellComplexSphere(Ring,ZZ) := (R,n) -> (
         )
     )
 
-cellComplexRPn = method();
+cellComplexRPn = method(TypicalValue=>CellComplex);
 cellComplexRPn(Ring,ZZ) := (R,n) -> (
     if n<0 then error "cellComplexRPn expects a non-negative integer";
     t := newSimplexCell {};
@@ -555,7 +555,7 @@ cellComplexRPn(Ring,ZZ) := (R,n) -> (
     cellComplex(R,{t})
     )
 
-cellComplexTorus = method();
+cellComplexTorus = method(TypicalValue=>CellComplex);
 cellComplexTorus(Ring,ZZ) := (R,n) -> (
     if n<0 then error "cellComplexTorus expects a non-negative integer";
     v := newSimplexCell {};
@@ -573,7 +573,7 @@ cellComplexTorus(Ring,ZZ) := (R,n) -> (
 -- Specific chain complexes
 ----------------------------
 
-taylorComplex = method();
+taylorComplex = method(TypicalValue=>CellComplex);
 taylorComplex(MonomialIdeal) := (I) -> (
     gensI := I_*;
     r := #gensI;
@@ -589,7 +589,7 @@ taylorComplex(MonomialIdeal) := (I) -> (
     cellComplex(ring I, {cells#(toList (0..(r-1)))})
     )
 
-scarfComplex = method()
+scarfComplex = method(TypicalValue=>CellComplex)
 scarfComplex(MonomialIdeal) := (I) -> (
     gensI := I_*;
     r := #gensI;
@@ -625,7 +625,7 @@ scarfComplex(MonomialIdeal) := (I) -> (
     cellComplex(ring I, values cells)
     )
 
-hullComplex = method();
+hullComplex = method(TypicalValue=>CellComplex);
 hullComplex(MonomialIdeal) := (I) -> ( 
     gensI := I_*;
     R := ring I;
