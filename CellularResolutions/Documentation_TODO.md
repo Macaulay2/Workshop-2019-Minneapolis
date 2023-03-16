@@ -12,9 +12,6 @@
   - either split the cellComplex key from cellComplex(Ring,List) or combined all of them?
 - cells
   - needs text between the examples
-- chainComplex(CellComplex)
-  - Make sure all optional parameters are covered
-  - discuss how the labels work
 - net(Cell)
   - missing documentation?
 - net(CellComplex)

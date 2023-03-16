@@ -426,5 +426,28 @@ assert(isCycle {} == true);
 assert(isCycle {(vx,1)} == false);
 assert(isCycle {(vx,1),(vy,-1)} == true);
 assert(isCycle {(vx,0)} == true);
+///
 
+
+--Irrelevant ideal of a toric variety
+TEST ///
+needsPackage "NormalToricVarieties"
+X = toricProjectiveSpace(1) ** toricProjectiveSpace(2);
+S = ring X;
+B = ideal X;
+Sigma = fan X;
+P = polytope Sigma;
+d = dim P;
+--Faces knows the order of the vertices relative to the output of vertices P
+F = faces_d P;
+m = product(apply(numgens S, i -> S_i));
+G = apply(max X, l -> m//product(apply(l,i -> S_i)));
+H = hashTable apply(#G, i -> (j := F#i#0#0;((vertices P)_j,G_i)))
+C = cellComplex(S,P,LabelFunction => (c -> H#c));
+Cres = (chainComplex C)[-1];
+assert(betti (res B) == betti Cres);
+assert(HH_0 Cres == S^1/B);
+assert(HH_1 Cres == 0);
+assert(HH_2 Cres == 0);
+assert(HH_3 Cres == 0);
 ///
