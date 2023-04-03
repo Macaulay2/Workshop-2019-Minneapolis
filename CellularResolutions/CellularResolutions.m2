@@ -52,6 +52,21 @@ CellComplex.synonym = "cell complex"
 Cell = new Type of MutableHashTable
 Cell.synonym = "cell"
 
+maxAndAllCells := (lst) -> (
+    if #lst == 0 then return (new HashTable,new HashTable);
+    bdfn := c -> set boundaryCells c;
+    maxcells := set lst;
+    bdcells := sum (maxcells/bdfn);
+    allcells := maxcells + bdcells;
+    maxcells = maxcells - bdcells;
+    while #bdcells != 0 do (
+	bdcells = sum (bdcells/bdfn);
+	allcells = allcells + bdcells;
+	maxcells = maxcells - bdcells;
+	);
+    (partition(dim,toList maxcells), partition(dim,toList allcells))
+    )
+
 --returns a hashtable of lists of cells indexed by dimension
 cellsFromMaxCells := lst -> (
     pendingCells := set lst;
@@ -98,23 +113,7 @@ cellComplex(SimplicialComplex) := {} >> o -> (C) -> (
     cellComplex(S,values cells)
     )
 
-maxAndAllCells = method()
-maxAndAllCells(List) := (lst) -> (
-    if #lst == 0 then return (new HashTable,new HashTable);
-    bdfn := c -> set boundaryCells c;
-    maxcells := set lst;
-    bdcells := sum (maxcells/bdfn);
-    allcells := maxcells + bdcells;
-    maxcells = maxcells - bdcells;
-    while #bdcells != 0 do (
-	bdcells = sum (bdcells/bdfn);
-	allcells = allcells + bdcells;
-	maxcells = maxcells - bdcells;
-	);
-    (partition(dim,toList maxcells), partition(dim,toList allcells))
-    )
-
-maxCells = method()
+maxCells = method(TypicalValue=>HashTable)
 maxCells(CellComplex) := (cacheValue (symbol maxCells)) (cellComplex ->
     (
         lst := flatten values cells cellComplex;
