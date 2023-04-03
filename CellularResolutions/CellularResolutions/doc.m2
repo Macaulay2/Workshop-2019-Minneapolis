@@ -1147,33 +1147,48 @@ doc ///
 doc ///
     Key
         hullComplex
+        (hullComplex,QQ,MonomialIdeal)
+        (hullComplex,ZZ,MonomialIdeal)
         (hullComplex,MonomialIdeal)
     Headline
         gives the hull complex of a monomial ideal
     Usage 
-    	hullComplex I
+        hullComplex I
+        hullComplex(t,I)
     Inputs
-    	I : MonomialIdeal
+        t : QQ
+        t : ZZ
+        I : MonomialIdeal
     Outputs 
         : CellComplex
-	    the hull complex of $I$ as described in Bayer-Sturmfels' ``Cellular Resolutions of Monomial Modules''
+            the hull complex of $I$ as described in Bayer-Sturmfels' ``Cellular Resolutions of Monomial Modules''
     Description
     	Text
             Given a monomial ideal $I$, this function returns the hull complex of that ideal.
+            If an rational number $t$ is provided, this will set the base used in
+            the exponents used to construct the polytope as described in
+            ``Combinatorial Commutative Algebra.'' The resulting complex is only a
+            resolution for $t\gg 0$. In particular $t > (n+1)!$ is sufficient where
+            $n$ is the number of variables in the ring. If t is not provided,
+            $(n+1)!+1$ will be used.
+        Text
             The example given below can be found as Example 4.23 in Miller-Sturmfels'
             ``Combinatorial Commutative Algebra.''
             In this example, the resolution supported on the hull complex is minimal,
-            but this is not always the case.
-	Example
-	    S = QQ[x,y,z];
-	    I = monomialIdeal (x^2*z, x*y*z, y^2*z, x^3*y^5, x^4*y^4, x^5*y^3);
-	    H = hullComplex I
-	    chainComplex H
-	    cells(1,H)/cellLabel
-	    cells(2,H)/cellLabel
-	    isMinimal H
+            but this is not always the case. We also see that for $t=3/2$ the resulting
+            complex is no longer a resolution.
+        Example
+            S = QQ[x,y,z];
+            I = monomialIdeal (x^2*z, x*y*z, y^2*z, x^3*y^5, x^4*y^4, x^5*y^3);
+            H = hullComplex I
+            chainComplex H
+            cells(1,H)/cellLabel
+            cells(2,H)/cellLabel
+            isMinimal H
+            H2 = hullComplex (3/2,I)
+            prune HH chainComplex H2
     SeeAlso 
-    	(taylorComplex,MonomialIdeal)
+        (taylorComplex,MonomialIdeal)
 ///
 
 

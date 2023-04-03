@@ -451,3 +451,16 @@ assert(HH_1 Cres == 0);
 assert(HH_2 Cres == 0);
 assert(HH_3 Cres == 0);
 ///
+
+-- Hull complex test
+TEST ///
+R = QQ[x,y,z];
+I = monomialIdeal (x^2*z, x*y*z, y^2*z, x^3*y^5, x^4*y^4, x^5*y^3);
+H = hullComplex I;
+chainComplex H;
+assert(isMinimal H);
+assert(HH_(-1) chainComplex H == R^1/I);
+assert((HH_0 chainComplex H)==0);
+H2 = hullComplex (3/2,I)
+assert((HH_0 chainComplex H2)!=0);
+///

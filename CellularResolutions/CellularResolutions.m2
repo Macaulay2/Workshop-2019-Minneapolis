@@ -627,18 +627,22 @@ scarfComplex(MonomialIdeal) := (I) -> (
 
 hullComplex = method(TypicalValue=>CellComplex);
 hullComplex(MonomialIdeal) := (I) -> ( 
+    n := numgens ring I;
+    hullComplex((n+1)!+1,I)
+    )
+hullComplex(ZZ,MonomialIdeal) := (t,I) -> hullComplex(t/1,I)
+hullComplex(QQ,MonomialIdeal) := (t,I) -> (
     gensI := I_*;
     R := ring I;
-    n := #(gens R);
-    t := (n+1)! + 1;
+    n := numgens R;
     expvecs := flatten (gensI/exponents);
     verts := for a in expvecs list for i from 0 to (n-1) list t^(a#i);
     P := convexHull(transpose matrix verts, id_(ZZ^n));
     Pdim := dim P;
     Pfaces := new HashTable from select(pairs faces P, (k,v) -> (k <= Pdim and k > 0)); --weird inequalities bc codim
-    Pfaces = applyValues(Pfaces, v -> apply(v,p -> if p#1 == {} then p#0)); -- selecting compact faces
-    Pfaces = applyValues(Pfaces, v -> delete( , v));
-    Pfaces = applyPairs(Pfaces, (d,lst) -> (Pdim-d,lst)); --flipping from codim to dim
+    Pfaces = applyValues(Pfaces, v -> select(v,p -> p#1 == {})); -- selecting compact faces
+    Pfaces = applyValues(Pfaces, v -> apply(v,p -> p#0)); --get the vertices for the faces
+    Pfaces = applyKeys(Pfaces, d -> Pdim-d); --flipping from codim to dim
     cells := new MutableHashTable;
     for v in Pfaces#0 do cells#v = newCell({},gensI#(v#0));
     for i from 1 to Pdim-1 do (
