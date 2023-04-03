@@ -165,8 +165,8 @@ chainToVirtualTally := (lst) -> (
     )
 
 boundary = method()
-boundary(Cell) := (cell) -> cell.boundary
-boundaryCells = method()
+boundary(Cell) := List => (cell) -> cell.boundary
+boundaryCells = method(TypicalValue=>List)
 boundaryCells(Cell) := (cell) -> apply(boundary(cell), c -> first c)
 --Boundary function, returns the boundary as a VirtualTally
 boundaryTally := (cell) -> chainToVirtualTally cell.boundary
@@ -332,14 +332,13 @@ RingMap ** CellComplex := (f,c) -> (
 
 --Get list of cells 
 cells = method();
-cells(CellComplex) := (cellComplex) -> cellComplex.cells
-cells(ZZ,CellComplex) := (r,cellComplex) -> (
+cells(CellComplex) := HashTable => (cellComplex) -> cellComplex.cells
+cells(ZZ,CellComplex) := List => (r,cellComplex) -> (
     if cellComplex.cells#?r 
     then cellComplex.cells#r
     else {}
     )
 
--- skeleton = method();
 skeleton(ZZ,CellComplex) := CellComplex => (n,cellComplex) -> (
     c := new HashTable from select(pairs cellComplex.cells, (k,v) -> k<=n);
     mkCellComplex(cellComplex.labelRing,c,null)
@@ -358,8 +357,8 @@ sparseBlockMap := (codomain,domain,ht) -> (
     assert(columns <= #components domain);
     map(codomain,domain,matrix apply(#components codomain,i -> apply(#components domain, j -> maybeHt(i,j)))))
 
---Create chain complex from cell complex 
-boundary(ZZ,CellComplex) := (r,cellComplex) -> (
+--Create one boundary map in the chain complex
+boundaryMap(ZZ,CellComplex) := opts -> (r,cellComplex) -> (
     R := cellComplex.labelRing;
     t := r-1;
     rCells := cells(r,cellComplex);
@@ -392,7 +391,7 @@ boundary(ZZ,CellComplex) := (r,cellComplex) -> (
 chainComplex(CellComplex) := {Reduced=>true, Prune=>true} >> o -> (cellComplex) -> (
     if not cellComplex.cache.?chainComplex then (
         cellComplex.cache.chainComplex =
-            (chainComplex apply(max((dim cellComplex) + 1,1), r -> boundary(r,cellComplex)))[1]
+            (chainComplex apply(max((dim cellComplex) + 1,1), r -> boundaryMap(r,cellComplex)))[1]
         );
     ret := if not o.Reduced then (
 	Ccopy := chainComplex apply(max cellComplex.cache.chainComplex,

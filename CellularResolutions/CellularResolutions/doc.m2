@@ -473,30 +473,30 @@ doc ///
 	    f = (cells(2,C))#0;
 	    boundaryCells(f)
     SeeAlso 
-    	(boundary,ZZ,CellComplex)
+        (boundaryMap,ZZ,CellComplex)
 ///
 
-doc /// 
-    Key  
-	(boundary,ZZ,CellComplex) 
-    Headline 
-    	compute the boundary map of a cell complex from r-faces to (r-1)-faces 
-    Usage 
-    	boundary(ZZ,CellComplex) 
-    Inputs 
+doc ///
+    Key
+        (boundaryMap,ZZ,CellComplex)
+    Headline
+        compute the boundary map of a cell complex from r-faces to (r-1)-faces
+    Usage
+        boundaryMap(ZZ,CellComplex)
+    Inputs
     	r : ZZ
-	    the source cell-dimension 
-	C : CellComplex 
-	    the CellComplex 
-    Outputs 
-    	: Matrix 
-	    the boundary map from r-faces to (r-1)-faces of C
+	    the source cell-dimension
+	C : CellComplex
+	    the CellComplex
+    Outputs
+        : Matrix
+            the boundary map from r-faces to (r-1)-faces of C
     Description
         Text
             This function returns the map in the chain complex from the r-th homological degree
             to the (r-1)-th homological degree.
         Text
-            For example, below we construct the taylor complex for the monomial ideal $\langle x,y,z\rangle$
+            For example, below we construct the Taylor complex for the monomial ideal $\langle x,y,z\rangle$
         Example
             R = QQ[x,y,z];
             vx = newSimplexCell({},x);
@@ -507,13 +507,12 @@ doc ///
             eyz = newSimplexCell {vy,vz};
             f = newSimplexCell {exy,exz,eyz};
             C = cellComplex(R,{f});
-            d1 = boundary_1 C
-            d2 = boundary_2 C
+            d1 = boundaryMap_1 C
+            d2 = boundaryMap_2 C
             assert(d1*d2==0)
-    SeeAlso 
+    SeeAlso
         (chainComplex,CellComplex)
-        -- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package
-        (chainComplex,SimplicialComplex) 
+        (chainComplex,SimplicialComplex)
 ///
 
 doc ///
@@ -584,8 +583,7 @@ doc ///
             chainComplex C
             chainComplex(C,Prune=>false)
     SeeAlso
-        (boundary,ZZ,CellComplex)
-	-- (boundary,SimplicialComplex) this command was changed in the SimplicialComplex package
+        (boundaryMap,ZZ,CellComplex)
         (chainComplex,SimplicialComplex)
         (homology,CellComplex)
         (homology,ZZ,CellComplex)
