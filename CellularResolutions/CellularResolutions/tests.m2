@@ -71,7 +71,7 @@ assert(HH^1 C == 0);
 assert(dim skeleton_1 C == 1);
 ///
 
-TEST /// 
+TEST ///
 a = newCell {};
 b1 = newCell {(a,1),(a,-1)};
 b2 = newCell {(a,1),(a,-1)};
@@ -170,8 +170,8 @@ assert(C.dd^2==0);
 assert(not isFree(D));
 ///
 
---Relabel test 
-TEST /// 
+--Relabel test
+TEST ///
 R = QQ[a,b,c];
 v1 = newSimplexCell {};
 v2 = newSimplexCell {};
@@ -196,7 +196,7 @@ assert(set labelsD2 === set {a^2*b^2*c, a*b^2*c^2});
 ///
 
 --Polytope test 1
-TEST /// 
+TEST ///
 R = QQ;
 P = hypercube 3;
 C = cellComplex(R,P);
@@ -220,7 +220,7 @@ assert(rank HH_2 C2 == 1);
 ///
 
 --Polytope test 2
-TEST /// 
+TEST ///
 R = QQ[x];
 M = transpose matrix {{0,0},{1,0},{2,1},{2,2},{1,2},{0,1}}; -- this is a hexagon
 P = convexHull M;
@@ -235,7 +235,7 @@ C1 = skeleton(1,C);
 assert(rank HH_1 C1 == 1);
 ///
 
---Polytope test 3 
+--Polytope test 3
 TEST ///
 R = ZZ[x];
 M = transpose matrix {{0,0,0},{0,1,0},{0,0,1},{1,0,0},{1,1,0},{1,0,1}};
@@ -265,7 +265,7 @@ assert(sort apply(cells(0,C),cellLabel) == sort {x*z,x*y,x,z,y,1});
 ///
 
 --Polyhedral complex test 1
-TEST /// 
+TEST ///
 R = QQ[x];
 P1 = convexHull matrix {{2,2,0},{1,-1,0}};
 P2 = convexHull matrix {{2,-2,0},{1,1,0}};
@@ -300,7 +300,7 @@ assert(sort apply(cells(0,C),cellLabel) == sort {x^2*y,x^2/y,1,y/x^2,1/(x^2*y)})
 ///
 
 
---Face poset 
+--Face poset
 TEST ///
 R = QQ;
 v1 = newCell {};
@@ -322,7 +322,7 @@ assert(isGraded P);
 assert(maximalElements P === {f});
 ///
 
---Minimality check 
+--Minimality check
 TEST ///
 R = QQ[x,y,z];
 v1 = newCell({},x^2*y);
@@ -364,7 +364,7 @@ assert(HH_1(C)==0);
 assert(HH_2(C)==ZZ^1);
 ///
 
---Sphere test 
+--Sphere test
 TEST ///
 C = cellComplexSphere(QQ,3);
 assert(dim C==3);
@@ -374,8 +374,8 @@ for i in {-1,0,1,2,4,20} do assert(HH_i(C)==0);
 assert(HH_3(C)== QQ^1);
 ///
 
---RPn test 
-TEST /// 
+--RPn test
+TEST ///
 C = cellComplexRPn(ZZ,4);
 assert(dim C==4);
 for i in (0..4) do assert(# cells(i,C) == 1);

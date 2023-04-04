@@ -17,25 +17,25 @@ export {"CellComplex",
         "cellComplex",
         "isCycle",
         "isSimplex",
-	"boundaryCells",
-	"relabelCellComplex",
-	"InferLabels",
-	"cells",
+        "boundaryCells",
+        "relabelCellComplex",
+        "InferLabels",
+        "cells",
         "cellLabel",
         "newCell",
         "newSimplexCell",
         "isFree",
         "isMinimal",
-	"Reduced",
+        "Reduced",
         "CellDimension",
-	"maxCells",
+        "maxCells",
         "cellComplexSphere",
         "cellComplexRPn",
         "cellComplexTorus",
-	"taylorComplex",
+        "taylorComplex",
         "scarfComplex",
-	"hullComplex",
-	"boundary",
+        "hullComplex",
+        "boundary",
         "LabelFunction"
         }
 protect labelRing
@@ -60,10 +60,10 @@ maxAndAllCells := (lst) -> (
     allcells := maxcells + bdcells;
     maxcells = maxcells - bdcells;
     while #bdcells != 0 do (
-	bdcells = sum (bdcells/bdfn);
-	allcells = allcells + bdcells;
-	maxcells = maxcells - bdcells;
-	);
+        bdcells = sum (bdcells/bdfn);
+        allcells = allcells + bdcells;
+        maxcells = maxcells - bdcells;
+        );
     (partition(dim,toList maxcells), partition(dim,toList allcells))
     )
 
@@ -88,7 +88,7 @@ mkCellComplex := (labelRingVal, cellsVal, maxCellsVal) -> (
             if maxCellsVal === null
             then {}
             else {symbol maxCells => maxCellsVal})
-	}
+        }
     )
 
 cellComplex = method(Options=>true, TypicalValue=>CellComplex)
@@ -124,18 +124,18 @@ maxCells(CellComplex) := (cacheValue (symbol maxCells)) (cellComplex ->
         maxcells = maxcells - bdcells;
         while #bdcells != 0 do (
             bdcells = sum (bdcells/bdfn);
-	    maxcells = maxcells - bdcells;
-	    );
+            maxcells = maxcells - bdcells;
+            );
         partition(dim,toList maxcells)
         ))
 
 --Define dimension for cell
 dim(Cell) := (cell) -> cell.cellDimension
 
---Define dimension for cell complex 
+--Define dimension for cell complex
 dim(CellComplex) := (cellComplex) -> max keys cellComplex.cells
 
---Define ring for cell complex 
+--Define ring for cell complex
 ring(CellComplex) := (cellComplex) -> cellComplex.labelRing
 
 
@@ -145,17 +145,17 @@ cellLabel(Cell) := (cell) -> cell.label
 --Make a cell, internal function
 makeCell := (lst, l, d) -> (
     bdim := -1;
-    for cell in lst do ( 
-	if bdim < 0 
-	then bdim = dim cell#0
-	else assert(bdim == dim cell#0)
-	);
+    for cell in lst do (
+        if bdim < 0
+        then bdim = dim cell#0
+        else assert(bdim == dim cell#0)
+        );
     n := max(bdim + 1,d);
     new Cell from {
-	symbol cellDimension => n, 
-	symbol boundary => lst, -- could verify that it's a list
-	symbol label => l
-    	}
+        symbol cellDimension => n,
+        symbol boundary => lst, -- could verify that it's a list
+        symbol label => l
+        }
     );
 
 chainToVirtualTally := (lst) -> (
@@ -296,7 +296,7 @@ newSimplexCell(List,Thing) := (boundary,label) -> (
     newCell(boundary,label)
     )
 
---Relabel function 
+--Relabel function
 relabelCellComplex = method(Options=>{InferLabels=>true},TypicalValue=>CellComplex);
 relabelCellComplex(CellComplex,HashTable) := o -> (C,T) -> (
     dimC := dim C;
@@ -304,18 +304,18 @@ relabelCellComplex(CellComplex,HashTable) := o -> (C,T) -> (
     tablecellsbydim := for i to dimC list select(keys T, c -> dim c == i);
     relabeledcells := new MutableHashTable;
     for c in cells(0,C) do relabeledcells#c = (
-	if any(tablecellsbydim#0, cell -> cell === c) then newCell({},T#c)
-	else newCell({},cellLabel c)
-	);
+        if any(tablecellsbydim#0, cell -> cell === c) then newCell({},T#c)
+        else newCell({},cellLabel c)
+        );
     for i from 1 to dimC do (
-	for c in cells(i,C) do (
-	    newbd := for b in boundaryCells c list relabeledcells#b;
-	    newlabel := if any(tablecellsbydim#i, cell -> cell === c) then T#c 
-	    else if not o.InferLabels then cellLabel(c)
-	    else inferLabel(newbd);
-	    relabeledcells#c = newCell(newbd, newlabel);
-	    );
-	);
+        for c in cells(i,C) do (
+            newbd := for b in boundaryCells c list relabeledcells#b;
+            newlabel := if any(tablecellsbydim#i, cell -> cell === c) then T#c
+            else if not o.InferLabels then cellLabel(c)
+            else inferLabel(newbd);
+            relabeledcells#c = newCell(newbd, newlabel);
+            );
+        );
     cellComplex(R, flatten values relabeledcells)
     )
 
@@ -327,14 +327,14 @@ RingMap ** CellComplex := (f,c) -> (
     -- ht := hashTable apply(allCells, c -> (c,f ** toModule(R,cellLabel c)));
     ht := hashTable apply(allCells, c -> (c,f(cellLabel c)));
     tempCellComplex := relabelCellComplex(c,ht);
-    cellComplex(S,flatten values cells tempCellComplex) 
+    cellComplex(S,flatten values cells tempCellComplex)
     )
 
---Get list of cells 
+--Get list of cells
 cells = method();
 cells(CellComplex) := HashTable => (cellComplex) -> cellComplex.cells
 cells(ZZ,CellComplex) := List => (r,cellComplex) -> (
-    if cellComplex.cells#?r 
+    if cellComplex.cells#?r
     then cellComplex.cells#r
     else {}
     )
@@ -376,15 +376,15 @@ boundaryMap(ZZ,CellComplex) := opts -> (r,cellComplex) -> (
     tCellsIndexed := new HashTable from toList apply(pairs(tCells),reverse);
     i := 0;
     L := flatten for F in rCells list (
-	l := if t==-1
+        l := if t==-1
              then (0,i) => inducedMap(codomain,domainModulesTable#F)
              else for p in pairs boundaryTally F list(
                  (cell,deg) := p;
                  if dim cell < dim F - 1 then continue;
                  (tCellsIndexed#cell,i) => deg_R*inducedMap(codomainModulesTable#cell,domainModulesTable#F));
-	i = i+1;
-	l
-	);
+        i = i+1;
+        l
+        );
     sparseBlockMap(codomain,domain,new HashTable from L)
     );
 
@@ -394,10 +394,10 @@ chainComplex(CellComplex) := {Reduced=>true, Prune=>true} >> o -> (cellComplex) 
             (chainComplex apply(max((dim cellComplex) + 1,1), r -> boundaryMap(r,cellComplex)))[1]
         );
     ret := if not o.Reduced then (
-	Ccopy := chainComplex apply(max cellComplex.cache.chainComplex,
+        Ccopy := chainComplex apply(max cellComplex.cache.chainComplex,
                                     i -> cellComplex.cache.chainComplex.dd_(i+1));
-	Ccopy
-	)
+        Ccopy
+        )
         else cellComplex.cache.chainComplex;
     if o.Prune then (
         prune ret --how expensive is prune? should it be cached?
@@ -415,14 +415,13 @@ homology(CellComplex) := opts -> (cellComplex) -> (
     );
 
 --Get cohomology directly from cell complex
-cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> ( 
+cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
     cohomology_i Hom(chainComplex(cellComplex),cellComplex.labelRing^1)
     );
 
 ----------
----Here there be polyhedra 
+---Here there be polyhedra
 ----------
-
 cellComplex(Ring,Polyhedron) := {LabelFunction => null} >> o -> (R,P) -> (
     if not isCompact P then error "The given polyhedron is not compact.";
     Pdim := dim P;
@@ -458,7 +457,7 @@ cellComplex(Ring,PolyhedralComplex) := {LabelFunction => null} >> o -> (R,P) -> 
     cells := new MutableHashTable;
     for i from 0 to Pdim do (
         for face in Pfaces#i do (
-	    bd := if i!=0
+            bd := if i!=0
                   then for f in Pfaces#(i-1) list (if isSubset(f,face) then cells#f else continue)
                   else {};
             cells#face =
@@ -520,7 +519,7 @@ net(CellComplex) := (cellComplex) -> (
     if nTotalCells == 0
     then "empty CellComplex"
     else "CellComplex of dimension " | d | " with " | nTotalCells | " total cells"
-    ); 
+    );
 
 
 ------------------------
@@ -579,11 +578,11 @@ taylorComplex(MonomialIdeal) := (I) -> (
     cells := new MutableHashTable;
     for i to r-1 do cells#{i} = newSimplexCell({},gensI#i);
     for k from 2 to r do (
-	for s in subsets(r,k) do (
-	    bd := for t in subsets(s,k-1) list cells#t;
-	    cells#s = newSimplexCell(bd, lcm(gensI_s));
-	    );
-	);
+        for s in subsets(r,k) do (
+            bd := for t in subsets(s,k-1) list cells#t;
+            cells#s = newSimplexCell(bd, lcm(gensI_s));
+            );
+        );
     cellComplex(ring I, {cells#(toList (0..(r-1)))})
     )
 
@@ -597,9 +596,9 @@ scarfComplex(MonomialIdeal) := (I) -> (
     for i to r-1 do cells#(gensI#i) = newSimplexCell({},gensI#i);
     for k from 2 to r do (
         hasCells := false;
-	for s in subsets(r,k) do (
+        for s in subsets(r,k) do (
             --boundary cell via the labels
-	    bdLabels := for t in subsets(s,k-1) list lcm(gensI_t);
+            bdLabels := for t in subsets(s,k-1) list lcm(gensI_t);
             incompleteBoundary := false;
             bd := for label in bdLabels list (
                 if cells#?label then cells#label else (incompleteBoundary = true; break;));
@@ -624,7 +623,7 @@ scarfComplex(MonomialIdeal) := (I) -> (
     )
 
 hullComplex = method(TypicalValue=>CellComplex);
-hullComplex(MonomialIdeal) := (I) -> ( 
+hullComplex(MonomialIdeal) := (I) -> (
     n := numgens ring I;
     hullComplex((n+1)!+1,I)
     )
