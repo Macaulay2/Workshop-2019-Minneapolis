@@ -16,6 +16,8 @@
   - missing documentation?
 - net(CellComplex)
   - missing documentation?
+- LabelFunction
+  - add examples that actually use LabelFunction
 
 # Short but probably not an issue
 - cellComplexRPn
