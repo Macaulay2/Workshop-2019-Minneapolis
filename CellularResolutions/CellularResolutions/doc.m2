@@ -188,12 +188,13 @@ doc ///
 
 doc ///
     Key
-        (cellComplex,SimplicialComplex)
+        (cellComplex,Ring,SimplicialComplex)
     Headline
         Creates a cell complex from a given simplicial complex
     Usage
-        cellComplex D
+        cellComplex(S,D)
     Inputs
+        S : Ring
         D : SimplicialComplex
             from which the cell complex is created
     Outputs
@@ -206,7 +207,7 @@ doc ///
             R = QQ[a..f];
             I = monomialIdeal(a*f, b*d, c*e);
             Delta = simplicialComplex I;
-            C = cellComplex(Delta)
+            C = cellComplex(R,Delta)
     SeeAlso
         cellComplex
 ///
@@ -933,17 +934,8 @@ doc ///
 
 doc ///
     Key
-        LabelFunction
-    Description
-        Text
-            This optional parameter allows one to supply a function to give labels to the verticies
-            of a cell complex coming from a Polyhedron or PolyhedralComplex
-///
-
-doc ///
-    Key
         (cellComplex,Ring,Polyhedron)
-        [(cellComplex,Ring,Polyhedron),LabelFunction]
+        [(cellComplex,Ring,Polyhedron),Labels]
     Headline
         creates cell complex from given polyhedron
     Usage
@@ -967,7 +959,7 @@ doc ///
             C = cellComplex(R,P);
             cells C
         Text
-            The labels on the verticies can be controlled via the optional parameter LabelFunction
+            The labels on the verticies can be controlled via the optional parameter Labels
             This parameter expects a function that takes a vertex given as a vector
     SeeAlso
         (cellComplex,Ring,PolyhedralComplex)
@@ -976,7 +968,7 @@ doc ///
 doc ///
     Key
         (cellComplex,Ring,PolyhedralComplex)
-        [(cellComplex,Ring,PolyhedralComplex),LabelFunction]
+        [(cellComplex,Ring,PolyhedralComplex),Labels]
     Headline
         creates cell complex from given polyhedral complex
     Usage
@@ -1003,7 +995,7 @@ doc ///
             C = cellComplex(R,F);
             facePoset C
         Text
-            The labels on the verticies can be controlled via the optional parameter LabelFunction
+            The labels on the verticies can be controlled via the optional parameter Labels
             This parameter expects a function that takes a vertex given as a vector
     SeeAlso
         (cellComplex,Ring,Polyhedron)

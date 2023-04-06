@@ -42,7 +42,6 @@ protect labelRing
 protect label
 protect cellDimension
 protect CellDimension
-protect LabelFunction
 protect Reduced
 protect Prune
 
@@ -97,17 +96,30 @@ cellComplex(Ring,List) := {} >> o -> (R,maxCells) -> (
     mkCellComplex(R, allCells, realMaxCells)
     )
 
-cellComplex(SimplicialComplex) := {} >> o -> (C) -> (
-    S := ring C;
+cellComplex(Ring,SimplicialComplex) := {Labels=>null} >> o -> (S,C) -> (
+    R := ring C;
     Cfaces := new HashTable from faces C;
     --cells indexes Cells by monomials corresponding to faces of the simplicial complex
     cells := new MutableHashTable from {};
     for i from 0 to dim C do (
         for simplex in Cfaces#i do (
+            label :=
+               (if class(o.Labels) === HashTable
+               then (if o.Labels#?simplex
+                     then o.Labels#simplex
+                     else null
+                   )
+               else null);
+            print i;
+            print simplex;
             bd := if i==0
                   then {}
-                  else for x in gens S list (if simplex%x==0 then cells#(simplex//x) else continue);
-            cells#simplex = newCell bd
+                  else
+                      for x in gens R list (
+                          if simplex%x==0 then cells#(simplex//x)
+                          else continue);
+            print bd;
+            cells#simplex = if label === null then newCell bd else newCell(bd,label)
             );
         );
     cellComplex(S,values cells)
@@ -422,14 +434,14 @@ cohomology(ZZ,CellComplex) := opts -> (i,cellComplex) -> (
 ----------
 ---Here there be polyhedra
 ----------
-cellComplex(Ring,Polyhedron) := {LabelFunction => null} >> o -> (R,P) -> (
+cellComplex(Ring,Polyhedron) := {Labels => null} >> o -> (R,P) -> (
     if not isCompact P then error "The given polyhedron is not compact.";
     Pdim := dim P;
     Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i,apply(lst,first)));
     verts := vertices P;
     vertexCells := apply(numColumns verts,
-                         if o.LabelFunction =!= null
-                         then (n -> newCell({},o.LabelFunction (verts_n)))
+                         if o.Labels =!= null
+                         then (n -> newCell({},o.Labels#(verts_n)))
                          else (n -> newCell({})));
     cells := new MutableHashTable;
     for i from 0 to Pdim do (
@@ -446,13 +458,13 @@ cellComplex(Ring,Polyhedron) := {LabelFunction => null} >> o -> (R,P) -> (
     cellComplex(R,flatten values cells)
     );
 
-cellComplex(Ring,PolyhedralComplex) := {LabelFunction => null} >> o -> (R,P) -> (
+cellComplex(Ring,PolyhedralComplex) := {Labels => null} >> o -> (R,P) -> (
     Pdim := dim P;
     Pfaces := applyPairs(faces P, (i,lst) -> (Pdim-i-1,apply(lst,first)));
     verts := vertices P;
     vertexCells := apply(numColumns verts,
-                         if o.LabelFunction =!= null
-                         then (n -> newCell({},o.LabelFunction (verts_n)))
+                         if o.Labels =!= null
+                         then (n -> newCell({},o.Labels#(verts_n)))
                          else (n -> newCell({})));
     cells := new MutableHashTable;
     for i from 0 to Pdim do (

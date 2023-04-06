@@ -92,7 +92,7 @@ TEST ///
 R = QQ[w,x,y,z]
 C = simplicialComplex monomialIdeal(w*x,w*y);
 dim C
-D = cellComplex(C);
+D = cellComplex(QQ,C);
 D
 assert(dim D==2);
 assert(#cells(2,D)==1);
@@ -254,7 +254,9 @@ TEST ///
 R = ZZ[x,y,z];
 M = transpose matrix {{0,0,0},{0,1,0},{0,0,1},{1,0,0},{1,1,0},{1,0,1}};
 P = convexHull M;
-C = cellComplex(R,P,LabelFunction=>(v -> x^(lift(v_0,ZZ))*y^(lift(v_1,ZZ))*z^(lift(v_2,ZZ))));
+V = vertices P;
+H = hashTable apply(numColumns V, i -> (v := V_i;(v,x^(lift(v_0,ZZ))*y^(lift(v_1,ZZ))*z^(lift(v_2,ZZ)))));
+C = cellComplex(R,P,Labels => H);
 assert(dim C==3);
 assert(# cells(0,C)==6);
 assert(# cells(1,C)==9);
@@ -291,7 +293,9 @@ P2 = convexHull matrix {{2,-2,0},{1,1,0}};
 P3 = convexHull matrix {{-2,-2,0},{1,-1,0}};
 P4 = convexHull matrix {{-2,2,0},{-1,-1,0}};
 F = polyhedralComplex {P1,P2,P3,P4};
-C = cellComplex(R,F,LabelFunction=>(v -> x^(lift(v_0,ZZ))*y^(lift(v_1,ZZ))));
+V = vertices F;
+H = hashTable apply(numColumns V, i -> (v := V_i;(v,x^(lift(v_0,ZZ))*y^(lift(v_1,ZZ)))));
+C = cellComplex(R,F,Labels=>H);
 assert(# cells(0,C)==5);
 assert(# cells(1,C)==8);
 assert(# cells(2,C)==4);
@@ -443,7 +447,7 @@ F = faces_d P;
 m = product(apply(numgens S, i -> S_i));
 G = apply(max X, l -> m//product(apply(l,i -> S_i)));
 H = hashTable apply(#G, i -> (j := F#i#0#0;((vertices P)_j,G_i)))
-C = cellComplex(S,P,LabelFunction => (c -> H#c));
+C = cellComplex(S,P,Labels => H);
 Cres = (chainComplex C)[-1];
 assert(betti (res B) == betti Cres);
 assert(HH_0 Cres == S^1/B);
