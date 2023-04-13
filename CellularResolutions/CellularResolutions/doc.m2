@@ -960,7 +960,12 @@ doc ///
             cells C
         Text
             The labels on the verticies can be controlled via the optional parameter Labels
-            This parameter expects a function that takes a vertex given as a vector
+            This parameter expects a hash table whose keys are vectors corresponding to the vertices of the polyhedron with desired labels as corresponding values.
+	Example 
+	    v = vertices P;
+	    H = hashTable {v_0 => x*y, v_1 => y*z, v_2 => x*w, v_3 => y*z};
+	    labeledC = cellComplex(QQ[x,y,z,w], P, Labels => H);
+	    for i to dim labeledC list cells(i,labeledC)/cellLabel
     SeeAlso
         (cellComplex,Ring,PolyhedralComplex)
 ///
@@ -996,7 +1001,7 @@ doc ///
             facePoset C
         Text
             The labels on the verticies can be controlled via the optional parameter Labels
-            This parameter expects a function that takes a vertex given as a vector
+            This parameter expects a hash table whose keys are vectors corresponding to the vertices of the polyhedron with desired labels as corresponding values.
     SeeAlso
         (cellComplex,Ring,Polyhedron)
 ///
