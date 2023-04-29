@@ -1,6 +1,7 @@
 
 TEST ///
 e = cellComplex(QQ,{});
+assert(isWellDefined e);
 assert(dim e === -infinity);
 assert(#maxCells e == 0);
 assert(#maxCells skeleton(0,e) == 0);
@@ -467,4 +468,34 @@ assert(HH_(-1) chainComplex H == R^1/I);
 assert((HH_0 chainComplex H)==0);
 H2 = hullComplex (3/2,I)
 assert((HH_0 chainComplex H2)!=0);
+///
+
+--isWellDefined test
+TEST ///
+R = QQ[x,y];
+S = ZZ[a,b];
+v1 = newCell({},x);
+v2 = newCell({},y);
+v3 = newCell({},a);
+v4 = newCell({},b);
+assert(isWellDefined v1);
+assert(isWellDefined v2);
+assert(isWellDefined v3);
+assert(isWellDefined v4);
+C1 = cellComplex(R,{v1,v3});
+--incompatible rings/two different rings
+assert(not isWellDefined C1);
+e1 = newCell({v1,v3},x);
+assert(not isWellDefined e1);
+C2 = cellComplex(R,{e1});
+assert(not isWellDefined C2);
+--label is not divisble by the labels in the boundary
+e2 = newSimplexCell({v1,v2},x);
+assert(not isWellDefined e2);
+C3 = cellComplex(R,{e2});
+assert(not isWellDefined C3);
+e3 = newSimplexCell({v1,v2});
+assert(isWellDefined e3);
+C4 = cellComplex(R,{e3});
+assert(isWellDefined C4);
 ///

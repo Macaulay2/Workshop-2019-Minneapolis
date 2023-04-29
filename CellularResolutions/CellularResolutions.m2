@@ -663,6 +663,30 @@ hullComplex(QQ,MonomialIdeal) := (t,I) -> (
     cellComplex(R,flatten values cells)
     )
 
+isWellDefined(Cell) := (C) -> (
+    R := ring C.label;
+    M := toModule(R,C.label);
+    if not isSubmodule M then return false;
+    --check that the boundary labels are compatible
+    --boundary is a list of pairs where the first element is the cell
+    if not all(C.boundary, x ->  isSubset(M,toModule(R,(x#0).label))) then return false;
+    --check that the boundary is a cycle in homology
+    isCycle(C.boundary)
+    )
+
+isWellDefined(CellComplex) := (C) -> (
+    allCells := flatten values C.cells;
+    containingModule := null;
+    for cell in allCells do (
+        if ring cell.label =!= C.labelRing then return false;
+        if not isWellDefined cell then return false;
+        M := toModule(C.labelRing,cell.label);
+        if containingModule === null then containingModule = ambient M;
+        if containingModule != ambient M then return false;
+        );
+    true
+    )
+
 ----------------------------
 
 ----------------------------
