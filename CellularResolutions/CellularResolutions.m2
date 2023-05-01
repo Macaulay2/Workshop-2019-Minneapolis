@@ -36,7 +36,6 @@ export {"CellComplex",
         "scarfComplex",
         "hullComplex",
         "boundary",
-        "LabelFunction",
         "subcomplex"
         }
 protect labelRing
