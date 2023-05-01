@@ -944,6 +944,8 @@ doc ///
         R : Ring
             that specifies the base ring
         P : Polyhedron
+        Labels => HashTable
+            that maps verticies in the polyhedron to labels
     Outputs
         : CellComplex
             whose cells are the faces of the given polyhedron P
@@ -961,10 +963,11 @@ doc ///
         Text
             The labels on the verticies can be controlled via the optional parameter Labels
             This parameter expects a hash table whose keys are vectors corresponding to the vertices of the polyhedron with desired labels as corresponding values.
-	Example 
+	Example
+            S = QQ[x,y,z,w];
 	    v = vertices P;
 	    H = hashTable {v_0 => x*y, v_1 => y*z, v_2 => x*w, v_3 => y*z};
-	    labeledC = cellComplex(QQ[x,y,z,w], P, Labels => H);
+	    labeledC = cellComplex(S, P, Labels => H);
 	    for i to dim labeledC list cells(i,labeledC)/cellLabel
     SeeAlso
         (cellComplex,Ring,PolyhedralComplex)
@@ -982,6 +985,8 @@ doc ///
         R : Ring
             that specifies the base ring
         P : PolyhedralComplex
+        Labels => HashTable
+            that maps verticies in the polyhedron to labels
     Outputs
         : CellComplex
             whose cells are the faces of the given polyhedral complex
