@@ -36,7 +36,8 @@ export {"CellComplex",
         "scarfComplex",
         "hullComplex",
         "boundary",
-        "LabelFunction"
+        "LabelFunction",
+        "subcomplex"
         }
 protect labelRing
 protect label
@@ -516,6 +517,43 @@ isMinimal(CellComplex) := (cellComplex) -> (
     R := cellComplex.labelRing;
     all(flatten values cells cellComplex,c -> isCellMinimal(R,c))
     )
+
+subcomplex = method(TypicalValue => CellComplex)
+subcomplex(CellComplex,RingElement) := (C,m) -> (
+    allCells := flatten values cells C;
+    R := ring C;
+    withNewLabels := apply(allCells, c -> (c,if (m % ideal toModule(R,cellLabel c))==0 then m else 0));
+    nontrivialCells := select(withNewLabels, p -> (p#1) != 0);
+    finalCells := new MutableHashTable;
+    --it is important here that the cells in allCells are sorted by dimension at this point
+    for p in nontrivialCells do (
+        c := p#0;
+        l := p#1;
+        newBoundary := apply(boundary c, p -> (finalCells#(p#0),p#1));
+        finalCells#c = newCell(newBoundary,l);
+        );
+    cellComplex(R,values finalCells)
+    )
+subcomplex(CellComplex,List) := (C,d) -> (
+    allCells := flatten values cells C;
+    R := ring C;
+    withNewLabels := apply(allCells, c -> (c,source basis(d,toModule(R,cellLabel c))));
+    nontrivialCells := select(withNewLabels, p -> (p#1) != 0);
+    finalCells := new MutableHashTable;
+    --it is important here that the cells in allCells are sorted by dimension at this point
+    for p in nontrivialCells do (
+        c := p#0;
+        l := p#1;
+        newBoundary := apply(boundary c, p -> (finalCells#(p#0),p#1));
+        finalCells#c = newCell(newBoundary,l);
+        );
+    cellComplex(R,values finalCells)
+    )
+subcomplex(CellComplex,ZZ) := (C,d) -> subcomplex(C,{d});
+
+CellComplex _ RingElement := (C,m) -> (subcomplex(C,m))
+CellComplex _ List := (C,d) -> (subcomplex(C,d))
+CellComplex _ ZZ := (C,d) -> (subcomplex(C,{d}))
 
 ---------
 -- Output
