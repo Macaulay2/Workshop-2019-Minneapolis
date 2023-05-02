@@ -36,9 +36,11 @@ export {"CellComplex",
         "scarfComplex",
         "hullComplex",
         "boundary",
-        "subcomplex"
+        "subcomplex",
+        "LabelRing"
         }
 protect labelRing
+protect LabelRing
 protect label
 protect cellDimension
 protect CellDimension
@@ -517,11 +519,29 @@ isMinimal(CellComplex) := (cellComplex) -> (
     all(flatten values cells cellComplex,c -> isCellMinimal(R,c))
     )
 
-subcomplex = method(TypicalValue => CellComplex)
-subcomplex(CellComplex,RingElement) := (C,m) -> (
+subcomplex = method(TypicalValue => CellComplex, Options=>{LabelRing=>null})
+subcomplex(CellComplex,RingElement) := o -> (C,m) -> (
     allCells := flatten values cells C;
     R := ring C;
-    withNewLabels := apply(allCells, c -> (c,if (m % ideal toModule(R,cellLabel c))==0 then m else 0));
+    S := if o.LabelRing =!= null then o.LabelRing else coefficientRing R;
+    withNewLabels := apply(allCells, c -> (c,if (m % ideal toModule(R,cellLabel c))==0 then 1_S else 0));
+    nontrivialCells := select(withNewLabels, p -> (p#1) != 0);
+    finalCells := new MutableHashTable;
+    --it is important here that the cells in allCells are sorted by dimension at this point
+    for p in nontrivialCells do (
+        c := p#0;
+        l := p#1;
+        newBoundary := apply(boundary c, p -> (finalCells#(p#0),p#1));
+        finalCells#c = newCell(newBoundary,l);
+        );
+    cellComplex(S,values finalCells)
+    )
+
+subcomplex(CellComplex,List) := o -> (C,d) -> (
+    allCells := flatten values cells C;
+    R := ring C;
+    S := if o.LabelRing =!= null then o.LabelRing else coefficientRing R;
+    withNewLabels := apply(allCells, c -> (c,source basis(d,toModule(R,cellLabel c),SourceRing=>S)));
     nontrivialCells := select(withNewLabels, p -> (p#1) != 0);
     finalCells := new MutableHashTable;
     --it is important here that the cells in allCells are sorted by dimension at this point
@@ -533,22 +553,8 @@ subcomplex(CellComplex,RingElement) := (C,m) -> (
         );
     cellComplex(R,values finalCells)
     )
-subcomplex(CellComplex,List) := (C,d) -> (
-    allCells := flatten values cells C;
-    R := ring C;
-    withNewLabels := apply(allCells, c -> (c,source basis(d,toModule(R,cellLabel c))));
-    nontrivialCells := select(withNewLabels, p -> (p#1) != 0);
-    finalCells := new MutableHashTable;
-    --it is important here that the cells in allCells are sorted by dimension at this point
-    for p in nontrivialCells do (
-        c := p#0;
-        l := p#1;
-        newBoundary := apply(boundary c, p -> (finalCells#(p#0),p#1));
-        finalCells#c = newCell(newBoundary,l);
-        );
-    cellComplex(R,values finalCells)
-    )
-subcomplex(CellComplex,ZZ) := (C,d) -> subcomplex(C,{d});
+
+subcomplex(CellComplex,ZZ) := o -> (C,d) -> subcomplex(C,{d},LabelRing=>o.LabelRing);
 
 CellComplex _ RingElement := (C,m) -> (subcomplex(C,m))
 CellComplex _ List := (C,d) -> (subcomplex(C,d))

@@ -1423,3 +1423,63 @@ doc ///
         This function does not check that the cell complex corresponds to
         a topologically realizable cell complex.
 ///
+
+
+doc ///
+    Key
+        subcomplex
+        LabelRing
+        [subcomplex,LabelRing]
+        (subcomplex,CellComplex,RingElement)
+        (subcomplex,CellComplex,List)
+        (subcomplex,CellComplex,ZZ)
+        (symbol _,CellComplex,RingElement)
+        (symbol _,CellComplex,List)
+        (symbol _,CellComplex,ZZ)
+    Headline
+        the subcomplex induced by a degree or monomial
+    Usage
+        subcomplex(C,m)
+        subcomplex(C,d)
+        C_m
+        C_d
+    Inputs
+        C : CellComplex
+        m : RingElement
+            a monomial
+        d : {ZZ,List}
+            a degree
+        LabelRing => Ring
+            for the labels on the output
+    Outputs
+        : CellComplex
+    Description
+        Text
+            This function computes the subcomplex of the input cell complex induced
+            by a monomial or a degree. The returned cell complex will be labeled
+            over the coefficient ring of the label ring of the original cell complex,
+            or the ring given by the LabelRing optional parameter if provided.
+        Text
+            When given a monomial, the function expects all labels to be monomials,
+            ideals, or submodules of the ring associated to the cell complex. In that case,
+            the returned cell complex will be the subcomplex of the original complex containing
+            the cells who's labels either divide or containg the provided monomial.
+            The labels on the cells in the returned cell complexes will be 1.
+        Example
+            R = QQ[x,y,z];
+            C = taylorComplex monomialIdeal {x,y,z}
+            subcomplex(C,x*y)
+            subcomplex(C,x*y,LabelRing=>R)
+        Text
+            When given a degree, the function will use basis to find the appropriate free module
+            over the new label ring representing the elements of that degree in the module
+            associated to the label
+        Example
+            subcomplex(C,1)
+        Text
+            In general, the degree version is intended to be used with fine-graded polynomial rings
+        Example
+            S = QQ[a,b,c,DegreeRank=>3];
+            D = taylorComplex monomialIdeal {a,b,c}
+            subcomplex(D,{1,1,0})
+///
