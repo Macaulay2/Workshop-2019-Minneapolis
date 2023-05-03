@@ -112,15 +112,12 @@ cellComplex(Ring,SimplicialComplex) := {Labels=>null} >> o -> (S,C) -> (
                      else null
                    )
                else null);
-            print i;
-            print simplex;
             bd := if i==0
                   then {}
                   else
                       for x in gens R list (
                           if simplex%x==0 then cells#(simplex//x)
                           else continue);
-            print bd;
             cells#simplex = if label === null then newCell bd else newCell(bd,label)
             );
         );
