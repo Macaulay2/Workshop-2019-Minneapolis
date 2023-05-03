@@ -191,6 +191,7 @@ doc ///
 doc ///
     Key
         (cellComplex,Ring,SimplicialComplex)
+        [(cellComplex,Ring,SimplicialComplex),Labels]
     Headline
         Creates a cell complex from a given simplicial complex
     Usage
@@ -199,6 +200,8 @@ doc ///
         S : Ring
         D : SimplicialComplex
             from which the cell complex is created
+        Labels => HashTable
+            that maps simplicies represented by monomials to labels
     Outputs
         : CellComplex
             that matches those of the given simplicial complex
@@ -209,7 +212,15 @@ doc ///
             R = QQ[a..f];
             I = monomialIdeal(a*f, b*d, c*e);
             Delta = simplicialComplex I;
-            C = cellComplex(R,Delta)
+            C = cellComplex(QQ,Delta)
+        Text
+            The optional parameter Label can be used to provide labels to the resulting cell complex.
+            By default all cells get a label of 1.
+        Example
+            S = QQ[x,y];
+            H = hashTable {a => x^5, b => y*x^4, c=>y^2*x^3, d => y^3*x^2, e => y^4*x, f => x^5};
+            C = cellComplex(S,Delta,Labels=>H)
+            applyValues(cells C, l -> apply(l,cellLabel))
     SeeAlso
         cellComplex
 ///
@@ -703,7 +714,7 @@ doc ///
     Usage
         cohomology(r,C)
     Inputs
-        r: ZZ
+        r : ZZ
             a non-negative integer
         C : CellComplex
     Outputs
@@ -1193,8 +1204,7 @@ doc ///
         hullComplex I
         hullComplex(t,I)
     Inputs
-        t : QQ
-        t : ZZ
+        t : {QQ,ZZ}
         I : MonomialIdeal
     Outputs
         : CellComplex
