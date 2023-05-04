@@ -47,8 +47,14 @@ protect CellDimension
 protect Reduced
 protect Prune
 
+hasAttribute = value Core#"private dictionary"#"hasAttribute";
+getAttribute = value Core#"private dictionary"#"getAttribute";
+ReverseDictionary = value Core#"private dictionary"#"ReverseDictionary";
+
 CellComplex = new Type of HashTable
 CellComplex.synonym = "cell complex"
+CellComplex.GlobalAssignHook = globalAssignFunction
+CellComplex.GlobalReleaseHook = globalReleaseFunction
 --Note, the mutable hash table means that equality works "Correctly"
 Cell = new Type of MutableHashTable
 Cell.synonym = "cell"
@@ -562,15 +568,16 @@ CellComplex _ ZZ := (C,d) -> (subcomplex(C,{d}))
 ---------
 
 net(Cell) := (cell) -> (
-    "Cell of dimension " | (dim cell)
+    "Cell of dimension " | (dim cell) | " with label " | (cellLabel cell)
     )
 
 net(CellComplex) := (cellComplex) -> (
+    if hasAttribute (cellComplex, ReverseDictionary) then return getAttribute (cellComplex, ReverseDictionary);
     d := dim cellComplex;
     nTotalCells := #(flatten values cells cellComplex);
     if nTotalCells == 0
     then "empty CellComplex"
-    else "CellComplex of dimension " | d | " with " | nTotalCells | " total cells"
+    else "CellComplex over " | (cellComplex.labelRing) | " of dimension " | d | " with " | nTotalCells | " total cells"
     );
 
 
