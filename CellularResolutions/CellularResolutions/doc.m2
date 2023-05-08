@@ -88,14 +88,18 @@ doc ///
             R = QQ[x,y];
             C = cellComplex(R,{c});
     SeeAlso
-        (newCell,List)
-        (newCell,List,Thing)
+        newCell
+        newSimplexCell
+        isWellDefined
 ///
 
 doc ///
     Key
         newCell
-        (newCell,List,Thing)
+        (newCell,List,Number)
+        (newCell,List,RingElement)
+        (newCell,List,Module)
+        (newCell,List,Ideal)
         (newCell,List)
         CellDimension
         [newCell,CellDimension]
@@ -108,7 +112,7 @@ doc ///
         boundary : List
             that gives the boundary of the new cell either as a list of pairs
             of cells and their orientation, or a list of cells.
-        label : Thing
+        label : {Number, RingElement, Module, Ideal}
             that gives a label to associate to the cell, otherwise attempt to
             infer it based on the labels on the boundary
         CellDimension => ZZ
@@ -151,7 +155,10 @@ doc ///
 doc ///
     Key
         newSimplexCell
-        (newSimplexCell,List,Thing)
+        (newSimplexCell,List,Number)
+        (newSimplexCell,List,RingElement)
+        (newSimplexCell,List,Module)
+        (newSimplexCell,List,Ideal)
         (newSimplexCell,List)
     Headline
         create a new cell
@@ -162,7 +169,7 @@ doc ///
         boundary : List
             that gives the boundary of the new cell either as a list of pairs
             of cells and their orientation, or a list of cells.
-        label : Thing
+        label : {Number,RingElement, Module, Ideal}
             that gives a label to associate to the cell, otherwise attempt to
             infer it based on the labels on the boundary
     Outputs

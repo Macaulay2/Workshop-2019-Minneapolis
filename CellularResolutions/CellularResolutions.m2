@@ -272,7 +272,10 @@ inferLabel := boundary -> (
 
 --Attach a cell
 newCell = method(Options => {CellDimension=>null}, TypicalValue=>Cell)
-newCell(List,Thing) := opt -> (boundary,label) -> (
+newCell(List,Number) :=
+newCell(List,RingElement) :=
+newCell(List,Module) :=
+newCell(List,Ideal) := opt -> (boundary,label) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
     then return newCell(inferOrientation boundary,label,CellDimension=>opt.CellDimension);
     if not isCycle boundary then error "Expected the boundary to be a cycle";
@@ -306,7 +309,10 @@ newSimplexCell(List) := (boundary) -> (
     if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
     newCell boundary
     )
-newSimplexCell(List,Thing) := (boundary,label) -> (
+newSimplexCell(List,Number) :=
+newSimplexCell(List,RingElement) :=
+newSimplexCell(List,Module) :=
+newSimplexCell(List,Ideal) := (boundary,label) -> (
     if #boundary!=0 and instance(boundary#0,Cell)
     then return newSimplexCell(inferOrientation boundary,label);
     if not isSimplexBoundary boundary then error "The given boundary is not a valid boundary for a simplex";
