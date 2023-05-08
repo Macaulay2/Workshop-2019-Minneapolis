@@ -499,3 +499,22 @@ assert(isWellDefined e3);
 C4 = cellComplex(R,{e3});
 assert(isWellDefined C4);
 ///
+
+--subcomplex test
+TEST ///
+R = QQ[x,y,z];
+v1 = newCell({},x*y);
+v2 = newCell({},x*z);
+v3 = newCell({},y*z);
+e1 = newSimplexCell {v1,v2};
+e2 = newSimplexCell {v1,v3};
+e3 = newSimplexCell {v2,v3};
+f = newSimplexCell {e1,e2,e3};
+C = cellComplex(R,{f});
+Cxy = subcomplex(C,x*y);
+assert(isWellDefined Cxy);
+assert(#flatten values cells Cxy == 1);
+Cxyz = subcomplex(C,x*y*z);
+assert(isWellDefined Cxy);
+assert(#flatten values cells Cxyz == #flatten values cells C)
+///
