@@ -574,7 +574,7 @@ CellComplex _ ZZ := (C,d) -> (subcomplex(C,{d}))
 ---------
 
 net(Cell) := (cell) -> (
-    "Cell of dimension " | (dim cell) | " with label " | (cellLabel cell)
+    "Cell of dimension " | (dim cell) | " with label " | (net cellLabel cell)
     )
 
 net(CellComplex) := (cellComplex) -> (
@@ -583,7 +583,9 @@ net(CellComplex) := (cellComplex) -> (
     nTotalCells := #(flatten values cells cellComplex);
     if nTotalCells == 0
     then "empty CellComplex"
-    else "CellComplex over " | (cellComplex.labelRing) | " of dimension " | d | " with " | nTotalCells | " total cells"
+    else (
+        ("CellComplex over " | (net cellComplex.labelRing) | " of dimension " | d | " with " | nTotalCells | " total cells") ||
+        stack(apply(d+1,i -> net cells_i cellComplex)))
     );
 
 
