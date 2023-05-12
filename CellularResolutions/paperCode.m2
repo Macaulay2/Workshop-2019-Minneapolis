@@ -51,7 +51,7 @@ P = convexHull id_(ZZ^4);
 Pcellular = cellComplex(S,P)
 
 verts = cells(0,Pcellular);
-H = new HashTable from {verts#0 => y*w, verts#1 => x*y*z, verts#2 => x^2*y, verts#3 => z^4*w};
+H = hashTable  {verts#0 => y*w, verts#1 => x*y*z, verts#2 => x^2*y, verts#3 => z^4*w};
 relabeledP = relabelCellComplex(Pcellular, H)
 cells(0,relabeledP)/(c -> cellLabel c)
 
@@ -73,7 +73,6 @@ B = ideal X;
 Sigma = fan X;
 P = polytope Sigma;
 d = dim P;
---Faces knows the order of the vertices relative to the output of vertices P
 F = faces_d P;
 m = product(apply(numgens S, i -> S_i));
 G = apply(max X, l -> m//product(apply(l,i -> S_i)));
