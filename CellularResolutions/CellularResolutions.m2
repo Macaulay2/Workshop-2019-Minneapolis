@@ -1,8 +1,9 @@
 -- -*- coding: utf-8 -*-
+-- This file is in the public domain
 newPackage(
     "CellularResolutions",
-    Version => "0.9",
-    Date => "July 22, 2019",
+    Version => "1.0",
+    Date => "May 14, 2023",
     Authors => {
         {Name => "Jay Yang", Email => "jayy@wustl.edu"},
         {Name => "Aleksandra Sobieska", Email => "asobieska@math.wisc.edu"}
@@ -12,38 +13,43 @@ newPackage(
     PackageExports => {"Polyhedra", "SimplicialComplexes", "Posets"}
     )
 
-export {"CellComplex",
+export {--types
+        "CellComplex",
         "Cell",
-        "cellComplex",
-        "isCycle",
-        "isSimplex",
+        --methods
+        "boundary",
         "boundaryCells",
-        "relabelCellComplex",
-        "InferLabels",
         "cells",
-        "cellLabel",
-        "newCell",
-        "newSimplexCell",
-        "isFree",
-        "isMinimal",
-        "Reduced",
-        "CellDimension",
-        "maxCells",
+        "cellComplex",
         "cellComplexSphere",
         "cellComplexRPn",
         "cellComplexTorus",
-        "taylorComplex",
-        "scarfComplex",
+        "cellLabel",
         "hullComplex",
-        "boundary",
+        "isCycle",
+        "isFree",
+        "isMinimal",
+        "isSimplex",
+        "newCell",
+        "newSimplexCell",
+        "maxCells",
+        "relabelCellComplex",
+        "scarfComplex",
         "subcomplex",
-        "LabelRing"
+        "taylorComplex",
+        --symbols (for optional parmeters)
+        "CellDimension",
+        "InferLabels",
+        "LabelRing",
+        "Reduced",
+        "Prune"
         }
 protect labelRing
-protect LabelRing
 protect label
 protect cellDimension
 protect CellDimension
+protect InferLabels
+protect LabelRing
 protect Reduced
 protect Prune
 

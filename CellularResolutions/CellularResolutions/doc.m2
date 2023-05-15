@@ -1,3 +1,4 @@
+-- This file is in the public domain
 
 beginDocumentation()
 
@@ -11,7 +12,7 @@ doc ///
             This package aims to make working with cellular resolutions of
             monomial ideals possible. Although the focus is on
             those constructs needed to work with cellular resolutions,
-	    the package additionally provides basic
+            the package additionally provides basic
             functions to work with cell complexes. For
             some direct ways to construct common cellular resolutions for
             monomial ideals, see @TO taylorComplex@ and @TO hullComplex@.
@@ -79,7 +80,7 @@ doc ///
         Text
             The method cellComplex takes a ring R and a list of maximal cells and constructs the
             corresponding cell complex. While the intent is for the supplied cells to be maximal,
-            including non-maximal cells is not forbiden and will generate valid cell complexes.
+            including non-maximal cells is not forbidden and will generate valid cell complexes.
         Text
             The ring R is the ring over which the labels are interpreted. This function does not
             directly check that the labels are in the correct ring.
@@ -209,7 +210,7 @@ doc ///
         D : SimplicialComplex
             from which the cell complex is created
         Labels => HashTable
-            that maps simplicies represented by monomials to labels
+            that maps simplices represented by monomials to labels
     Outputs
         : CellComplex
             that matches those of the given simplicial complex
@@ -483,7 +484,7 @@ doc ///
     Description
         Text
             Given a cell C, this command returns a list whose elements are the boundary cells of C.
-            This differs from @TO boundary@ in that it returns returns only the boundary cells of C,
+            This differs from @TO boundary@ in that it returns only the boundary cells of C,
             whereas boundaryCells returns a list of two-element sequences of the boundary cells and
             their corresponding orientation.
         Example
@@ -872,7 +873,7 @@ doc ///
     Description
         Text
             The face poset of a cell complex is the poset of cells with partial ordering given by inclusion.
-	    The example below constructs the square as a cellular complex and returns the face poset.
+            The example below constructs the square as a cellular complex and returns the face poset.
         Example
             R = QQ;
             v1 = newCell {};
@@ -981,14 +982,14 @@ doc ///
             C = cellComplex(R,P);
             cells C
         Text
-            The labels on the verticies can be controlled via the optional parameter Labels
+            The labels on the vertices can be controlled via the optional parameter Labels
             This parameter expects a hash table whose keys are vectors corresponding to the vertices of the polyhedron with desired labels as corresponding values.
-	Example
+        Example
             S = QQ[x,y,z,w];
-	    v = vertices P;
-	    H = hashTable {v_0 => x*y, v_1 => y*z, v_2 => x*w, v_3 => y*z};
-	    labeledC = cellComplex(S, P, Labels => H);
-	    for i to dim labeledC list cells(i,labeledC)/cellLabel
+            v = vertices P;
+            H = hashTable {v_0 => x*y, v_1 => y*z, v_2 => x*w, v_3 => y*z};
+            labeledC = cellComplex(S, P, Labels => H);
+            for i to dim labeledC list cells(i,labeledC)/cellLabel
     SeeAlso
         (cellComplex,Ring,PolyhedralComplex)
 ///
@@ -1025,7 +1026,7 @@ doc ///
             C = cellComplex(R,F);
             facePoset C
         Text
-            The labels on the verticies can be controlled via the optional parameter Labels
+            The labels on the vertices can be controlled via the optional parameter Labels
             This parameter expects a hash table whose keys are vectors corresponding to the vertices of the polyhedron with desired labels as corresponding values.
     SeeAlso
         (cellComplex,Ring,Polyhedron)
@@ -1054,8 +1055,8 @@ doc ///
             Given a cell complex C and a hashtable, whose key-value pairs
             are a cell from C and a new label for that cell, this command
             relabels C accordingly. Labels for cells not provided in the
-            hashtable are inferred to be the lcm of the labels of their
-            boundary cells, unless the option InferLabels is set to false.
+            hashtable are inferred to be the least common multiple of the labels
+            of their boundary cells, unless the option InferLabels is set to false.
         Example
             R = QQ[a,b,c];
             P1 = convexHull matrix {{0,1,0},{0,0,1}};
@@ -1088,7 +1089,7 @@ doc ///
         C : CellComplex
     Outputs
         : CellComplex
-         whose cells labels are given by tensoring by the ring map f
+         whose cells labels are given by taking the tensor product by the ring map f
     Description
         Text
             Given a ring map f and a cell complex C, then for each label, viewed as a module M,
@@ -1190,7 +1191,7 @@ doc ///
     Description
         Text
             This function returns the n-dimensional torus as a cell complex in the usual way:
-            the product of n copies of S^1.
+            the product of n copies of $S^1$.
         Example
             T3 = cellComplexTorus(QQ,3)
             cells(T3)
@@ -1264,7 +1265,7 @@ doc ///
     Description
         Text
             Given a monomial ideal I, this function returns the Taylor complex of that ideal.
-            Recall that the Taylor complex is a simplex with verticies labeled by the generators
+            Recall that the Taylor complex is a simplex with vertices labeled by the generators
             of the ideal.
         Example
             S = QQ[x,y,z];
@@ -1359,7 +1360,7 @@ doc ///
             the label itself must be a submodule (not necessarily proper).
         Text
             Ring element labels are interpreted as the module of the principal ideal
-            generated by the element in the ring. Importantly, if all labels are 
+            generated by the element in the ring. Importantly, if all labels are
             ring elements then the condition is simply that the labels on the boundary
             should divide the labels on the current cell.
         Text
