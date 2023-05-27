@@ -556,7 +556,12 @@ subcomplex(CellComplex,List) := o -> (C,d) -> (
     allCells := flatten values cells C;
     R := ring C;
     S := if o.LabelRing =!= null then o.LabelRing else coefficientRing R;
-    withNewLabels := apply(allCells, c -> (c,source basis(d,toModule(R,cellLabel c),SourceRing=>S)));
+    withNewLabels := apply(allCells, c -> (c,(
+            M := toModule(R,cellLabel c);
+            bSuper := basis(d,super M);
+            bLabel := super basis(d,M);
+            image lift(bLabel//bSuper,S)
+            )));
     nontrivialCells := select(withNewLabels, p -> (p#1) != 0);
     finalCells := new MutableHashTable;
     --it is important here that the cells in allCells are sorted by dimension at this point
