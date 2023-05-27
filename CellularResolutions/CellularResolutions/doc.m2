@@ -966,7 +966,7 @@ doc ///
             that specifies the base ring
         P : Polyhedron
         Labels => HashTable
-            that maps verticies in the polyhedron to labels
+            that maps vertices in the polyhedron to labels
     Outputs
         : CellComplex
             whose cells are the faces of the given polyhedron P
@@ -1007,13 +1007,13 @@ doc ///
             that specifies the base ring
         P : PolyhedralComplex
         Labels => HashTable
-            that maps verticies in the polyhedron to labels
+            that maps vertices in the polyhedron to labels
     Outputs
         : CellComplex
             whose cells are the faces of the given polyhedral complex
     Description
         Text
-            Given a polyhedral complex, this commend returns the
+            Given a polyhedral complex, this command returns the
             cell complex whose cells correspond to the faces of the polyhedral
             complex. The faces have the default label 1.
         Example
@@ -1430,7 +1430,7 @@ doc ///
             isWellDefined cellComplex(R,{f})
         Text
             Another important way that cell complexes can fail to be well defined is
-            if they have labels from differnt rings
+            if they have labels from different rings
         Example
             R = QQ[x,y];
             S = ZZ[a,b];
