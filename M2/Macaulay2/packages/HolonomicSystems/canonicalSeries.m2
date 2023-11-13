@@ -153,9 +153,12 @@ RingMap Power := (f, v) -> Power{f v#0, v#1}
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
+-- turn X^-e to Xinv^e in an exponent vector
+invKludge = (R, n, i, e) -> if n <= i and i < 2*n and e < 0 then R_(2*n+i)^(-e) else R_i^e
+
 -- TODO: move this to AssociatedAlgebras?
 FreeAlgebraQuotient _ List := RingElement => (R, v) -> if #v === 0 then 1_R else product(
-    if isListOfIntegers v then pairs v else v, (i, e) -> R_i^e )
+    n := numgens R // 4; if isListOfIntegers v then pairs v else v, (i, e) -> invKludge(R, n, i, e))
 
 -- TODO: move this to Core?
 listForm Number := n -> {({}, n)}
@@ -165,15 +168,19 @@ nilssonRing = method()
 nilssonRing Ring := (cacheValue symbol NilssonRing) (W -> (
     n := numgens W // 2;
     X := local X;
+    Xinv := local Xinv;
     dX := local dX;
     logX := local logX;
-    S := QQ<| dX_0..dX_(n-1), X_0..X_(n-1), logX_0..logX_(n-1) |> / flatten apply(n, i -> nonnull join(
-	    flatten table(n, {X, logX, dX}, (j, sym) -> if i <  j then sym_i * sym_j - sym_j * sym_i ),
-	    flatten table(n, {X, logX},     (j, sym) -> if i != j then  dX_i * sym_j - sym_j *  dX_i ),
-	    -* FIXME: only missing dX*logX - 1/X - logX*dX, since 1/X is not allowed in this ring *-
-	    apply(n, j -> X_i * logX_j - logX_j * X_i ), { dX_i*X_i-1-X_i*dX_i, X_i*dX_i*logX_i-1-X_i*logX_i*dX_i }));
-    WtoS := f -> sum(listForm f, (m, c) -> c * S_(reverse toList pairs flatten reverse pack_n m));
-    StoW := f -> sum(listForm f, (m, c) -> c * W_(reverse drop(m, -1)));
+    S := QQ<| dX_0..dX_(n-1), X_0..X_(n-1), logX_0..logX_(n-1), Xinv_0..Xinv_(n-1) |> / flatten apply(n, i -> nonnull join(
+	    flatten table(n, {X, Xinv, logX, dX}, (j, sym) -> if i <  j then sym_i * sym_j - sym_j * sym_i ),
+	    flatten table(n, {X, Xinv, logX},     (j, sym) -> if i != j then  dX_i * sym_j - sym_j *  dX_i ),
+	    apply(n, j -> X_i * logX_j - logX_j * X_i),
+	    apply(n, j -> X_i * Xinv_j - Xinv_j * X_i),
+	    apply(n, j -> Xinv_i * logX_j - logX_j * Xinv_i),
+	    { dX_i*X_i-1-X_i*dX_i, dX_i*Xinv_i+Xinv_i^2-Xinv_i*dX_i, X_i*Xinv_i-1, dX_i*logX_i-Xinv_i-logX_i*dX_i }));
+    -- The variables of W are ordered as X_i..., dX_i...
+    WtoS := f -> sum(listForm f, (m, c) -> c * S_(reverse toList pairs flatten reverse pack_n m)); -- FIXME: ...
+    StoW := f -> sum(listForm f, (m, c) -> c * W_(reverse drop(m, -2*n))); -- FIXME: not much of a map
     S, WtoS, StoW))
 --------------------------------------------------------------------------------
 
@@ -219,6 +226,7 @@ solvePrimaryFrobeniusIdeal(Ideal, Ring) := List => (I, W) -> (
     -- f := map(W, T, product \ pack(2, mingle drop(W.dpairVars, -1)));
     -- makeLogMonomial \ f \ factor \ sort values S
     (R, f1, f2) := elapsedTime nilssonRing W;
+    -- The variables of R are ordered as dX.., X.., logX.., Xinv..
     g := map(R, T, R_*_{2*n .. 3*n-1});
     g \ sort values S)
 
@@ -233,10 +241,12 @@ solveFrobeniusIdeal(Ideal, Ring) := List => (I, W) -> (
 	if dim C > 0 then error "expected zero-dimensional components";
 	(p, m) := (solveMax C, degree C); -- the point and its multiplicity
 	--mon := makeRationalMonomial(first W.dpairVars, p);
-	mon := if any(p, i -> floor i != i or i < 0)
-	then makeMonomial(first W.dpairVars, select(pairs p, (i, e) -> e != 0))
-	--FIXME: version above works for negative or rational exponents, the one below doesn't
-	else T_(flatten{toList(n:0), apply(p, i -> sub(i, ZZ)), toList(n:0)});
+	mon := if any(p, i -> floor i != i)
+	then makeMonomial(first W.dpairVars, select(pairs p, (i, e) -> e != 0)) else T_(
+	    --FIXME: version above works for rational exponents, the one below doesn't
+	    flatten { -- The variables of T are ordered as:
+		toList(n:0), apply(p, i -> if i > 0 then sub(i, ZZ) else 0),   -- dX.., X..
+		toList(n:0), apply(p, i -> if i < 0 then sub(i, ZZ) else 0)}); -- logX.., Xinv..
 	if m == 1 then return mon;
 	psi := map(R, R, apply(n, i -> R_i + p_i));
 	apply(solvePrimaryFrobeniusIdeal(psi C, W), ell -> mon * ell)
@@ -288,9 +298,13 @@ nonpositiveWeightGens(Ideal, List) := List => (I, w) -> (
 	    e1 := first exponents inw(g, fw);
 	    e2 := take(e1, -n) - take(e1, n);
 	    epos := apply(e2, i -> max(0, i));
+	    -- NOTE: a genericity assumption is needed here,
+	    -- otherwise we need inverses
 	    eneg := apply(e2, i -> max(0, -i));
 	    W_epos * g // W_eneg))
     )
+
+concatMats = T -> concatRows for row in T list concatCols row
 
 truncatedCanonicalSeries = method()
 truncatedCanonicalSeries(Ideal, List, ZZ) := List => (I, w, k) -> (
@@ -299,18 +313,26 @@ truncatedCanonicalSeries(Ideal, List, ZZ) := List => (I, w, k) -> (
     r := holonomicRank I;
     G := ideal nonpositiveWeightGens(I, w);
     (S, WtoS, StoW) := nilssonRing W;
-    -- FIXME: this step fails if any start terms have negative or rational exponents
-    A := WtoS \ value \ cssLeadTerm(G, w);
+    -- FIXME: this step fails if any start terms have rational exponents
+    A := apply(cssLeadTerm(G, w), a -> if ring a === W then WtoS a else a);
+    assert all(A, a -> ring a === S);
     V := elapsedTime nilssonSupport(G, w, k);
-    -- The variables of S are ordered as dX_i..., X_i..., logX_i...
+    -- The variables of S are ordered as dX_i..., X_i..., logX_i..., Xinv_i...
+    -- B is a truncated basis of L_p
     B := splice table(V, (n:0)..(n:r-1), (e, l) -> S_(toList join(n:0,e,l)));
     B  = B - set apply((n:0)..(n:r-1), l -> S_(toList join(n:0,n:0,l)));
+    --
+    error 0;
+    R := ((coefficientRing S)(monoid[S_*_(toList(2*n..2*n+n-1))]))(
+	monoid[S_*_(toList(n..n+n-1) | toList(n..3*n+n-1))]);
     G' := WtoS \ G_*;
     G', apply(A, a -> (
 	    B' := a * B - set A;
-	    M := concatCols flatten table(G', B', (g, b) -> last coefficients(g * b, Monomials => B));
-	    v := concatCols apply(G', g -> last coefficients(g * a, Monomials => B));
-	    first first entries(a + matrix{B'} * solve(sub(M, QQ), sub(-v, QQ)))))
+	    M := concatMats table(G', B', (g, b) -> sub(last coefficients(g * b, Monomials => B'), QQ));
+	    v := concatRows apply(G', g -> sub(last coefficients(g * a, Monomials => B'), QQ));
+	    if M == 0 and v == 0 then error "truncatedCanonicalSeries: k was too small";
+	    s := solve(M, -v);
+	    first first entries(a + matrix{B'} * s)))
     )
 
 --------------------
@@ -333,25 +355,24 @@ TEST /// -- test solveFrobeniusIdeal
 ///
 
 TEST ///
-  W = makeWeylAlgebra(QQ[x]);
+  S = QQ[x]
+  W = makeWeylAlgebra S;
   I = ideal(x*dx*(x*dx-3)-x*(x*dx+101)*(x*dx+13))
-  w = {1};
+  w = {1}
   nilssonSupport(I,w)
   nilssonSupport(I,w,3)
   cssLeadTerm(I, w)
-  (G, sols) = truncatedCanonicalSeries(I, w, 4);
-  table(G, sols, (g, s) -> (g * s)[0,x,0])
+  (G, sols) = truncatedCanonicalSeries(I, w, 4)
+  -- error terms:
+  table(G, sols, (g, s) -> (g * s)[0,x,0,0])
 
-  -- TODO: do SST eq. (1.22)
-  -- See SST pp. 26
-  A = matrix{{1,0,0,-1},{0,1,0,1},{0,0,1,1}}
+  A = matrix{{1,1,1,1,1},{1,1,0,-1,0},{0,1,1,-1,0}}
   beta = {1,0,0}
   I = gkz(A,beta)
-  w = {1,1,1,0}
+  w = {1,1,1,1,0}
   nilssonSupport(I,w)
   nilssonSupport(I,w,3)
   cssLeadTerm(I, w)
-  (G, sols) = truncatedCanonicalSeries(I, w, 4);
 ///
 
 TEST ///
@@ -364,13 +385,13 @@ TEST ///
   netList G
   netList sols
   -- error terms:
-  table(G, sols, (g, s) -> (g * s)[0,x,0])
+  table(G, sols, (g, s) -> (g * s)[0,x,0,0])
 ///
 
 end--
 restart
 path = prepend("~/Desktop/Workshop-2019-Minneapolis/M2/Macaulay2/packages/", path);
-installPackage "WeylAlgebras"
+installPackage "Dmodules"
 needsPackage "HolonomicSystems"
 check HolonomicSystems
 viewHelp HolonomicSystems

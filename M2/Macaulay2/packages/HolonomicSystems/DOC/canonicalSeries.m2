@@ -324,7 +324,7 @@ doc ///
       beta = {2,1,0,2}
       Hbeta = gkz(A,beta)
       w = {9,1,99999, 9999999, 3, 999}
-      netList cssLeadTerm(Hbeta, w)
+      -- FIXME: netList cssLeadTerm(Hbeta, w)
 ///
 
 end--

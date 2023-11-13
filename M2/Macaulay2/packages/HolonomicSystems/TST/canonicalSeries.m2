@@ -42,3 +42,23 @@ distraction(J,S) == ideal(t_1 +t_2 +t_3+t_4 +t_5 -1, t_1 +t_2 -t_4, t_2 +t_3 -t_
 cssExptsMult(I,w) --{{4, {0, 0, 0, 0, 1}}}
 --matches Ex 2.6.4
 ///
+
+TEST ///
+restart
+debug needsPackage "HolonomicSystems"
+  W = makeWeylAlgebra(QQ[x_0,x_1])
+  I = ideal(x_0*dx_0^2 - x_1*dx_1^2 + dx_0 - dx_1, x_0*dx_0 + x_1*dx_1 - 1) -- TODO: +1 instead of -1
+  w = {-10,-17}
+  I = gbw(I, fw := -w|w)
+  netList I_*
+  G = ideal nonpositiveWeightGens(I, w);
+  netList G_*
+
+  errorDepth=2
+  --cssLeadTerm(G, w)
+
+  (G, sols) = truncatedCanonicalSeries(I, w, 10);
+  M
+  v
+  break
+///
